@@ -31,11 +31,22 @@
     </header>
 
     <main>
-      <form method="POST" action="/signin" >
+      <form id="form" method="POST" action="/signin" >
         id (whatever): <input type="text" name="id" value="" />
         password (this will be ignored): <input type="password" name="password" value="" />
         <input type="submit" value="Sign-In" />
       </form>
     </main>
+    <script>
+      const form = document.querySelector('#form');
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const data = new FormData(e.target);
+        fetch('/signin', {
+          method: 'POST',
+          body: data
+        })
+      });
+    </script>
   </body>
 </html>
