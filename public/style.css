@@ -6,7 +6,7 @@
 }
 
 body {
-  font-family: "Benton Sans", "Helvetica Neue", helvetica, arial, sans-serif;
+  font-family: Roboto, helvetica, arial, sans-serif;
   margin: 2em;
 }
 
@@ -29,7 +29,7 @@ form {
   background-color: cyan;
   display: inline-block;
   width: 100%;
-  max-width: 340px;
+  max-width: 500px;
   border-radius: 3px;
 }
 

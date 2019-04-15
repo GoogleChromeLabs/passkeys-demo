@@ -20,8 +20,9 @@ app.get('/', function(request, response) {
   response.sendFile(__dirname + '/views/index.html');
 });
 
-app.post('/login', function(request, response) {
-  // TODO: Accept sign-in as long as `id` present. Ignore `password`
+app.post('/signin', function(request, response) {
+  // TODO: If cookie contains an id (already signed in, this is reauth), let the user sign-in
+  // TODO: If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
   // TODO: If sign-in failed, return 401.
   // TODO: If sign-in succeeded, redirect to `/home`.
 });
@@ -33,14 +34,19 @@ app.get('/home', function(request, response) {
   response.sendFile(__dirname + '/views/home.html');
 });
 
-app.get('/logout', function(request, response) {
+app.get('/signout', function(request, response) {
+  // TODO: Remove cookie
+  // TODO: Redirect to `/`
   response.sendFile(__dirname + '/views/logout.html');
 });
 
 app.get('/reauth', function(request, response) {
+  // TODO: Show `/views/reauth.html`.
+  // TODO: User is supposed to enter a password (which will be ignored)
+  // TODO: When developed, do fingerprint reauth
+  // TODO: Make XHR POST to `/signin`
   response.sendFile(__dirname + '/views/reauth.html');
 });
-
 
 // listen for requests :)
 const listener = app.listen(process.env.PORT, function() {

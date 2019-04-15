@@ -26,33 +26,16 @@
   <body>
     <header>
       <h1>
-        A Dream of the Future
+        WebAuthn codelab
       </h1>
     </header>
 
     <main>
-      <p class="bold">Oh hi,</p>
-      
-      <p>Tell me your hopes and dreams:</p>
-      
-      <form>
-        <input name="dream" type="text" maxlength="100" placeholder="Dreams!" aria-labelledby="submit-dream">
-        <button type="submit" id="submit-dream">Submit Dream</button>
+      <form method="POST" action="/signin" >
+        id (whatever): <input type="text" name="id" value="" />
+        password (this will be ignored): <input type="password" name="password" value="" />
+        <input type="submit" value="Sign-In" />
       </form>
-      
-      <section class="dreams">
-        <ul id="dreams"></ul>
-      </section>
     </main>
-
-    <footer>
-      Made with <a href="https://glitch.com">Glitch</a>!
-    </footer>
-
-    <!-- include the Glitch button to show what the webpage is about and
-          to make it easier for folks to view source and remix -->
-    <div class="glitchButton" style="position:fixed;top:20px;right:20px;"></div>
-    <script src="https://button.glitch.me/button.js"></script>
-
   </body>
 </html>
