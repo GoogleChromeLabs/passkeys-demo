@@ -5,6 +5,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const hbs = require('hbs');
+const webauthn = require('./libs/webauthn');
 const multer = require('multer');
 const upload = multer();
 const app = express();
@@ -77,6 +78,8 @@ app.get('/signout', function(req, res) {
   // Redirect to `/`
   res.redirect(307, '/');
 });
+
+app.use('/webauth', webauthn);
 
 // listen for req :)
 const listener = app.listen(process.env.PORT, function() {
