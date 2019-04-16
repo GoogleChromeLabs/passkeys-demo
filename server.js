@@ -8,21 +8,19 @@ const hbs = require('hbs');
 const multer = require('multer');
 const upload = multer();
 const app = express();
+
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 app.set('views', './views');
-
-// we've started you off with Express, 
-// but feel free to use whatever libs or frameworks you'd like through `package.json`.
-
 app.use(cookieParser());
-
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
 const csrfCheck = (req, res, next) => {
-  if (req.headers.) {
+  console.log(req.header('X-Requested-With'));
+  if (req.header('X-Requested-With') === 'XMLHttpRequest') {
     res.send(400).send();
+  } else {
+    next();
   }
 };
 
@@ -38,7 +36,7 @@ app.get('/', function(req, res) {
   res.render('index.html');
 });
 
-app.post('/signin', upload.array(), function(req, res) {
+app.post('/signin', upload.array(), csrfCheck, function(req, res) {
   // If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
   if (!req.body.id) {
     // If sign-in failed, return 401.
@@ -60,8 +58,8 @@ app.get('/home', function(req, res) {
     // If user is not signed in, redirect to `/`.
     res.redirect(307, '/');
   }
-  // TODO: If user is signed in, redirect to `/reauth`.
   // `home.html` shows sign-out link
+  // TODO: When developed, allow user to register their authenticator
   res.render('home.html', {id: req.cookies.id});
 });
 
