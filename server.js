@@ -20,6 +20,12 @@ app.use(cookieParser());
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
+const csrfCheck = (req, res, next) => {
+  if (req.headers.) {
+    res.send(400).send();
+  }
+};
+
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', function(req, res) {
   // Check cookie
@@ -43,7 +49,7 @@ app.post('/signin', upload.array(), function(req, res) {
   } else {
     // If sign-in succeeded, redirect to `/home`.
     res.cookie('id', req.body.id, {
-      maxAge: 60000
+      maxAge: 30000
     });
     res.status(200).send({});
   }
