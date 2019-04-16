@@ -20,11 +20,11 @@ const _fetch = async (path, payload = '') => {
       // Server authentication succeeded
       return res.json();
     } else {
-      const text = await res.text();
       // Server authentication failed
-      throw text;
+      const result = await res.json();
+      throw result.error;
     }
   } catch (e) {
-    return Promise.reject(e);
+    return Promise.reject({error: e});
   }
 }

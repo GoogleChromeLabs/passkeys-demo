@@ -27,12 +27,16 @@ app.get('/', function(req, res) {
 });
 
 app.post('/signin', upload.array(), function(req, res) {
-  // TODO: If cookie contains an id (already signed in, this is reauth), let the user sign-in
-  // TODO: If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
-  // TODO: If sign-in failed, return 401.
-  // TODO: If sign-in succeeded, redirect to `/home`.
-  if (req.body.id) {
-    res.status(200);
+  // If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
+  if (!req.body.id) {
+    // If sign-in failed, return 401.
+    res.status(401).send({
+      error: 'invalid id'
+    });
+  // If cookie contains an id (already signed in, this is reauth), let the user sign-in
+  } else {
+    // If sign-in succeeded, redirect to `/home`.
+    res.status(200).send({});
   }
 });
 

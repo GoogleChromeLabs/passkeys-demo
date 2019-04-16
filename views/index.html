@@ -41,7 +41,11 @@
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
-        _fetch('/signin', new FormData(e.target));
+        _fetch('/signin', new FormData(e.target)).then(e => {
+          location.href = '/home';
+        }).catch(e => {
+          alert(e.error);
+        });        
       });
     </script>
   </body>
