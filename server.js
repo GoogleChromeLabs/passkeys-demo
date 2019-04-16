@@ -22,14 +22,13 @@ app.use(express.static('public'));
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', function(req, res) {
+  // Check cookie
   if (req.cookies.id) {
+    // If user is signed in, redirect to `/reauth`.
     res.redirect(307, '/reauth');
     return;
   }
-  // TODO: Check cookie
-  // TODO: If user is not signed in, show `index.html` with id/password form.
-  // TODO: If user is signed in, redirect to `/reauth`.
-  // TODO: `index.html` shows id/password field along with "sign in" button.
+  // If user is not signed in, show `index.html` with id/password form.
   res.render('index.html');
 });
 
@@ -43,23 +42,21 @@ app.post('/signin', upload.array(), function(req, res) {
   // If cookie contains an id (already signed in, this is reauth), let the user sign-in
   } else {
     // If sign-in succeeded, redirect to `/home`.
-    res.cookie('id', req.body.id);
+    res.cookie('id', req.body.id, {
+      maxAge: 60000
+    });
     res.status(200).send({});
   }
 });
 
 app.get('/home', function(req, res) {
-  // TODO: If user is not signed in, redirect to `/`.
+  if (!req.cookies.id) {
+    // If user is not signed in, redirect to `/`.
+    res.redirect(307, '/');
+  }
   // TODO: If user is signed in, redirect to `/reauth`.
-  // TODO: `home.html` shows sign-out link
+  // `home.html` shows sign-out link
   res.render('home.html', {id: req.cookies.id});
-});
-
-app.get('/signout', function(req, res) {
-  // TODO: Remove cookie
-  // TODO: Redirect to `/`
-  
-  res.render('logout.html');
 });
 
 app.get('/reauth', function(req, res) {
@@ -68,6 +65,13 @@ app.get('/reauth', function(req, res) {
   // Make XHR POST to `/signin`
   // TODO: When developed, do fingerprint reauth
   res.render('reauth.html', {id: req.cookies.id});
+});
+
+app.get('/signout', function(req, res) {
+  // Remove cookie
+  res.clearCookie('id');
+  // Redirect to `/`
+  res.redirect(307, '/');
 });
 
 // listen for req :)
