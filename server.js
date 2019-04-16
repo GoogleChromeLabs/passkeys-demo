@@ -17,7 +17,7 @@ app.use(express.static('public'));
 
 const csrfCheck = (req, res, next) => {
   console.log(req.header('X-Requested-With'));
-  if (req.header('X-Requested-With') === 'XMLHttpRequest') {
+  if (req.header('X-Requested-With') != 'XMLHttpRequest') {
     res.send(400).send();
   } else {
     next();
