@@ -5,9 +5,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const hbs = require('hbs');
-const webauthn = require('./libs/webauthn');
-const multer = require('multer');
-const upload = multer();
+const auth = require('./libs/auth');
 const app = express();
 
 app.set('view engine', 'html');
@@ -15,15 +13,6 @@ app.engine('html', hbs.__express);
 app.set('views', './views');
 app.use(cookieParser());
 app.use(express.static('public'));
-
-const csrfCheck = (req, res, next) => {
-  console.log(req.header('X-Requested-With'));
-  if (req.header('X-Requested-With') != 'XMLHttpRequest') {
-    res.send(400).send();
-  } else {
-    next();
-  }
-};
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', function(req, res) {
@@ -35,23 +24,6 @@ app.get('/', function(req, res) {
   }
   // If user is not signed in, show `index.html` with id/password form.
   res.render('index.html');
-});
-
-app.post('/signin', upload.array(), csrfCheck, function(req, res) {
-  // If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
-  if (!req.body.id) {
-    // If sign-in failed, return 401.
-    res.status(401).send({
-      error: 'invalid id'
-    });
-  // If cookie contains an id (already signed in, this is reauth), let the user sign-in
-  } else {
-    // If sign-in succeeded, redirect to `/home`.
-    res.cookie('id', req.body.id, {
-      maxAge: 30000
-    });
-    res.status(200).send({});
-  }
 });
 
 app.get('/home', function(req, res) {
@@ -79,7 +51,7 @@ app.get('/signout', function(req, res) {
   res.redirect(307, '/');
 });
 
-app.use('/webauth', webauthn);
+app.use('/auth', auth);
 
 // listen for req :)
 const listener = app.listen(process.env.PORT, function() {

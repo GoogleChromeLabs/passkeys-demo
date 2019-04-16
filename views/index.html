@@ -31,7 +31,7 @@
     </header>
 
     <main>
-      <form id="form" method="POST" action="/signin" >
+      <form id="form" method="POST" action="/auth/signin" >
         id (whatever): <input type="text" name="id" value="" />
         password (this will be ignored): <input type="password" name="password" value="" />
         <input type="submit" value="Sign-In" />
@@ -41,7 +41,7 @@
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
-        _fetch('/signin', new FormData(e.target)).then(e => {
+        _fetch('/auth/signin', new FormData(e.target)).then(e => {
           location.href = '/home';
         }).catch(e => {
           alert(e.error);
