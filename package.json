@@ -12,7 +12,8 @@
   "dependencies": {
     "express": "^4.16.4",
     "hbs": "^4.0.4",
-    "multer": "^1.4.1"
+    "multer": "^1.4.1",
+    "cookie-parser": "^1.4.4"
   },
   "engines": {
     "node": "8.x"

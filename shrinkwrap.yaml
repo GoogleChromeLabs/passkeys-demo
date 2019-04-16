@@ -1,4 +1,5 @@
 dependencies:
+  cookie-parser: 1.4.4
   express: 4.16.4
   hbs: 4.0.4
   multer: 1.4.1
@@ -90,6 +91,15 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
+  /cookie-parser/1.4.4:
+    dependencies:
+      cookie: 0.3.1
+      cookie-signature: 1.0.6
+    dev: false
+    engines:
+      node: '>= 0.8.0'
+    resolution:
+      integrity: sha512-lo13tqF3JEtFO7FyA49CqbhaFkskRJ0u/UAiINgrIXeRCY41c88/zxtrECl8AKH3B0hj9q10+h3Kt8I7KlW4tw==
   /cookie-signature/1.0.6:
     dev: false
     resolution:
@@ -587,6 +597,7 @@ registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
 specifiers:
+  cookie-parser: ^1.4.4
   express: ^4.16.4
   hbs: ^4.0.4
   multer: ^1.4.1

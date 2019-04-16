@@ -3,6 +3,7 @@
 
 // init project
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const hbs = require('hbs');
 const multer = require('multer');
 const upload = multer();
@@ -13,6 +14,8 @@ app.set('views', './views');
 
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
+
+app.use(cookieParser());
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
@@ -44,7 +47,7 @@ app.get('/home', function(req, res) {
   // TODO: If user is not signed in, redirect to `/`.
   // TODO: If user is signed in, redirect to `/reauth`.
   // TODO: `home.html` shows sign-out link
-  res.render('home.html');
+  res.render('home.html', {id: id});
 });
 
 app.get('/signout', function(req, res) {
