@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "express": "^4.16.4",
-    "hbs": "^4.0.4"
+    "hbs": "^4.0.4",
+    "multer": "^1.4.1"
   },
   "engines": {
     "node": "8.x"
