@@ -22,6 +22,10 @@ app.use(express.static('public'));
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', function(req, res) {
+  if (req.cookies.id) {
+    res.redirect(307, '/reauth');
+    return;
+  }
   // TODO: Check cookie
   // TODO: If user is not signed in, show `index.html` with id/password form.
   // TODO: If user is signed in, redirect to `/reauth`.
@@ -39,6 +43,7 @@ app.post('/signin', upload.array(), function(req, res) {
   // If cookie contains an id (already signed in, this is reauth), let the user sign-in
   } else {
     // If sign-in succeeded, redirect to `/home`.
+    res.cookie('id', req.body.id);
     res.status(200).send({});
   }
 });
@@ -47,21 +52,22 @@ app.get('/home', function(req, res) {
   // TODO: If user is not signed in, redirect to `/`.
   // TODO: If user is signed in, redirect to `/reauth`.
   // TODO: `home.html` shows sign-out link
-  res.render('home.html', {id: id});
+  res.render('home.html', {id: req.cookies.id});
 });
 
 app.get('/signout', function(req, res) {
   // TODO: Remove cookie
   // TODO: Redirect to `/`
+  
   res.render('logout.html');
 });
 
 app.get('/reauth', function(req, res) {
-  // TODO: Show `reauth.html`.
-  // TODO: User is supposed to enter a password (which will be ignored)
+  // Show `reauth.html`.
+  // User is supposed to enter a password (which will be ignored)
+  // Make XHR POST to `/signin`
   // TODO: When developed, do fingerprint reauth
-  // TODO: Make XHR POST to `/signin`
-  res.render('reauth.html');
+  res.render('reauth.html', {id: req.cookies.id});
 });
 
 // listen for req :)
