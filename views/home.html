@@ -43,11 +43,14 @@
       </p>
     </main>
     <script>
+      _fetch('/auth/getKey').then(res => {
+        
+      });
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
         _fetch('/auth/putKey', new FormData(e.target))
-        .then(async (res) => {
+        .then(res => {
           console.log(res.credential);
         })
         .catch(e => {
