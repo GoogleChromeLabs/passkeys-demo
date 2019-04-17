@@ -46,10 +46,16 @@
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
-        _fetch('/auth/signin', new FormData(e.target)).then(e => {
-          location.href = '/home';
-        }).catch(e => {
-          alert(e.error);
+        _fetch('/auth/putKey', new FormData(e.target))
+        .then(async (res) => {
+          console.log(res.credential);
+        })
+        .catch(e => {
+          if (e) {
+            alert(e.error);
+          } else {
+            alert('Unkown error.');
+          }
         });        
       });
     </script>
