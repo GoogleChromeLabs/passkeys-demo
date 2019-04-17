@@ -51,12 +51,20 @@
       </p>
     </main>
     <script>
+      import html from 'lit-html';
+
       const getCredential = () => {
         _fetch('/auth/getKey').then(res => {
           const list = document.querySelector('#list');
-          list.textContent = '';
-          const li = html;
-          list.appendChild(li);
+          if (res & res.credential) {
+            list.textContent = '';
+            const li = html`<li>${res.credential}</li>`;
+            // const li = document.createElement('li');
+            // li.textContent = res.credential;
+            list.appendChild(li);
+          } else {
+            list.textContent = 'None';
+          }
         });
       }
       const form = document.querySelector('#form');

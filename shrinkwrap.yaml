@@ -2,6 +2,7 @@ dependencies:
   cookie-parser: 1.4.4
   express: 4.16.4
   hbs: 4.0.4
+  lit-html: 1.0.0
   lowdb: 1.0.0
   multer: 1.4.1
 packages:
@@ -294,6 +295,10 @@ packages:
     dev: false
     resolution:
       integrity: sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE=
+  /lit-html/1.0.0:
+    dev: false
+    resolution:
+      integrity: sha512-oeWlpLmBW3gFl7979Wol2LKITpmKTUFNn7PnFbh6YNynF61W74l6x5WhwItAwPRSATpexaX1egNnRzlN4GOtfQ==
   /lodash/4.17.11:
     dev: false
     resolution:
@@ -633,5 +638,6 @@ specifiers:
   cookie-parser: ^1.4.4
   express: ^4.16.4
   hbs: ^4.0.4
+  lit-html: ^1.0.0
   lowdb: ^1.0.0
   multer: ^1.4.1
