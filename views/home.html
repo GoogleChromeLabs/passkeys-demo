@@ -35,7 +35,7 @@
         Welcome, {{id}}!
       </h2>
       <h3>
-        Your registered credentials:
+        Your registered credential:
       </h3>
       <ul id="list">
       </ul>
@@ -43,7 +43,7 @@
         Register a new credential:
       </h3>
       <form id="form" method="POST" action="/auth/putKey" >
-        credential: <input type="text" name="credential" value="" />
+        Dummy text credential: <input type="text" name="credential" value="" />
         <input type="submit" value="Register a new key" />
       </form>
       <p>
@@ -57,20 +57,31 @@
         _fetch('/auth/getKey').then(res => {
           const list = document.querySelector('#list');
           if (res && res.credential) {
-            list.textContent = '';
             const li = html`<li>${res.credential}
-              <button id="${res.credential}" @click=${(e) => {
-                _fetch('/auth/removeKey', ).then
-              }} value="Remove"/>
+              <button id="${res.credential}" @click=${removeCredential}>Remove</button>
             </li>`;
-            // const li = document.createElement('li');
-            // li.textContent = res.credential;
             render(li, list);
           } else {
-            list.textContent = 'None';
+            const li = html`<li>Register a new credential
+              <button id="${res.credential}" @click=${removeCredential}>Remove</button>
+            </li>`;
+            render(li, list);
           }
         });
       }
+      const removeCredential = e => {
+        return _fetch('/auth/removeKey')
+        .then(e => {
+          getCredential();
+        })
+        .catch(e => {
+          if (e) {
+            alert(e.error);
+          } else {
+            alert('Unkown error.');
+          }
+        });
+      };
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
