@@ -15,7 +15,7 @@ db.defaults({
 const csrfCheck = (req, res, next) => {
   console.log(req.header('X-Requested-With'));
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
-    res.send(400).send();
+    res.status(400).json({error: 'invalid access.'});
   } else {
     next();
   }
@@ -25,27 +25,52 @@ router.post('/signin', upload.array(), csrfCheck, (req, res) => {
   // If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
   if (!req.body.id) {
     // If sign-in failed, return 401.
-    res.status(401).send({
-      error: 'invalid id'
-    });
+    res.status(400).json({error: 'invalid id.'});
   // If cookie contains an id (already signed in, this is reauth), let the user sign-in
   } else {
     // If sign-in succeeded, redirect to `/home`.
     res.cookie('id', req.body.id);
-    res.status(200).send({});
+    res.status(200).json({});
   }
 });
 
-router.post('/keys', upload.array(), csrfCheck, (req, res) => {
-  const id = db.get('users')
-    .find({ id: req.cookie.id })
+// For tests
+router.post('/putKey', upload.array(), csrfCheck, (req, res) => {
+  if (!req.cookies.id) {
+    res.status(400).json({error: 'not signed in.'});
+    return;
+  }
+  const stab = {
+    id: req.cookies.id,
+    credential: 'deadbeef'
+  };
+  db.get('users')
+    .push(stab)
+    .write();
+  res.json(stab);
+});
+
+router.post('/getKey', upload.array(), csrfCheck, (req, res) => {
+  if (!req.cookies.id) {
+    res.status(400).json({error: 'not signed in.'});
+    return;
+  }
+  const user = db.get('users')
+    .find({ id: req.cookies.id })
     .value();
+  res.json(user);
 });
 
 router.post('/removeKey', upload.array(), csrfCheck, (req, res) => {
+  if (!req.cookies.id) {
+    rres.status(400).json({error: 'not signed in.'});
+    return;
+  }
   db.get('users')
-    .push({ firstName: request.query.fName, lastName: request.query.lName })
-    .write()
+    .find({ id: req.cookies.id })
+    .remove()
+    .write();
+  res.json({});
 });
 
 router.post('/makeCred', upload.array(), csrfCheck, (req, res) => {
