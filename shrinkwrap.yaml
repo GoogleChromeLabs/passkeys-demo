@@ -2,6 +2,7 @@ dependencies:
   cookie-parser: 1.4.4
   express: 4.16.4
   hbs: 4.0.4
+  lowdb: 1.0.0
   multer: 1.4.1
 packages:
   /accepts/1.3.5:
@@ -226,6 +227,10 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=
+  /graceful-fs/4.1.15:
+    dev: false
+    resolution:
+      integrity: sha512-6uHUhOPEBgQ24HM+r6b/QwWfZq+yiFcipKFrOFiBEnWdy5sdzYoi+pJeQaPI5qOLRFqWmAXUPQNsielzdLoecA==
   /handlebars/4.0.14:
     dependencies:
       async: 2.6.2
@@ -277,6 +282,10 @@ packages:
       node: '>= 0.10'
     resolution:
       integrity: sha1-6qM9bd16zo9/b+DJygRA5wZzix4=
+  /is-promise/2.1.0:
+    dev: false
+    resolution:
+      integrity: sha1-eaKp7OfwlugPNtKy87wWwf9L8/o=
   /isarray/0.0.1:
     dev: false
     resolution:
@@ -289,6 +298,18 @@ packages:
     dev: false
     resolution:
       integrity: sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
+  /lowdb/1.0.0:
+    dependencies:
+      graceful-fs: 4.1.15
+      is-promise: 2.1.0
+      lodash: 4.17.11
+      pify: 3.0.0
+      steno: 0.4.4
+    dev: false
+    engines:
+      node: '>=4'
+    resolution:
+      integrity: sha512-2+x8esE/Wb9SQ1F9IHaYWfsC9FIecLOPrK4g17FGEayjUWH172H6nwicRovGvSE2CPZouc2MCIqCI7h9d+GftQ==
   /media-typer/0.3.0:
     dev: false
     engines:
@@ -395,6 +416,12 @@ packages:
     dev: false
     resolution:
       integrity: sha1-32BBeABfUi8V60SQ5yR6G/qmf4w=
+  /pify/3.0.0:
+    dev: false
+    engines:
+      node: '>=4'
+    resolution:
+      integrity: sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY=
   /process-nextick-args/2.0.0:
     dev: false
     resolution:
@@ -513,6 +540,12 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
+  /steno/0.4.4:
+    dependencies:
+      graceful-fs: 4.1.15
+    dev: false
+    resolution:
+      integrity: sha1-BxEFvfwobmYVwEA8J+nXtdy4Vcs=
   /streamsearch/0.1.2:
     dev: false
     engines:
@@ -600,4 +633,5 @@ specifiers:
   cookie-parser: ^1.4.4
   express: ^4.16.4
   hbs: ^4.0.4
+  lowdb: ^1.0.0
   multer: ^1.4.1

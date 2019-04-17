@@ -3,6 +3,15 @@ const router = express.Router();
 const multer = require('multer');
 const upload = multer();
 
+const low = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
+const adapter = new FileSync('.data/db.json');
+const db = low(adapter);
+
+db.defaults({
+  users: []
+}).write();
+
 const csrfCheck = (req, res, next) => {
   console.log(req.header('X-Requested-With'));
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
