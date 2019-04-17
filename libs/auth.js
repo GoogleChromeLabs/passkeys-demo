@@ -21,7 +21,7 @@ const csrfCheck = (req, res, next) => {
   }
 };
 
-router.post('/signin', upload.array(), csrfCheck, function(req, res) {
+router.post('/signin', upload.array(), csrfCheck, (req, res) => {
   // If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
   if (!req.body.id) {
     // If sign-in failed, return 401.
@@ -34,6 +34,30 @@ router.post('/signin', upload.array(), csrfCheck, function(req, res) {
     res.cookie('id', req.body.id);
     res.status(200).send({});
   }
+});
+
+router.post('/keys', upload.array(), csrfCheck, (req, res) => {
+  const id = db.get('users')
+    .find({ id: req.cookie.id })
+    .value();
+});
+
+router.post('/removeKey', upload.array(), csrfCheck, (req, res) => {
+  db.get('users')
+    .push({ firstName: request.query.fName, lastName: request.query.lName })
+    .write()
+});
+
+router.post('/makeCred', upload.array(), csrfCheck, (req, res) => {
+});
+
+router.post('/regCred', upload.array(), csrfCheck, (req, res) => {
+});
+
+router.post('/getAsst', upload.array(), csrfCheck, (req, res) => {
+});
+
+router.post('/authAsst', upload.array(), csrfCheck, (req, res) => {
 });
 
 module.exports = router;
