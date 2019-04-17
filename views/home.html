@@ -58,7 +58,11 @@
           const list = document.querySelector('#list');
           if (res && res.credential) {
             list.textContent = '';
-            const li = html`<li>${res.credential}</li>`;
+            const li = html`<li>${res.credential}
+              <button id="${res.credential}" @click=${(e) => {
+                _fetch('/auth/removeKey', ).then
+              }} value="Remove"/>
+            </li>`;
             // const li = document.createElement('li');
             // li.textContent = res.credential;
             render(li, list);
