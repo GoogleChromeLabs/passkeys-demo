@@ -34,11 +34,24 @@
       <h2>
         Welcome, {{id}}!
       </h2>
+      <form id="form" method="POST" action="/auth/putKey" >
+        credential: <input type="text" name="credential" value="" />
+        <input type="submit" value="Register a new key" />
+      </form>
       <p>
         <a href="/signout">Sign out</a>
       </p>
     </main>
     <script>
+      const form = document.querySelector('#form');
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        _fetch('/auth/signin', new FormData(e.target)).then(e => {
+          location.href = '/home';
+        }).catch(e => {
+          alert(e.error);
+        });        
+      });
     </script>
   </body>
 </html>

@@ -12,16 +12,21 @@ db.defaults({
   users: []
 }).write();
 
-const csrfCheck = (req, res, next) => {
-  console.log(req.header('X-Requested-With'));
+const sessionCheck = (req, res, next) => {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
     res.status(400).json({error: 'invalid access.'});
-  } else {
-    next();
   }
+  if (!req.cookies.id) {
+    res.status(400).json({error: 'not signed in.'});
+    return;
+  }
+  next();
 };
 
-router.post('/signin', upload.array(), csrfCheck, (req, res) => {
+router.post('/signin', upload.array(), (req, res) => {
+  if (req.header('X-Requested-With') != 'XMLHttpRequest') {
+    res.status(400).json({error: 'invalid access.'});
+  }
   // If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
   if (!req.body.id) {
     // If sign-in failed, return 401.
@@ -35,14 +40,13 @@ router.post('/signin', upload.array(), csrfCheck, (req, res) => {
 });
 
 // For tests
-router.post('/putKey', upload.array(), csrfCheck, (req, res) => {
-  if (!req.cookies.id) {
-    res.status(400).json({error: 'not signed in.'});
-    return;
+router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
+  if (!req.body.credential) {
+    res.status(400).json({ error: 'invalid request' });
   }
   const stab = {
     id: req.cookies.id,
-    credential: 'deadbeef'
+    credential: req.body.credential
   };
   db.get('users')
     .push(stab)
@@ -50,22 +54,14 @@ router.post('/putKey', upload.array(), csrfCheck, (req, res) => {
   res.json(stab);
 });
 
-router.post('/getKey', upload.array(), csrfCheck, (req, res) => {
-  if (!req.cookies.id) {
-    res.status(400).json({error: 'not signed in.'});
-    return;
-  }
+router.post('/getKey', upload.array(), sessionCheck, (req, res) => {
   const user = db.get('users')
     .find({ id: req.cookies.id })
     .value();
   res.json(user);
 });
 
-router.post('/removeKey', upload.array(), csrfCheck, (req, res) => {
-  if (!req.cookies.id) {
-    rres.status(400).json({error: 'not signed in.'});
-    return;
-  }
+router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
   db.get('users')
     .find({ id: req.cookies.id })
     .remove()
@@ -73,16 +69,16 @@ router.post('/removeKey', upload.array(), csrfCheck, (req, res) => {
   res.json({});
 });
 
-router.post('/makeCred', upload.array(), csrfCheck, (req, res) => {
+router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
 });
 
-router.post('/regCred', upload.array(), csrfCheck, (req, res) => {
+router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
 });
 
-router.post('/getAsst', upload.array(), csrfCheck, (req, res) => {
+router.post('/getAsst', upload.array(), sessionCheck, (req, res) => {
 });
 
-router.post('/authAsst', upload.array(), csrfCheck, (req, res) => {
+router.post('/authAsst', upload.array(), sessionCheck, (req, res) => {
 });
 
 module.exports = router;
