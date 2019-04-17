@@ -22,7 +22,6 @@
     
     <!-- import the webpage's client-side javascript file -->
     <script src="/client.js"></script>
-    <script src="https://unpkg.com/lit-html@1.0.0/lit-html.js"></script>
   </head>
   <body>
     <header>
@@ -51,16 +50,18 @@
         <a href="/signout">Sign out</a>
       </p>
     </main>
-    <script>
+    <script type="module">
+      import { html, render } from "https://unpkg.com/lit-html@1.0.0/lit-html.js?module";
+
       const getCredential = () => {
         _fetch('/auth/getKey').then(res => {
           const list = document.querySelector('#list');
-          if (res & res.credential) {
+          if (res && res.credential) {
             list.textContent = '';
             const li = html`<li>${res.credential}</li>`;
             // const li = document.createElement('li');
             // li.textContent = res.credential;
-            list.appendChild(li);
+            render(li, list);
           } else {
             list.textContent = 'None';
           }
