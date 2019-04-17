@@ -56,19 +56,21 @@
       const getCredential = () => {
         _fetch('/auth/getKey').then(res => {
           const list = document.querySelector('#list');
-          if (res && res.credential) {
-            const li = html`<li>${res.credential}
+          html`${res && res.credential ?
+            html`<li>${res.credential}
               <button id="${res.credential}" @click=${removeCredential}>Remove</button>
-            </li>`;
-            render(li, list);
-          } else {
-            const li = html`<li>Register a new credential
-              <button id="${res.credential}" @click=${removeCredential}>Remove</button>
-            </li>`;
-            render(li, list);
+            </li>` :
+            html`<li>None: 
+              <button @click=${makeCredential}>Register a new credential</button>
+            </li>`
+          }`
+          render(li, list);
           }
         });
       }
+      const makeCredential = e => {
+        return;
+      };
       const removeCredential = e => {
         return _fetch('/auth/removeKey')
         .then(e => {
@@ -87,7 +89,7 @@
         e.preventDefault();
         _fetch('/auth/putKey', new FormData(e.target))
         .then(res => {
-          console.log(res.credential);
+          getCredential();
         })
         .catch(e => {
           if (e) {

@@ -58,13 +58,12 @@ router.post('/getKey', upload.array(), sessionCheck, (req, res) => {
   const user = db.get('users')
     .find({ id: req.cookies.id })
     .value();
-  res.json(user);
+  res.json(user || {});
 });
 
 router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
   db.get('users')
-    .find({ id: req.cookies.id })
-    .remove()
+    .remove({ id: req.cookies.id })
     .write();
   res.json({});
 });
