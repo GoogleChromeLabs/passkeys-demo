@@ -131,6 +131,18 @@ router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
 
 /**
  * Register user credential.
+ * Input format:
+ * ```{
+     id: String,
+     type: 'public-key',
+     rawId: String,
+     response: {
+       clientDataJSON: String,
+       attestationObject: String,
+       signature: String,
+       userHandle: String
+     }
+ * }```
  **/
 router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
   // Replace this `stab` with proper credential info to store
