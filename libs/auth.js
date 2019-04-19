@@ -158,6 +158,21 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
   res.json(stab);
 });
 
+/**
+ * Respond with required information to call navigator.credential.get()
+ * Input is passed via `req.body` with similar format as output
+ * Output format:
+ * ```{
+ 
+     challenge: String,
+     userVerification: ('required'|'preferred'|'discouraged'),
+     allowCredentials: [{
+       id: String,
+       type: 'public-key',
+       transports: [('ble'|'nfc'|'usb'|'internal'), ...]
+     }, ...]
+ * }```
+ **/
 router.post('/getAsst', upload.array(), sessionCheck, (req, res) => {
 });
 
