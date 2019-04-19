@@ -68,6 +68,26 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
   res.json({});
 });
 
+/**
+ * Fetch required information before calling navigator.credential.create()
+ * Return in format like:
+ * {
+   rp: {
+     id: String,
+     name: String
+   },
+   user: {
+     displayName: String,
+     id: String,
+     name: String
+   },
+   publicKeyCredParams: [{  // @herrjemand
+     type: 'public-key', alg: -7
+   }],
+   timeout: Number,
+   challenge: 
+ * }
+ **/
 router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
 });
 
