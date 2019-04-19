@@ -177,7 +177,7 @@ router.post('/getAsst', upload.array(), sessionCheck, (req, res) => {
 });
 
 /**
- * Authenticate user.
+ * Authenticate the user.
  * Input format:
  * ```{
      id: String,
