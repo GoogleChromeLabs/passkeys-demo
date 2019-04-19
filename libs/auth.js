@@ -85,7 +85,18 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
      type: 'public-key', alg: -7
    }],
    timeout: Number,
-   challenge: 
+   challenge: String,
+   excludeCredentials: [{
+     id: String,
+     type: 'public-key',
+     transports: [('ble'|'nfc'|'usb'|'internal'),...]
+   }, ...],
+   authenticatorSelection: {
+     authenticatorAttachment: '',
+     requireResidentKey: '',
+     userVerification: ''
+   },
+   attestation: ''
  * }
  **/
 router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
