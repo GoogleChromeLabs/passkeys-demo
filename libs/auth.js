@@ -151,6 +151,7 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
     credential: req.body.credential
   };
   // Store user info
+  // TODO: This only adds new entry. Figure out ways to update existing entry.
   db.get('users')
     .push(stab)
     .write();
@@ -163,7 +164,6 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
  * Input is passed via `req.body` with similar format as output
  * Output format:
  * ```{
- 
      challenge: String,
      userVerification: ('required'|'preferred'|'discouraged'),
      allowCredentials: [{
@@ -176,6 +176,21 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
 router.post('/getAsst', upload.array(), sessionCheck, (req, res) => {
 });
 
+/**
+ * Authenticate user.
+ * Input format:
+ * ```{
+     id: String,
+     type: 'public-key',
+     rawId: String,
+     response: {
+       clientDataJSON: String,
+       authenticatorData: String,
+       signature: String,
+       userHandle: String
+     }
+ * }```
+ **/
 router.post('/authAsst', upload.array(), sessionCheck, (req, res) => {
   // Query the user
   const user = db.get('users')
