@@ -12,6 +12,10 @@ db.defaults({
   users: []
 }).write();
 
+/**
+ * Checks CSRF protection using custom header `X-Requested-With`
+ * If cookie doesn't contain `id`, consider 
+ **/
 const sessionCheck = (req, res, next) => {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
     res.status(400).json({error: 'invalid access.'});
@@ -23,6 +27,11 @@ const sessionCheck = (req, res, next) => {
   next();
 };
 
+/**
+ * Verifies user credential and let the user sign-in.
+ * No preceding registration required.
+ * This only checks if `id` is not empty string and ignores the password.
+ **/
 router.post('/signin', upload.array(), (req, res) => {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
     res.status(400).json({error: 'invalid access.'});
@@ -39,7 +48,7 @@ router.post('/signin', upload.array(), (req, res) => {
   }
 });
 
-// For tests
+// For test purposes
 router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
   if (!req.body.credential) {
     res.status(400).json({ error: 'invalid request' });
@@ -54,6 +63,15 @@ router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
   res.json(stab);
 });
 
+/**
+ * Returns a credential id
+ * (This server only stores one key per user id.)
+ * Response format:
+ * ```{
+ *   id: String,
+ *   credential: String
+ * }```
+ **/
 router.post('/getKey', upload.array(), sessionCheck, (req, res) => {
   const user = db.get('users')
     .find({ id: req.cookies.id })
@@ -61,6 +79,10 @@ router.post('/getKey', upload.array(), sessionCheck, (req, res) => {
   res.json(user || {});
 });
 
+/**
+ * Removes a credential id attached to the user
+ * Responds with empty JSON `{}`
+ **/
 router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
   db.get('users')
     .remove({ id: req.cookies.id })
@@ -70,34 +92,35 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
 
 /**
  * Fetch required information before calling navigator.credential.create()
- * Return in format like:
- * {
-   rp: {
-     id: String,
-     name: String
-   },
-   user: {
-     displayName: String,
-     id: String,
-     name: String
-   },
-   publicKeyCredParams: [{  // @herrjemand
-     type: 'public-key', alg: -7
-   }],
-   timeout: Number,
-   challenge: String,
-   excludeCredentials: [{
-     id: String,
-     type: 'public-key',
-     transports: [('ble'|'nfc'|'usb'|'internal'),...]
-   }, ...],
-   authenticatorSelection: {
-     authenticatorAttachment: '',
-     requireResidentKey: '',
-     userVerification: ''
-   },
-   attestation: ''
- * }
+ * Input is passed via `req.body` with similar format as output
+ * Output format:
+ * ```{
+     rp: {
+       id: String,
+       name: String
+     },
+     user: {
+       displayName: String,
+       id: String,
+       name: String
+     },
+     publicKeyCredParams: [{  // @herrjemand
+       type: 'public-key', alg: -7
+     }],
+     timeout: Number,
+     challenge: String,
+     excludeCredentials: [{
+       id: String,
+       type: 'public-key',
+       transports: [('ble'|'nfc'|'usb'|'internal'), ...]
+     }, ...],
+     authenticatorSelection: {
+       authenticatorAttachment: ('platform'|'cross-platform'),
+       requireResidentKey: Boolean,
+       userVerification: ('required'|'preferred'|'discouraged')
+     },
+     attestation: ('none'|'indirect'|'direct')
+ * }```
  **/
 router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
 });
