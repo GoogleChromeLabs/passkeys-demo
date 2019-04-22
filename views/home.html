@@ -19,7 +19,7 @@
 
     <!-- import the webpage's stylesheet -->
     <link rel="stylesheet" href="/style.css">
-    <script src="https://unpkg.com/base64url@3.0.1/dist/base64url.js"></script>
+    <script src="/base64url-arraybuffer.js"></script>
   </head>
   <body>
     <header>
@@ -69,12 +69,12 @@
       const makeCredential = async () => {
         const user = await registerCredential({
           authenticatorSelection: {
-            authenticatorAttachment: 'platform'
+            authenticatorAttachment: 'platform',
             userVerification: 'required'
           }
         });
         console.log(user);
-        return;
+        return user;
       };
       const removeCredential = e => {
         return _fetch('/auth/removeKey')
@@ -92,8 +92,8 @@
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
-        _fetch('/auth/putKey', new FormData(e.target))
-        .then(res => {
+        makeCredential()
+        .then(() => {
           getCredential();
         })
         .catch(e => {
