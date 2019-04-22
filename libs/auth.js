@@ -155,7 +155,7 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
      attestation: ('none'|'indirect'|'direct')
  * }```
  **/
-router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
+router.post('/makeCred', sessionCheck, (req, res) => {
   const user = db.get('users')
     .find({ id: req.cookies.id })
     .value();
@@ -175,7 +175,7 @@ router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
   }];
   response.timeout = (req.body && req.body.timeout) || 1000 * 30;
   response.challenge = base64url(crypto.randomBytes(32));
-  req.cookie.set('challenge', response.challenge);
+  res.cookie('challenge', response.challenge);
 
   // Only specify `excludeCredentials` when reauthFlag is `false`
   if (user && !user.credential) {
