@@ -50,7 +50,7 @@ export const registerCredential = async (opts) => {
 
     const parsedCred = await this._encodeAuthenticatorAttestationResponse(cred);
 
-    return await this._fetch(`${WEBAUTHN_REGCRED}`, parsedCred);
+    return await this._fetch('/auth/regCred' , parsedCred);
 
   } catch (e) {
     console.error(e);
