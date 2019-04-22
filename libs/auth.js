@@ -241,7 +241,7 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
 
   try {
     const challenge = req.cookies.challenge;
-    const origin = `${req.protocol}://${req.get('host')}`;
+    const origin = `https://${req.get('host')}`; // TODO: Temporary work around for scheme
     const response = verifyCredential(credential, challenge, origin);
 
     switch (response.fmt) {

@@ -73,8 +73,11 @@
             userVerification: 'required'
           }
         });
-        console.log(user);
-        return user;
+        if (user) {
+          getCredential();
+        } else {
+          alert('Error registering your key');
+        }
       };
       const removeCredential = e => {
         return _fetch('/auth/removeKey')
@@ -92,7 +95,7 @@
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
-        makeCredential()
+        _fetch('/auth/putKey', new FormData(e.target))
         .then(() => {
           getCredential();
         })
