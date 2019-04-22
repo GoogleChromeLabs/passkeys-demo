@@ -1,4 +1,4 @@
-import { base64url } from 'https://unpkg.com/base64url@3.0.1/index.js?module';
+import { base64url } from 'https://unpkg.com/base64url@3.0.1/dist/base64url.js?module';
 
 export const _fetch = async (path, payload = '') => {
   const headers = {
