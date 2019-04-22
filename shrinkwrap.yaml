@@ -1,4 +1,5 @@
 dependencies:
+  base64url: 3.0.1
   cookie-parser: 1.4.4
   crypto: 1.0.1
   express: 4.16.4
@@ -30,6 +31,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-H1qVYh1MYhEEFLsP97cVKqCGo7KfCyTt6uEWqsTBr9SO84oK9Uwbyd/yCW+6rKJLHksBNUVWZDAjfS+Ccx0Bbg==
+  /base64url/3.0.1:
+    dev: false
+    engines:
+      node: '>=6.0.0'
+    resolution:
+      integrity: sha512-ir1UPr3dkwexU7FdV8qBBbNDRUhMmIekYMFZfi+C/sLNnRESKPl23nB9b2pltqfOQNnGzsDdId90AEtG5tCx4A==
   /body-parser/1.18.3:
     dependencies:
       bytes: 3.0.0
@@ -641,6 +648,7 @@ registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
 specifiers:
+  base64url: ^3.0.1
   cookie-parser: ^1.4.4
   crypto: ^1.0.1
   express: ^4.16.4

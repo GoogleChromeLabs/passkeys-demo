@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const upload = multer();
+const base64url = require('base64url');
+const crypto = require('crypto');
 
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
@@ -138,15 +140,15 @@ router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
   };
   response.user = {
     displayName: 'No name',
-    id: createBase64Random(),
+    id: base64url(crypto.randomBytes(32)),
     name: user.id
   };
   response.pubKeyCredParams = [{
     type: 'public-key', alg: -7
   }];
   response.timeout = req.body.timeout || 1000 * 30;
-  response.challenge = createBase64Random();
-  req.session.challenge = response.challenge;
+  response.challenge = base64url(crypto.randomBytes(32));
+  req.cookie('challenge', response.challenge);
 
   // Only specify `excludeCredentials` when reauthFlag is `false`
   if (!user.credential) {
@@ -168,7 +170,7 @@ router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
     asFlag = true;
     as.authenticatorAttachment = aa;
   }
-  if (rr && typeof rr == boolean) {
+  if (rr && typeof rr == 'boolean') {
     asFlag = true;
     as.requireResidentKey = rr;
   }
@@ -202,18 +204,46 @@ router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
  * }```
  **/
 router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
-  // Replace this `stab` with proper credential info to store
-  const stab = {
-    id: req.cookies.id,
-    credential: req.body.credential
-  };
-  // Store user info
-  // TODO: This only adds new entry. Figure out ways to update existing entry.
-  db.get('users')
-    .push(stab)
-    .write();
-  // Respond with user info
-  res.json(stab);
+  const credId = req.body.id;
+  const type = req.body.type;
+  const credential = req.body.response;
+  if (!credId || !type || !credential) {
+    res.status(400).send('`response` missing in request');
+    return;
+  }
+
+  try {
+    const challenge = req.cookies.challenge;
+    const origin = `${req.protocol}://${req.get('host')}`;
+    const response = verifyCredential(credential, challenge, origin);
+
+    switch (response.fmt) {
+      case 'none':
+      case 'packed':
+        // Ignore attestation
+        break;
+      case 'fido-u2f':
+      case 'android-safetynet':
+      default:
+        // Not implemented yet
+        throw 'Attestation not supported';
+    }
+
+    // Replace this `stab` with proper credential info to store
+    const user = {
+      id: req.cookies.id,
+      credential: credId
+    };
+    // Store user info
+    // TODO: This only adds new entry. Figure out ways to update existing entry.
+    db.get('users')
+      .push(user)
+      .write();
+    // Respond with user info
+    res.json(user);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 /**

@@ -16,7 +16,8 @@
     "cookie-parser": "^1.4.4",
     "lowdb": "^1.0.0",
     "lit-html": "^1.0.0",
-    "crypto": "^1.0.1"
+    "crypto": "^1.0.1",
+    "base64url": "^3.0.1"
   },
   "engines": {
     "node": "8.x"
