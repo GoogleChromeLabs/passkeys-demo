@@ -12,6 +12,7 @@ app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 app.set('views', './views');
 app.use(cookieParser());
+app.use(express.json());
 app.use(express.static('public'));
 
 // http://expressjs.com/en/starter/basic-routing.html
