@@ -127,6 +127,63 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
  * }```
  **/
 router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
+  const user = db.get('users')
+    .find({ id: req.cookies.id })
+    .value();
+
+  const response = {};
+  response.rp = {
+    id: req.host,
+    name: 'Polykart'
+  };
+  response.user = {
+    displayName: 'No name',
+    id: createBase64Random(),
+    name: user.id
+  };
+  response.pubKeyCredParams = [{
+    type: 'public-key', alg: -7
+  }];
+  response.timeout = req.body.timeout || 1000 * 30;
+  response.challenge = createBase64Random();
+  req.session.challenge = response.challenge;
+
+  // Only specify `excludeCredentials` when reauthFlag is `false`
+  if (!user.credential) {
+    response.excludeCredentials.push({
+      id: user.credential,
+      type: 'public-key',
+      transports: 'internal'
+    });
+  }
+
+  const as = {}; // authenticatorSelection
+  const aa = req.body.authenticatorSelection.authenticatorAttachment;
+  const rr = req.body.authenticatorSelection.requireResidentKey;
+  const uv = req.body.authenticatorSelection.userVerification;
+  const cp = req.body.attestation; // attestationConveyancePreference
+  let asFlag = false;
+
+  if (aa && (aa == 'platform' || aa == 'cross-platform')) {
+    asFlag = true;
+    as.authenticatorAttachment = aa;
+  }
+  if (rr && typeof rr == boolean) {
+    asFlag = true;
+    as.requireResidentKey = rr;
+  }
+  if (uv && (uv == 'required' || uv == 'preferred' || uv == 'discouraged')) {
+    asFlag = true;
+    as.userVerification = uv;
+  }
+  if (asFlag) {
+    response.authenticatorSelection = as;
+  }
+  if (cp && (cp == 'none' || cp == 'indirect' || cp == 'direct')) {
+    response.attestation = cp;
+  }
+
+  res.json(response);
 });
 
 /**

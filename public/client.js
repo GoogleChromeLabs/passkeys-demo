@@ -26,7 +26,32 @@ export const _fetch = async (path, payload = '') => {
   } catch (e) {
     return Promise.reject({error: e});
   }
-}
+};
+
+const encodeAuthenticatorAttestationResponse = (atts) => {
+  const credential = {};
+  if (atts.id)    credential.id =     atts.id;
+  if (atts.type)  credential.type =   atts.type;
+  if (atts.rawId) credential.rawId =  base64url.encode(atts.rawId);
+
+  if (atts.response) {
+    const clientDataJSON =
+      base64url.encode(atts.response.clientDataJSON);
+    const attestationObject =
+      base64url.encode(atts.response.attestationObject);
+    const signature =
+      base64url.encode(atts.response.signature);
+    const userHandle =
+      base64url.encode(atts.response.userHandle);
+    credential.response = {
+      clientDataJSON,
+      attestationObject,
+      signature,
+      userHandle
+    };
+  }
+  return credential;
+};
 
 export const registerCredential = async (opts) => {
   if (!window.PublicKeyCredential) {
@@ -48,12 +73,15 @@ export const registerCredential = async (opts) => {
       publicKey: options
     });
 
-    const parsedCred = await this._encodeAuthenticatorAttestationResponse(cred);
+    const parsedCred = await encodeAuthenticatorAttestationResponse(cred);
 
-    return await this._fetch('/auth/regCred' , parsedCred);
+    return await _fetch('/auth/regCred' , parsedCred);
 
   } catch (e) {
     console.error(e);
     return Promise.reject(e);
   }
-}
+};
+
+export const verifyAssertion = async (opts) => {
+};
