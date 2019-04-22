@@ -168,17 +168,17 @@ router.post('/makeCred', upload.array(), sessionCheck, (req, res) => {
   response.user = {
     displayName: 'No name',
     id: base64url(crypto.randomBytes(32)),
-    name: user.id
+    name: req.cookies.id
   };
   response.pubKeyCredParams = [{
     type: 'public-key', alg: -7
   }];
-  response.timeout = req.body.timeout || 1000 * 30;
+  response.timeout = (req.body && req.body.timeout) || 1000 * 30;
   response.challenge = base64url(crypto.randomBytes(32));
-  req.cookie('challenge', response.challenge);
+  req.cookie.set('challenge', response.challenge);
 
   // Only specify `excludeCredentials` when reauthFlag is `false`
-  if (!user.credential) {
+  if (user && !user.credential) {
     response.excludeCredentials.push({
       id: user.credential,
       type: 'public-key',
