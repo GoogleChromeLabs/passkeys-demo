@@ -1,7 +1,6 @@
-// client-side js
-// run by the browser each time your view template is loaded
+import { base64url } from 'https://unpkg.com/base64url@3.0.1/index.js?module';
 
-const _fetch = async (path, payload = '') => {
+export const _fetch = async (path, payload = '') => {
   const headers = {
     'X-Requested-With': 'XMLHttpRequest'
   };
@@ -26,5 +25,35 @@ const _fetch = async (path, payload = '') => {
     }
   } catch (e) {
     return Promise.reject({error: e});
+  }
+}
+
+export const registerCredential = async (opts) => {
+  if (!window.PublicKeyCredential) {
+    throw 'WebAuthn not supported on this browser.';
+  }
+  try {
+    const options = await _fetch('/auth/makeCred', opts);
+
+    options.user.id = base64url.decode(options.user.id);
+    options.challenge = base64url.decode(options.challenge);
+
+    if (options.excludeCredentials) {
+      for (let cred of options.excludeCredentials) {
+        cred.id = base64url.decode(cred.id);
+      }
+    }
+
+    const cred = await navigator.credentials.create({
+      publicKey: options
+    });
+
+    const parsedCred = await this._encodeAuthenticatorAttestationResponse(cred);
+
+    return await this._fetch(`${WEBAUTHN_REGCRED}`, parsedCred);
+
+  } catch (e) {
+    console.error(e);
+    return Promise.reject(e);
   }
 }

@@ -10,9 +10,6 @@
 
     <!-- import the webpage's stylesheet -->
     <link rel="stylesheet" href="/style.css">
-    
-    <!-- import the webpage's client-side javascript file -->
-    <script src="/client.js" defer></script>
   </head>
   <body>
     <header>
@@ -29,6 +26,7 @@
       </form>
     </main>
     <script>
+      import { _fetch } from '/client.js';
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
