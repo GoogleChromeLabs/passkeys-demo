@@ -1,5 +1,3 @@
-import { base64url } from 'https://unpkg.com/base64url@3.0.1/dist/base64url.js?module';
-
 export const _fetch = async (path, payload = '') => {
   const headers = {
     'X-Requested-With': 'XMLHttpRequest'
