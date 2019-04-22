@@ -30,6 +30,33 @@ const sessionCheck = (req, res, next) => {
   next();
 };
 
+const verifyCredential = (credential, challenge, origin) => {
+  const attestationObject = credential.attestationObject;
+  const authenticatorData = credential.authenticatorData;
+  if (!attestationObject && !authenticatorData)
+    throw 'Invalid request.';
+
+  const clientDataJSON = credential.clientDataJSON;
+  // const signature = credential.signature;
+  // const userHandle = credential.userHandle;
+  const clientData = JSON.parse(base64url.decode(clientDataJSON));
+
+  if (clientData.challenge !== challenge)
+    throw 'Wrong challenge code.';
+
+  if (clientData.origin !== origin)
+    throw 'Wrong origin.';
+
+  // Temporary workaround for inmature CBOR
+  // const buffer = base64url.toBuffer(attestationObject || authenticatorData);
+  // const response = cbor.decodeAllSync(buffer)[0];
+
+  const response = {};
+  response.fmt = 'none';
+
+  return response;
+};
+
 /**
  * Verifies user credential and let the user sign-in.
  * No preceding registration required.

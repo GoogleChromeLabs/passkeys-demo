@@ -65,7 +65,14 @@
           render(li, list);
         });
       }
-      const makeCredential = e => {
+      const makeCredential = async () => {
+        const user = await registerCredential({
+          authenticatorSelection: {
+            authenticatorAttachment: 'platform'
+            userVerification: 'required'
+          }
+        });
+        console.log(user);
         return;
       };
       const removeCredential = e => {
