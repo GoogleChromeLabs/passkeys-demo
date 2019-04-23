@@ -83,6 +83,31 @@ export const registerCredential = async (opts) => {
   }
 };
 
+const encodeAuthenticatorAssertionResponse = asst => {
+  const credential = {};
+  if (asst.id)    credential.id =     asst.id;
+  if (asst.type)  credential.type =   asst.type;
+  if (asst.rawId) credential.rawId =  base64url.encode(asst.rawId);
+
+  if (asst.response) {
+    const clientDataJSON =
+      base64url.encode(asst.response.clientDataJSON);
+    const authenticatorData =
+      base64url.encode(asst.response.authenticatorData);
+    const signature =
+      base64url.encode(asst.response.signature);
+    const userHandle =
+      base64url.encode(asst.response.userHandle);
+    credential.response = {
+      clientDataJSON,
+      authenticatorData,
+      signature,
+      userHandle
+    };
+  }
+  return credential;
+};
+
 export const verifyAssertion = async (opts) => {
   if (!window.PublicKeyCredential) {
     throw 'WebAuthn not supported on this browser.';
@@ -91,7 +116,7 @@ export const verifyAssertion = async (opts) => {
     const credId = localStorage.getItem('credential');
     if (!credId) return null;
 
-    const url =`/auth/getAsst?reauth=${encodeURIComponent(credId)}`;
+    const url =`/auth/getAsst?credId=${encodeURIComponent(credId)}`;
     const options = await _fetch(url);
 
     options.challenge = base64url.decode(options.challenge);
@@ -106,9 +131,9 @@ export const verifyAssertion = async (opts) => {
       publicKey: options
     });
 
-    const parsedCred = await this._encodeAuthenticatorAssertionResponse(cred);
+    const parsedCred = await encodeAuthenticatorAssertionResponse(cred);
 
-    return await this._fetch(`/auth/authAsst?reauth`, parsedCred);
+    return await this._fetch(`/auth/authAsst`, parsedCred);
   } catch (e) {
     console.error(e);
     return Promise.reject(e);

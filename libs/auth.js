@@ -288,6 +288,28 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
  * }```
  **/
 router.post('/getAsst', upload.array(), sessionCheck, (req, res) => {
+  const credId = req.query.credId;
+  if (!credId) {
+    res.status(400).send('`credId` missing in request');
+    return;
+  }
+
+  const user = db.get('users')
+    .find({ id: req.cookies.id })
+    .value();
+
+  const response = {};
+  response.userVerification = req.body.userVerification || 'preferred';
+  response.challenge = base64url(crypto.randomBytes(32));
+  res.cookie('challenge', response.challenge);
+
+  response.allowCredentials = [{
+    id: credId,
+    type: 'public-key',
+    transports: ['internal']
+  }];
+
+  res.json(response);
 });
 
 /**
@@ -306,15 +328,66 @@ router.post('/getAsst', upload.array(), sessionCheck, (req, res) => {
  * }```
  **/
 router.post('/authAsst', upload.array(), sessionCheck, (req, res) => {
+  const credId = req.body.id;
+  const type = req.body.type;
+  const credential = req.body.response;
+  if (!credId || !type || !credential) {
+    res.status(400).send('`response` missing in request');
+    return;
+  }
+
   // Query the user
   const user = db.get('users')
     .find({ id: req.cookies.id })
     .value();
 
-  // TODO: Verify the signature against public key included in the user info
+  try {
+    const challenge = req.session.challenge;
+    const origin = `https://${req.get('host')}`; // TODO: Temporary work around for scheme
+    const response = verifyCredential(credential, challenge, origin);
 
-  // Respond with user info if verified. Otherwise error.
-  res.json(user || {});
+    switch (response.fmt) {
+      case 'none':
+      case 'packed':
+        // Ignore attestation
+        break;
+      case 'fido-u2f':
+      case 'android-safetynet':
+      default:
+        // Not implemented yet
+        throw 'Attestation not supported';
+    }
+
+    let authr = null;
+    if (user.credential) {
+      if (user.credential === credId) {
+        authr = _authr;
+        break;
+      }
+    }
+    if (!authr) {
+      res.status(400).send('Matching authenticator not found');
+      return;
+    }
+
+    // Update timestamp
+    const now = (new Date()).getTime();
+    authr.last_used = now;
+    // TODO: Anything else to update?
+
+console.log(_profile);
+    store.save(profile.id, _profile);
+
+    delete _profile.password;
+    delete _profile.secondFactors;
+    delete _profile.reauthKeys;
+    _profile.reauth = now;
+    req.session.profile = _profile;
+    res.json(_profile);
+  } catch (e) {
+    console.error(e);
+    res.status(400).send(e);
+  }
 });
 
 module.exports = router;
