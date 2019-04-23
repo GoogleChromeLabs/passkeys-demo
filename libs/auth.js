@@ -80,6 +80,13 @@ router.post('/signin', upload.array(), (req, res) => {
   return;
 });
 
+router.get('/signout', function(req, res) {
+  // Remove cookie
+  res.clearCookie('id');
+  // Redirect to `/`
+  res.redirect(307, '/');
+});
+
 // For test purposes
 router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
   if (!req.body.credential) {
@@ -118,7 +125,8 @@ router.post('/getKey', upload.array(), sessionCheck, (req, res) => {
  **/
 router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
   db.get('users')
-    .remove({ id: req.cookies.id })
+    .find({ id: req.cookies.id })
+    .assign({ credential: '' })
     .write();
   res.json({});
 });
@@ -178,7 +186,7 @@ router.post('/makeCred', sessionCheck, (req, res) => {
   res.cookie('challenge', response.challenge);
 
   // Only specify `excludeCredentials` when reauthFlag is `false`
-  if (user && !user.credential) {
+  if (user && user.credential) {
     response.excludeCredentials.push({
       id: user.credential,
       type: 'public-key',
@@ -264,7 +272,7 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
     // Store user info
     // TODO: This only adds new entry. Figure out ways to update existing entry.
     db.get('users')
-      .push(user)
+      .update(user)
       .write();
     // Respond with user info
     res.json(user);

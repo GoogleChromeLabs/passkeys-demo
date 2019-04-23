@@ -24,7 +24,7 @@
   <body>
     <header>
       <h1>
-        WebAuthn codelab
+        <a href="/">WebAuthn codelab</a>
       </h1>
     </header>
 
@@ -37,15 +37,8 @@
       </h3>
       <ul id="list">
       </ul>
-      <h3>
-        Your registered public key credential:
-      </h3>
-      <form id="form" method="POST" action="/auth/putKey" >
-        Dummy text credential for test purpose: <input type="text" name="credential" value="" />
-        <input type="submit" value="Register a new key" />
-      </form>
       <p>
-        <a href="/signout">Sign out</a>
+        <a href="/auth/signout">Sign out</a>
       </p>
     </main>
     <script type="module">
@@ -92,21 +85,6 @@
           }
         });
       };
-      const form = document.querySelector('#form');
-      form.addEventListener('submit', e => {
-        e.preventDefault();
-        _fetch('/auth/putKey', new FormData(e.target))
-        .then(() => {
-          getCredential();
-        })
-        .catch(e => {
-          if (e) {
-            alert(e.error);
-          } else {
-            alert('Unkown error.');
-          }
-        });        
-      });
       getCredential();
     </script>
   </body>

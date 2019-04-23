@@ -45,13 +45,6 @@ app.get('/reauth', function(req, res) {
   res.render('reauth.html', {id: req.cookies.id});
 });
 
-app.get('/signout', function(req, res) {
-  // Remove cookie
-  res.clearCookie('id');
-  // Redirect to `/`
-  res.redirect(307, '/');
-});
-
 app.use('/auth', auth);
 
 // listen for req :)
