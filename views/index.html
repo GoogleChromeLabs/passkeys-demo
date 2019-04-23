@@ -29,9 +29,12 @@
     </header>
 
     <main>
+      <h2>
+        Login with random id/password
+      </h2>
       <form id="form" method="POST" action="/auth/signin" >
-        id (whatever): <input type="text" name="id" value="" />
-        password (this will be ignored): <input type="password" name="password" value="" />
+        id: <input type="text" name="id" placeholder="Whatever" value="" />
+        password: <input type="password" name="password" placeholder="This will be ignored" value="" />
         <input type="submit" value="Sign-In" />
       </form>
     </main>
