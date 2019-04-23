@@ -39,8 +39,11 @@
           alert(e.error);
         });        
       });
+
       verifyAssertion({}).then(user => {
-        console.log(user);
+        location.href = '/home';
+      }).catch(e => {
+        console.error(e);
       });
     </script>
   </body>

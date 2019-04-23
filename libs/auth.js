@@ -342,7 +342,7 @@ router.post('/authAsst', upload.array(), sessionCheck, (req, res) => {
     .value();
 
   try {
-    const challenge = req.session.challenge;
+    const challenge = req.cookies.challenge;
     const origin = `https://${req.get('host')}`; // TODO: Temporary work around for scheme
     const response = verifyCredential(credential, challenge, origin);
 
