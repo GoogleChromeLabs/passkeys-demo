@@ -264,18 +264,16 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
         throw 'Attestation not supported';
     }
 
-    // Replace this `stab` with proper credential info to store
-    const user = {
-      id: req.cookies.id,
-      credential: credId
-    };
     // Store user info
-    // TODO: This only adds new entry. Figure out ways to update existing entry.
     db.get('users')
-      .update(user)
+      .find({ id: req.cookies.id })
+      .assign({ credential: credId })
       .write();
     // Respond with user info
-    res.json(user);
+    res.json({
+      id: req.cookies.id,
+      credential: credId
+    });
   } catch (e) {
     res.status(400).send(e);
   }
