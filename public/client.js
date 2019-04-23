@@ -72,6 +72,8 @@ export const registerCredential = async (opts) => {
     });
 
     const parsedCred = await encodeAuthenticatorAttestationResponse(cred);
+    
+    localStorage.setItem('credential', parsedCred.id);
 
     return await _fetch('/auth/regCred' , parsedCred);
 
@@ -82,4 +84,33 @@ export const registerCredential = async (opts) => {
 };
 
 export const verifyAssertion = async (opts) => {
+  if (!window.PublicKeyCredential) {
+    throw 'WebAuthn not supported on this browser.';
+  }
+  try {
+    const credId = localStorage.getItem('credential');
+    if (!credId) return null;
+
+    const url =`/auth/getAsst?reauth=${encodeURIComponent(credId)}`;
+    const options = await _fetch(url);
+
+    options.challenge = base64url.decode(options.challenge);
+
+    if (options.allowCredentials) {
+      for (let cred of options.allowCredentials) {
+        cred.id = base64url.decode(cred.id);
+      }
+    }
+
+    const cred = await navigator.credentials.get({
+      publicKey: options
+    });
+
+    const parsedCred = await this._encodeAuthenticatorAssertionResponse(cred);
+
+    return await this._fetch(`/auth/authAsst?reauth`, parsedCred);
+  } catch (e) {
+    console.error(e);
+    return Promise.reject(e);
+  }
 };
