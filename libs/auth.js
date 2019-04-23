@@ -75,7 +75,14 @@ router.post('/signin', upload.array(), (req, res) => {
   } else {
     // If sign-in succeeded, redirect to `/home`.
     res.cookie('id', req.body.id);
-    res.status(200).json({});
+    const user = {
+      id: req.body.id,
+      credential: ''
+    }
+    db.get('users')
+      .push(user)
+      .write();
+    res.status(200).json(user);
   }
   return;
 });
