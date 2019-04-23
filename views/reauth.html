@@ -27,7 +27,7 @@
       </form>
     </main>
     <script type="module">
-      import { _fetch } from '/client.js';
+      import { _fetch, verifyAssertion } from '/client.js';
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
@@ -38,6 +38,9 @@
         .catch(e => {
           alert(e.error);
         });        
+      });
+      verifyAssertion({}).then(user => {
+        console.log(user);
       });
     </script>
   </body>

@@ -358,32 +358,11 @@ router.post('/authAsst', upload.array(), sessionCheck, (req, res) => {
         throw 'Attestation not supported';
     }
 
-    let authr = null;
-    if (user.credential) {
-      if (user.credential === credId) {
-        authr = _authr;
-        break;
-      }
-    }
-    if (!authr) {
+    if (user.credential !== credId) {
       res.status(400).send('Matching authenticator not found');
-      return;
+    } else {
+      res.json(user);
     }
-
-    // Update timestamp
-    const now = (new Date()).getTime();
-    authr.last_used = now;
-    // TODO: Anything else to update?
-
-console.log(_profile);
-    store.save(profile.id, _profile);
-
-    delete _profile.password;
-    delete _profile.secondFactors;
-    delete _profile.reauthKeys;
-    _profile.reauth = now;
-    req.session.profile = _profile;
-    res.json(_profile);
   } catch (e) {
     console.error(e);
     res.status(400).send(e);
