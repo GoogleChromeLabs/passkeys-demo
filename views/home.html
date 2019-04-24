@@ -73,7 +73,7 @@
           if (user) {
             getCredential();
           } else {
-            alert('Error registering your key');
+            console.info('Registering credential silently failed.');
           }
         })
         .catch(e => {

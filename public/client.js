@@ -53,10 +53,16 @@ const encodeAuthenticatorAttestationResponse = (atts) => {
 
 export const registerCredential = async (opts) => {
   if (!window.PublicKeyCredential) {
-    console.error('WebAuthn not supported on this browser.');
+    console.info('WebAuthn not supported on this browser.');
     return Promise.resolve(null);
   }
   try {
+    const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    if (!UVPAA) {
+      console.info('User Verifying Platform Authenticator not available.');
+      return Promise.resolve(null);
+    }
+
     const options = await _fetch('/auth/makeCred', opts);
 
     options.user.id = base64url.decode(options.user.id);
@@ -77,7 +83,6 @@ export const registerCredential = async (opts) => {
     localStorage.setItem('credential', parsedCred.id);
 
     return await _fetch('/auth/regCred' , parsedCred);
-
   } catch (e) {
     throw e;
   }
@@ -110,13 +115,18 @@ const encodeAuthenticatorAssertionResponse = asst => {
 
 export const verifyAssertion = async (opts) => {
   if (!window.PublicKeyCredential) {
-    console.error('WebAuthn not supported on this browser.');
+    console.info('WebAuthn not supported on this browser.');
     return Promise.resolve(null);
   }
   try {
     const credId = localStorage.getItem('credential');
     if (!credId) {
-      console.info('No stored credential found on this browser');
+      console.info('No stored credential found on this browser.');
+      return Promise.resolve(null);
+    }
+    const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    if (!UVPAA) {
+      console.info('User Verifying Platform Authenticator not available.');
       return Promise.resolve(null);
     }
 
