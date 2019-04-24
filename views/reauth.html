@@ -41,7 +41,9 @@
       });
 
       verifyAssertion({}).then(user => {
-        location.href = '/home';
+        if (user) {
+          location.href = '/home';
+        }
       }).catch(e => {
         console.error(e);
       });

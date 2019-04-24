@@ -116,7 +116,8 @@ export const verifyAssertion = async (opts) => {
   try {
     const credId = localStorage.getItem('credential');
     if (!credId) {
-      throw 'No stored credential found on this browser';
+      console.info('No stored credential found on this browser');
+      return Promise.resolve(null);
     }
 
     const url =`/auth/getAsst?credId=${encodeURIComponent(credId)}`;

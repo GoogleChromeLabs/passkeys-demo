@@ -34,8 +34,7 @@
       </h2>
       <form id="form" method="POST" action="/auth/signin" >
         id: <input type="text" name="id" placeholder="Whatever" value="" />
-        password: <input type="password" name="password" placeholder="This will be ignored" value="" />
-        <input type="submit" value="Sign-In" />
+        <input type="submit" value="Next" />
       </form>
     </main>
     <script type="module">
@@ -43,8 +42,11 @@
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
-        _fetch('/auth/signin', new FormData(e.target)).then(e => {
-          location.href = '/home';
+        _fetch('/auth/signin', new FormData(e.target)).then(user => {
+          if (user.credential) {
+            localStorage.setItem('credential', user.credential);
+          }
+          location.href = '/reauth';
         }).catch(e => {
           alert(e.error);
         });        
