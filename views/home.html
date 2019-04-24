@@ -76,6 +76,7 @@
         }
       };
       const removeCredential = e => {
+        await removeCredential();
         return _fetch('/auth/removeKey')
         .then(e => {
           getCredential();

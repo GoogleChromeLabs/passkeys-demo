@@ -78,8 +78,7 @@ export const registerCredential = async (opts) => {
     return await _fetch('/auth/regCred' , parsedCred);
 
   } catch (e) {
-    console.error(e);
-    return Promise.reject(e);
+    throw e;
   }
 };
 
@@ -137,7 +136,16 @@ export const verifyAssertion = async (opts) => {
 
     return await _fetch(`/auth/authAsst`, parsedCred);
   } catch (e) {
-    console.error(e);
-    return Promise.reject(e);
+    throw e;
+  }
+};
+
+export removeCredential = async () => {
+  try {
+    localStorage.removeItem('credential')
+    return _fetch('/auth/removeKey')
+      .then(e => {
+  } catch (e) {
+    throw e;
   }
 };

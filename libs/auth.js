@@ -67,21 +67,29 @@ router.post('/signin', upload.array(), (req, res) => {
     res.status(400).json({error: 'invalid access.'});
     return;
   }
+  const id = req.body.id;
   // If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
-  if (!req.body.id) {
+  if (!id) {
     // If sign-in failed, return 401.
     res.status(400).json({error: 'invalid id.'});
   // If cookie contains an id (already signed in, this is reauth), let the user sign-in
   } else {
-    // If sign-in succeeded, redirect to `/home`.
-    res.cookie('id', req.body.id);
-    const user = {
-      id: req.body.id,
-      credential: ''
+    // See if account already exists
+    let user = db.get('users')
+      .find({ id: id })
+      .value();
+    // If user entry is not created yet, create one
+    if (!user) {
+      user = {
+        id: req.body.id,
+        credential: ''
+      }
+      db.get('users')
+        .push(user)
+        .write();
     }
-    db.get('users')
-      .push(user)
-      .write();
+    res.cookie('id', id);
+    // If sign-in succeeded, redirect to `/home`.
     res.status(200).json(user);
   }
   return;
@@ -100,14 +108,13 @@ router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
     res.status(400).json({ error: 'invalid request' });
     return;
   }
-  const stab = {
-    id: req.cookies.id,
-    credential: req.body.credential
-  };
+  const id = req.cookies.id;
+  const credential = req.body.credential;
   db.get('users')
-    .push(stab)
+    .find({ id: id })
+    .assign({ credential: credential })
     .write();
-  res.json(stab);
+  res.json({ id: id, credential: credential });
 });
 
 /**
@@ -171,8 +178,9 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
  * }```
  **/
 router.post('/makeCred', sessionCheck, (req, res) => {
+  const id = req.cookies.id;
   const user = db.get('users')
-    .find({ id: req.cookies.id })
+    .find({ id: id })
     .value();
 
   const response = {};
@@ -183,7 +191,7 @@ router.post('/makeCred', sessionCheck, (req, res) => {
   response.user = {
     displayName: 'No name',
     id: base64url(crypto.randomBytes(32)),
-    name: req.cookies.id
+    name: id
   };
   response.pubKeyCredParams = [{
     type: 'public-key', alg: -7
@@ -246,6 +254,8 @@ router.post('/makeCred', sessionCheck, (req, res) => {
  * }```
  **/
 router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
+  const id = req.cookies.id;
+  const challenge = req.cookies.challenge;
   const credId = req.body.id;
   const type = req.body.type;
   const credential = req.body.response;
@@ -255,7 +265,6 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
   }
 
   try {
-    const challenge = req.cookies.challenge;
     const origin = `https://${req.get('host')}`; // TODO: Temporary work around for scheme
     const response = verifyCredential(credential, challenge, origin);
 
@@ -273,12 +282,12 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
 
     // Store user info
     db.get('users')
-      .find({ id: req.cookies.id })
+      .find({ id: id })
       .assign({ credential: credId })
       .write();
     // Respond with user info
     res.json({
-      id: req.cookies.id,
+      id: id,
       credential: credId
     });
   } catch (e) {
