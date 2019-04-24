@@ -130,15 +130,17 @@ export const verifyAssertion = async (opts) => {
       return Promise.resolve(null);
     }
 
-    const url =`/auth/getAsst?credId=${encodeURIComponent(credId)}`;
-    const options = await _fetch(url);
+    const options = await _fetch(`/auth/getAsst?credId=${encodeURIComponent(credId)}`);
 
     options.challenge = base64url.decode(options.challenge);
 
     if (options.allowCredentials) {
-      for (let cred of options.allowCredentials) {
-        cred.id = base64url.decode(cred.id);
-      }
+      let cred = options.allowCredentials[0];
+      cred.id = base64url.decode(cred.id);
+    }
+    if (options.allowCredentials[0].id !== credId) {
+      console.info("Stored credential didn't match");
+      return Promise.resolve(null);
     }
 
     const cred = await navigator.credentials.get({
