@@ -138,13 +138,13 @@ export const verifyAssertion = async (opts) => {
       console.info("Credential not stored on server side");
       return Promise.resolve(null);
     }
-    if (options.allowCredentials[0].id !== credId) {
+    if (options.allowCredentials[0].id === credId) {      
+      let cred = options.allowCredentials[0];
+      cred.id = base64url.decode(cred.id);
+    } else {
       console.info("Stored credential didn't match");
       return Promise.resolve(null);
     }
-
-    const aCred = options.allowCredentials[0];
-    aCred.id = base64url.decode(aCred.id);
 
     const cred = await navigator.credentials.get({
       publicKey: options
