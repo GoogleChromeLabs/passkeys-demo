@@ -45,7 +45,7 @@
       </p>
     </main>
     <script type="module">
-      import { _fetch, registerCredential } from '/client.js';
+      import { _fetch, registerCredential, unregisterCredential } from '/client.js';
       import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
 
       const getCredential = () => {
@@ -63,22 +63,30 @@
         });
       }
       const makeCredential = async () => {
-        const user = await registerCredential({
+        registerCredential({
           authenticatorSelection: {
             authenticatorAttachment: 'platform',
             userVerification: 'required'
           }
+        })
+        .then(user => {
+          if (user) {
+            getCredential();
+          } else {
+            alert('Error registering your key');
+          }
+        })
+        .catch(e => {
+          if (e) {
+            alert(e.error);
+          } else {
+            alert('Unkown error.');
+          }
         });
-        if (user) {
-          getCredential();
-        } else {
-          alert('Error registering your key');
-        }
       };
       const removeCredential = e => {
-        await removeCredential();
-        return _fetch('/auth/removeKey')
-        .then(e => {
+        unregisterCredential()
+        .then(() => {
           getCredential();
         })
         .catch(e => {

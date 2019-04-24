@@ -53,7 +53,8 @@ const encodeAuthenticatorAttestationResponse = (atts) => {
 
 export const registerCredential = async (opts) => {
   if (!window.PublicKeyCredential) {
-    throw 'WebAuthn not supported on this browser.';
+    console.error('WebAuthn not supported on this browser.');
+    return Promise.resolve(null);
   }
   try {
     const options = await _fetch('/auth/makeCred', opts);
@@ -109,7 +110,8 @@ const encodeAuthenticatorAssertionResponse = asst => {
 
 export const verifyAssertion = async (opts) => {
   if (!window.PublicKeyCredential) {
-    throw 'WebAuthn not supported on this browser.';
+    console.error('WebAuthn not supported on this browser.');
+    return Promise.resolve(null);
   }
   try {
     const credId = localStorage.getItem('credential');
@@ -140,11 +142,10 @@ export const verifyAssertion = async (opts) => {
   }
 };
 
-export removeCredential = async () => {
+export const unregisterCredential = async () => {
   try {
-    localStorage.removeItem('credential')
-    return _fetch('/auth/removeKey')
-      .then(e => {
+    localStorage.removeItem('credential');
+    return _fetch('/auth/removeKey');
   } catch (e) {
     throw e;
   }
