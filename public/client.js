@@ -149,7 +149,7 @@ export const verifyAssertion = async (opts) => {
 
     return await _fetch(`/auth/authAsst`, parsedCred);
   } catch (e) {
-    throw e;
+    throw 'Authentication failed. Use password to sign-in.';
   }
 };
 

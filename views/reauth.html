@@ -32,7 +32,7 @@
       form.addEventListener('submit', e => {
         e.preventDefault();
         _fetch('/auth/signin', new FormData(e.target))
-        .then(e => {
+        .then(user => {
           location.href = '/home';
         })
         .catch(e => {
@@ -45,7 +45,7 @@
           location.href = '/home';
         }
       }).catch(e => {
-        console.error(e);
+        alert(e);
       });
     </script>
   </body>
