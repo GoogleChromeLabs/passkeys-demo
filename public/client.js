@@ -119,14 +119,14 @@ export const verifyAssertion = async (opts) => {
     return Promise.resolve(null);
   }
   try {
-    const credId = localStorage.getItem('credential');
-    if (!credId) {
-      console.info('No stored credential found on this browser.');
-      return Promise.resolve(null);
-    }
     const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
     if (!UVPAA) {
       console.info('User Verifying Platform Authenticator not available.');
+      return Promise.resolve(null);
+    }
+    const credId = localStorage.getItem('credential');
+    if (!credId) {
+      console.info('No stored credential found on this browser.');
       return Promise.resolve(null);
     }
 
@@ -134,10 +134,7 @@ export const verifyAssertion = async (opts) => {
 
     options.challenge = base64url.decode(options.challenge);
 
-    if (options.allowCredentials) {
-      let cred = options.allowCredentials[0];
-      cred.id = base64url.decode(cred.id);
-    } else {
+    if (options.allowCredentials.length === 0) {
       console.info("Credential not stored on server side");
       return Promise.resolve(null);
     }
@@ -145,6 +142,9 @@ export const verifyAssertion = async (opts) => {
       console.info("Stored credential didn't match");
       return Promise.resolve(null);
     }
+
+    const aCred = options.allowCredentials[0];
+    aCred.id = base64url.decode(aCred.id);
 
     const cred = await navigator.credentials.get({
       publicKey: options
