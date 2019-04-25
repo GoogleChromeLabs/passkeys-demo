@@ -18,7 +18,7 @@ app.use(express.static('public'));
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', function(req, res) {
   // Check cookie
-  if (req.cookies.id) {
+  if (req.cookies.username) {
     // If user is signed in, redirect to `/reauth`.
     res.redirect(307, '/reauth');
     return;
@@ -28,13 +28,13 @@ app.get('/', function(req, res) {
 });
 
 app.get('/home', function(req, res) {
-  if (!req.cookies.id) {
+  if (!req.cookies.username) {
     // If user is not signed in, redirect to `/`.
     res.redirect(307, '/');
   }
   // `home.html` shows sign-out link
   // TODO: When developed, allow user to register their authenticator
-  res.render('home.html', {id: req.cookies.id});
+  res.render('home.html', {username: req.cookies.username});
 });
 
 app.get('/reauth', function(req, res) {
@@ -42,7 +42,7 @@ app.get('/reauth', function(req, res) {
   // User is supposed to enter a password (which will be ignored)
   // Make XHR POST to `/signin`
   // TODO: When developed, do fingerprint reauth
-  res.render('reauth.html', {id: req.cookies.id});
+  res.render('reauth.html', {username: req.cookies.username});
 });
 
 app.use('/auth', auth);

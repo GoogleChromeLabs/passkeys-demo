@@ -16,14 +16,14 @@ db.defaults({
 
 /**
  * Checks CSRF protection using custom header `X-Requested-With`
- * If cookie doesn't contain `id`, consider the user is not authenticated.
+ * If cookie doesn't contain `username`, consider the user is not authenticated.
  **/
 const sessionCheck = (req, res, next) => {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
     res.status(400).json({error: 'invalid access.'});
     return;
   }
-  if (!req.cookies.id) {
+  if (!req.cookies.username) {
     res.status(401).json({error: 'not signed in.'});
     return;
   }
@@ -60,35 +60,35 @@ const verifyCredential = (credential, challenge, origin) => {
 /**
  * Verifies user credential and let the user sign-in.
  * No preceding registration required.
- * This only checks if `id` is not empty string and ignores the password.
+ * This only checks if `username` is not empty string and ignores the password.
  **/
 router.post('/signin', upload.array(), (req, res) => {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
     res.status(400).json({error: 'invalid access.'});
     return;
   }
-  const id = req.body.id;
-  // If cookie doesn't contain an id, let in as long as `id` present (Ignore password)
-  if (!id) {
+  const username = req.body.username;
+  // If cookie doesn't contain a username, let in as long as `username` present (Ignore password)
+  if (!username) {
     // If sign-in failed, return 401.
-    res.status(400).json({error: 'invalid id.'});
-  // If cookie contains an id (already signed in, this is reauth), let the user sign-in
+    res.status(400).json({error: 'invalid username.'});
+  // If cookie contains a username (already signed in, this is reauth), let the user sign-in
   } else {
     // See if account already exists
     let user = db.get('users')
-      .find({ id: id })
+      .find({ username: username })
       .value();
     // If user entry is not created yet, create one
     if (!user) {
       user = {
-        id: req.body.id,
+        username: username,
         credential: ''
       }
       db.get('users')
         .push(user)
         .write();
     }
-    res.cookie('id', id);
+    res.cookie('username', username);
     // If sign-in succeeded, redirect to `/home`.
     res.status(200).json(user);
   }
@@ -97,7 +97,7 @@ router.post('/signin', upload.array(), (req, res) => {
 
 router.get('/signout', function(req, res) {
   // Remove cookie
-  res.clearCookie('id');
+  res.clearCookie('username');
   // Redirect to `/`
   res.redirect(307, '/');
 });
@@ -108,27 +108,27 @@ router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
     res.status(400).json({ error: 'invalid request' });
     return;
   }
-  const id = req.cookies.id;
+  const username = req.cookies.username;
   const credential = req.body.credential;
   db.get('users')
-    .find({ id: id })
+    .find({ username: username })
     .assign({ credential: credential })
     .write();
-  res.json({ id: id, credential: credential });
+  res.json({ username: username, credential: credential });
 });
 
 /**
  * Returns a credential id
- * (This server only stores one key per user id.)
+ * (This server only stores one key per username.)
  * Response format:
  * ```{
- *   id: String,
+ *   username: String,
  *   credential: String
  * }```
  **/
 router.post('/getKey', upload.array(), sessionCheck, (req, res) => {
   const user = db.get('users')
-    .find({ id: req.cookies.id })
+    .find({ username: req.cookies.username })
     .value();
   res.json(user || {});
 });
@@ -139,7 +139,7 @@ router.post('/getKey', upload.array(), sessionCheck, (req, res) => {
  **/
 router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
   db.get('users')
-    .find({ id: req.cookies.id })
+    .find({ username: req.cookies.username })
     .assign({ credential: '' })
     .write();
   res.json({});
@@ -178,9 +178,9 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
  * }```
  **/
 router.post('/makeCred', sessionCheck, (req, res) => {
-  const id = req.cookies.id;
+  const username = req.cookies.username;
   const user = db.get('users')
-    .find({ id: id })
+    .find({ username: username })
     .value();
 
   const response = {};
@@ -191,7 +191,7 @@ router.post('/makeCred', sessionCheck, (req, res) => {
   response.user = {
     displayName: 'No name',
     id: base64url(crypto.randomBytes(32)),
-    name: id
+    name: username
   };
   response.pubKeyCredParams = [{
     type: 'public-key', alg: -7
@@ -254,7 +254,7 @@ router.post('/makeCred', sessionCheck, (req, res) => {
  * }```
  **/
 router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
-  const id = req.cookies.id;
+  const username = req.cookies.username;
   const challenge = req.cookies.challenge;
   const credId = req.body.id;
   const type = req.body.type;
@@ -282,12 +282,12 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
 
     // Store user info
     db.get('users')
-      .find({ id: id })
+      .find({ username: username })
       .assign({ credential: credId })
       .write();
     // Respond with user info
     res.json({
-      id: id,
+      username: username,
       credential: credId
     });
   } catch (e) {
@@ -317,7 +317,7 @@ router.post('/getAsst', upload.array(), sessionCheck, (req, res) => {
   }
 
   const user = db.get('users')
-    .find({ id: req.cookies.id })
+    .find({ username: req.cookies.username })
     .value();
 
   const response = {};
@@ -360,7 +360,7 @@ router.post('/authAsst', upload.array(), sessionCheck, (req, res) => {
 
   // Query the user
   const user = db.get('users')
-    .find({ id: req.cookies.id })
+    .find({ username: req.cookies.username })
     .value();
 
   try {
