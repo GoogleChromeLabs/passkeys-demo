@@ -4,21 +4,12 @@ const multer = require('multer');
 const upload = multer();
 const base64url = require('base64url');
 const crypto = require('crypto');
-const { Fido2Lib } = require('fido2-lib');
 
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('.data/db.json');
 const db = low(adapter);
-
-const f2l = new Fido2Lib({
-    timeout: 30,
-    rpId: "example.com",
-    rpName: "WebAuthn Codelab",
-    attestation: "none",
-    cryptoParams: [-7]
-});
-
+                                                                                                                              
 db.defaults({
   users: []
 }).write();
