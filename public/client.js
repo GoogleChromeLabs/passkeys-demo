@@ -63,7 +63,7 @@ export const registerCredential = async (opts) => {
       return Promise.resolve(null);
     }
 
-    const options = await _fetch('/auth/makeCred', opts);
+    const options = await _fetch('/auth/registerRequest', opts);
 
     options.user.id = base64url.decode(options.user.id);
     options.challenge = base64url.decode(options.challenge);
@@ -82,7 +82,7 @@ export const registerCredential = async (opts) => {
     
     localStorage.setItem('credential', parsedCred.id);
 
-    return await _fetch('/auth/regCred' , parsedCred);
+    return await _fetch('/auth/registerResponse' , parsedCred);
   } catch (e) {
     throw e;
   }
@@ -130,7 +130,7 @@ export const verifyAssertion = async (opts) => {
       return Promise.resolve(null);
     }
 
-    const options = await _fetch(`/auth/getAsst?credId=${encodeURIComponent(credId)}`);
+    const options = await _fetch(`/auth/signinRequest?credId=${encodeURIComponent(credId)}`);
 
     options.challenge = base64url.decode(options.challenge);
 
@@ -152,7 +152,7 @@ export const verifyAssertion = async (opts) => {
 
     const parsedCred = await encodeAuthenticatorAssertionResponse(cred);
 
-    return await _fetch(`/auth/authAsst`, parsedCred);
+    return await _fetch(`/auth/signinResponse`, parsedCred);
   } catch (e) {
     throw 'Authentication failed. Use password to sign-in.';
   }

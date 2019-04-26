@@ -177,7 +177,7 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
      attestation: ('none'|'indirect'|'direct')
  * }```
  **/
-router.post('/makeCred', sessionCheck, (req, res) => {
+router.post('/registerRequest', sessionCheck, (req, res) => {
   const username = req.cookies.username;
   const user = db.get('users')
     .find({ username: username })
@@ -253,7 +253,7 @@ router.post('/makeCred', sessionCheck, (req, res) => {
      }
  * }```
  **/
-router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
+router.post('/registerResponse', upload.array(), sessionCheck, (req, res) => {
   const username = req.cookies.username;
   const challenge = req.cookies.challenge;
   const credId = req.body.id;
@@ -309,7 +309,7 @@ router.post('/regCred', upload.array(), sessionCheck, (req, res) => {
      }, ...]
  * }```
  **/
-router.post('/getAsst', upload.array(), sessionCheck, (req, res) => {
+router.post('/signinRequest', upload.array(), sessionCheck, (req, res) => {
   const credId = req.query.credId;
   if (!credId) {
     res.status(400).send('`credId` missing in request');
@@ -349,7 +349,7 @@ router.post('/getAsst', upload.array(), sessionCheck, (req, res) => {
      }
  * }```
  **/
-router.post('/authAsst', upload.array(), sessionCheck, (req, res) => {
+router.post('/singinResponse', upload.array(), sessionCheck, (req, res) => {
   const credId = req.body.id;
   const type = req.body.type;
   const credential = req.body.response;
