@@ -381,6 +381,8 @@ router.post('/signinResponse', upload.array(), sessionCheck, (req, res) => {
         throw 'Attestation not supported';
     }
 
+    res.clearCookie('challenge');
+
     if (user.credential !== credId) {
       res.status(400).send('Matching authenticator not found');
     } else {
