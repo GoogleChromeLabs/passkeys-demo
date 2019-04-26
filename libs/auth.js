@@ -265,7 +265,7 @@ router.post('/registerResponse', upload.array(), sessionCheck, (req, res) => {
   }
 
   try {
-    const origin = `https://${req.get('host')}`; // TODO: Temporary work around for scheme
+    const origin = `${req.schema}://${req.get('host')}`;
     const response = verifyCredential(credential, challenge, origin);
 
     switch (response.fmt) {
@@ -285,6 +285,7 @@ router.post('/registerResponse', upload.array(), sessionCheck, (req, res) => {
       .find({ username: username })
       .assign({ credential: credId })
       .write();
+    res.clearCookie('challenge');
     // Respond with user info
     res.json({
       username: username,
@@ -365,7 +366,7 @@ router.post('/signinResponse', upload.array(), sessionCheck, (req, res) => {
 
   try {
     const challenge = req.cookies.challenge;
-    const origin = `https://${req.get('host')}`; // TODO: Temporary work around for scheme
+    const origin = `${req.schema}://${req.get('host')}`;
     const response = verifyCredential(credential, challenge, origin);
 
     switch (response.fmt) {

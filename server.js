@@ -16,10 +16,10 @@ app.use(express.json());
 app.use(express.static('public'));
 
 app.use((req, res, next) => {
-  console.log(req.secure);
-  // if (!req.secure) {
-  //   return res.redirect(301, `https://${req.headers.host}${req.url}`);
-  // }
+  if ((req.get('x-forwarded-proto')).split(',')[0] !== 'https') {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  req.schema = 'https';
   next();
 });
 
