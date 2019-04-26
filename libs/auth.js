@@ -349,7 +349,7 @@ router.post('/signinRequest', upload.array(), sessionCheck, (req, res) => {
      }
  * }```
  **/
-router.post('/singinResponse', upload.array(), sessionCheck, (req, res) => {
+router.post('/signinResponse', upload.array(), sessionCheck, (req, res) => {
   const credId = req.body.id;
   const type = req.body.type;
   const credential = req.body.response;
