@@ -321,6 +321,11 @@ router.post('/signinRequest', upload.array(), sessionCheck, (req, res) => {
     .find({ username: req.cookies.username })
     .value();
 
+  if (!user.credential || user.credential !== credId) {
+    res.json(null);
+    return;
+  }
+
   const response = {};
   response.userVerification = req.body.userVerification || 'preferred';
   response.challenge = base64url(crypto.randomBytes(32));
