@@ -82,7 +82,7 @@ router.post('/signin', upload.array(), (req, res) => {
     if (!user) {
       user = {
         username: username,
-        credential: ''
+        credentials: []
       }
       db.get('users')
         .push(user)
