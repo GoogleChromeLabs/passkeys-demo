@@ -227,7 +227,7 @@ router.post('/registerRequest', sessionCheck, (req, res) => {
       response.excludeCredentials.push({
         id: cred.id,
         type: 'public-key',
-        transports: 'internal'
+        transports: ['internal']
       });
     }
   }
