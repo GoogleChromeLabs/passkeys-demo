@@ -109,12 +109,20 @@ router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
     return;
   }
   const username = req.cookies.username;
-  const credential = req.body.credential;
+  const credId = req.body.credential;
+  const user = db.get('users')
+    .find({ username: username })
+    .value();
+  user.credentials.push({
+    id: credId
+  });
+
   db.get('users')
     .find({ username: username })
-    .assign({ credential: credential })
+    .assign({ credentials: user.credentials })
     .write();
-  res.json({ username: username, credential: credential });
+
+  res.json(user);
 });
 
 /**
@@ -138,8 +146,17 @@ router.post('/getKey', upload.array(), sessionCheck, (req, res) => {
  * Responds with empty JSON `{}`
  **/
 router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
+  const credId = req.body.credId;
+  const username = req.cookies.username;
+  const user = db.get('users')
+    .find({ username: username })
+    .value();
+
+  for (let cred of user.credentials) {
+  }
+
   db.get('users')
-    .find({ username: req.cookies.username })
+    .find({ username: username })
     .assign({ credential: '' })
     .write();
   res.json({});
