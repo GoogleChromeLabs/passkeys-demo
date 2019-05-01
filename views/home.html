@@ -46,7 +46,8 @@
     </main>
     <script type="module">
       import { _fetch, registerCredential, unregisterCredential } from '/client.js';
-      import { html, render, repeat } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
+      import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
+      import { repeat } from 'https://unpkg.com/lit-html@1.0.0/directives/repeat.js?module';
 
       const makeCredential = async () => {
         registerCredential({
@@ -74,7 +75,7 @@
       const getCredential = () => {
         _fetch('/auth/getKey').then(res => {
           const list = document.querySelector('#list');
-          const li = html`${res && res.credential ?
+          const li = html`${res && res.credentials ?
             html`${repeat(res.credentials, cred => cred.id, (cred, index) => html`<li>${cred.id}
               <button id="${cred.id}" @click=${removeCredential}>Remove</button>
             </li>`)}` :

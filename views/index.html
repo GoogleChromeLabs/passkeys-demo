@@ -43,9 +43,6 @@
       form.addEventListener('submit', e => {
         e.preventDefault();
         _fetch('/auth/signin', new FormData(e.target)).then(user => {
-          if (user.credential) {
-            localStorage.setItem('credential', user.credential);
-          }
           location.href = '/reauth';
         }).catch(e => {
           alert(e.error);
