@@ -152,13 +152,16 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
     .find({ username: username })
     .value();
 
-  for (let cred of user.credentials) {
-  }
+  const newCreds = user.credentials.filter(cred => {
+    // Leave credential ids that do not match
+    return cred.id !== credId;
+  });
 
   db.get('users')
     .find({ username: username })
-    .assign({ credential: '' })
+    .assign({ credentials: newCreds })
     .write();
+
   res.json({});
 });
 
@@ -216,14 +219,17 @@ router.post('/registerRequest', sessionCheck, (req, res) => {
   response.timeout = (req.body && req.body.timeout) || 1000 * 30;
   response.challenge = base64url(crypto.randomBytes(32));
   res.cookie('challenge', response.challenge);
+  response.excludeCredentials = [];
 
   // Only specify `excludeCredentials` when reauthFlag is `false`
-  if (user && user.credential) {
-    response.excludeCredentials.push({
-      id: user.credential,
-      type: 'public-key',
-      transports: 'internal'
-    });
+  if (user.credentials.length > 0) {
+    for (let cred of user.credentials) {
+      response.excludeCredentials.push({
+        id: cred.id,
+        type: 'public-key',
+        transports: 'internal'
+      });
+    }
   }
 
   const as = {}; // authenticatorSelection
@@ -298,16 +304,23 @@ router.post('/registerResponse', upload.array(), sessionCheck, (req, res) => {
     }
 
     // Store user info
+    const user = db.get('users')
+      .find({ username: username })
+      .value();
+    
+    user.credentials.push({
+      id: credId
+    });
+
     db.get('users')
       .find({ username: username })
-      .assign({ credential: credId })
+      .assign({ credentials: user.credentials })
       .write();
+
     res.clearCookie('challenge');
+
     // Respond with user info
-    res.json({
-      username: username,
-      credential: credId
-    });
+    res.json(user);
   } catch (e) {
     res.status(400).send(e);
   }
@@ -338,22 +351,21 @@ router.post('/signinRequest', upload.array(), sessionCheck, (req, res) => {
     .find({ username: req.cookies.username })
     .value();
 
-  // TODO: How does server know the same device?
-  // if (!user.credential || user.credential !== credId) {
-  //   res.json(null);
-  //   return;
-  // }
-
   const response = {};
   response.userVerification = req.body.userVerification || 'preferred';
   response.challenge = base64url(crypto.randomBytes(32));
   res.cookie('challenge', response.challenge);
+  response.allowCredentials = [];
 
-  response.allowCredentials = [{
-    id: credId,
-    type: 'public-key',
-    transports: ['internal']
-  }];
+  if (user.credentials.length > 0) {
+    for (let cred of user.credentials) {
+      response.allowCredentials.push({
+        id: cred.id,
+        type: 'public-key',
+        transports: ['internal']
+      });
+    }
+  }
 
   res.json(response);
 });
@@ -406,6 +418,7 @@ router.post('/signinResponse', upload.array(), sessionCheck, (req, res) => {
 
     res.clearCookie('challenge');
 
+    // TODO: Implement real verification
     if (user.credential !== credId) {
       res.status(400).send('Matching authenticator not found');
     } else {
