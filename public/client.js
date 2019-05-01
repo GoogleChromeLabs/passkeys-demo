@@ -154,10 +154,12 @@ export const verifyAssertion = async (opts) => {
   }
 };
 
-export const unregisterCredential = async () => {
+export const unregisterCredential = async (credId) => {
   try {
-    const credId = localStorage.getItem('credential');
-    localStorage.removeItem('credential');
+    const _credId = localStorage.getItem('credential');
+    if (credId === _credId) {
+      localStorage.removeItem('credential');
+    }
     return _fetch(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
   } catch (e) {
     throw e;

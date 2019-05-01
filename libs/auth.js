@@ -146,7 +146,7 @@ router.post('/getKey', upload.array(), sessionCheck, (req, res) => {
  * Responds with empty JSON `{}`
  **/
 router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
-  const credId = req.body.credId;
+  const credId = req.query.credId;
   const username = req.cookies.username;
   const user = db.get('users')
     .find({ username: username })

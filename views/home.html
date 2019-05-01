@@ -33,10 +33,10 @@
         Welcome, {{username}}!
       </h2>
       <h3>
-        Your registered credential:
+        Your registered credentials:
       </h3>
-      <ul id="list">
-      </ul>
+      <section id="list">
+      </section>
       <p>
         <a href="/">Try reauth</a>
       </p>
@@ -65,7 +65,7 @@
         })
         .catch(e => {
           if (e) {
-            alert(e.error);
+            alert(e);
           } else {
             alert('Unkown error.');
           }
@@ -75,20 +75,18 @@
       const getCredential = () => {
         _fetch('/auth/getKey').then(res => {
           const list = document.querySelector('#list');
-          const li = html`${res && res.credentials ?
-            html`${repeat(res.credentials, cred => cred.id, (cred, index) => html`<li>${cred.id}
+          const li = html`<ul>
+            ${repeat(res.credentials, cred => cred.id, (cred, index) => html`<li>${cred.id}
               <button id="${cred.id}" @click=${removeCredential}>Remove</button>
-            </li>`)}` :
-            html`<li>None: 
-              <button @click=${makeCredential}>Register a new credential</button>
-            </li>`
-          }`
+            </li>`)}
+            </ul>
+            <button @click=${makeCredential}>Register a new credential</button>`
           render(li, list);
         });
       };
 
       const removeCredential = e => {
-        unregisterCredential()
+        unregisterCredential(e.target.id)
         .then(() => {
           getCredential();
         })
