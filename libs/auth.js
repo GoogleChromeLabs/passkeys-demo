@@ -419,11 +419,13 @@ router.post('/signinResponse', upload.array(), sessionCheck, (req, res) => {
     res.clearCookie('challenge');
 
     // TODO: Implement real verification
-    if (user.credential !== credId) {
-      res.status(400).send('Matching authenticator not found');
-    } else {
-      res.json(user);
+    for (let cred of user.credentials) {
+      if (cred.id === credId) {
+        res.json(user);
+        return;
+      }
     }
+    res.status(400).send('Matching authenticator not found');
   } catch (e) {
     console.error(e);
     res.status(400).send(e);
