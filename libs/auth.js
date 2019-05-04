@@ -302,7 +302,7 @@ router.post('/registerRequest', sessionCheck, async (req, res) => {
     if (user.credentials.length > 0) {
       for (let cred of user.credentials) {
         response.excludeCredentials.push({
-          id: cred.id,
+          id: cred.credId,
           type: 'public-key',
           transports: ['internal']
         });
