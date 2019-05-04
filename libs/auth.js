@@ -103,32 +103,32 @@ const sessionCheck = (req, res, next) => {
   next();
 };
 
-const verifyCredential = (credential, challenge, origin) => {
-  const attestationObject = credential.attestationObject;
-  const authenticatorData = credential.authenticatorData;
-  if (!attestationObject && !authenticatorData)
-    throw 'Invalid request.';
+// const verifyCredential = (credential, challenge, origin) => {
+//   const attestationObject = credential.attestationObject;
+//   const authenticatorData = credential.authenticatorData;
+//   if (!attestationObject && !authenticatorData)
+//     throw 'Invalid request.';
 
-  const clientDataJSON = credential.clientDataJSON;
-  // const signature = credential.signature;
-  // const userHandle = credential.userHandle;
-  const clientData = JSON.parse(base64url.decode(clientDataJSON));
+//   const clientDataJSON = credential.clientDataJSON;
+//   // const signature = credential.signature;
+//   // const userHandle = credential.userHandle;
+//   const clientData = JSON.parse(base64url.decode(clientDataJSON));
 
-  if (clientData.challenge !== challenge)
-    throw 'Wrong challenge code.';
+//   if (clientData.challenge !== challenge)
+//     throw 'Wrong challenge code.';
 
-  if (clientData.origin !== origin)
-    throw 'Wrong origin.';
+//   if (clientData.origin !== origin)
+//     throw 'Wrong origin.';
 
-  // Temporary workaround for inmature CBOR
-  // const buffer = base64url.toBuffer(attestationObject || authenticatorData);
-  // const response = cbor.decodeAllSync(buffer)[0];
+//   // Temporary workaround for inmature CBOR
+//   // const buffer = base64url.toBuffer(attestationObject || authenticatorData);
+//   // const response = cbor.decodeAllSync(buffer)[0];
 
-  const response = {};
-  response.fmt = 'none';
+//   const response = {};
+//   response.fmt = 'none';
 
-  return response;
-};
+//   return response;
+// };
 
 /**
  * Verifies user credential and let the user sign-in.
@@ -177,27 +177,27 @@ router.get('/signout', function(req, res) {
 });
 
 // For test purposes
-router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
-  if (!req.body.credential) {
-    res.status(400).json({ error: 'invalid request' });
-    return;
-  }
-  const username = req.cookies.username;
-  const credId = req.body.credential;
-  const user = db.get('users')
-    .find({ username: username })
-    .value();
-  user.credentials.push({
-    id: credId
-  });
+// router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
+//   if (!req.body.credential) {
+//     res.status(400).json({ error: 'invalid request' });
+//     return;
+//   }
+//   const username = req.cookies.username;
+//   const credId = req.body.credential;
+//   const user = db.get('users')
+//     .find({ username: username })
+//     .value();
+//   user.credentials.push({
+//     id: credId
+//   });
 
-  db.get('users')
-    .find({ username: username })
-    .assign({ credentials: user.credentials })
-    .write();
+//   db.get('users')
+//     .find({ username: username })
+//     .assign({ credentials: user.credentials })
+//     .write();
 
-  res.json(user);
-});
+//   res.json(user);
+// });
 
 /**
  * Returns a credential id
@@ -238,6 +238,8 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
 
   res.json({});
 });
+
+route.post('', 
 
 /**
  * Respond with required information to call navigator.credential.create()
@@ -468,7 +470,7 @@ router.post('/signinResponse', upload.array(), sessionCheck, async (req, res) =>
       credential = cred;
     }
   }
-  
+
   if (!credential) {
     res.status(400).send('Authenticating credential not found.');
     return;
@@ -495,22 +497,21 @@ router.post('/signinResponse', upload.array(), sessionCheck, async (req, res) =>
       factor: "either",
       publicKey: credential.publicKey,
       prevCounter: credential.prevCounter,
-      userHandle: credential.userId
+      userHandle: coerceToArrayBuffer(user.id)
     };
     const result = await f2l.assertionResult(clientAssertionResponse, assertionExpectations);
 
     res.clearCookie('challenge');
 
-    // TODO: Implement real verification
-    for (let cred of user.credentials) {
-      if (cred.id === credId) {
-        res.json(user);
-        return;
-      }
-    }
-    res.status(400).send('Matching authenticator not found');
+    credential.counter = result.authnrData.get("counter");
+    
+    db.get('users')
+      .find({ id: req.cookies.id })
+      .assign(user)
+      .write();
+
+    res.json(user);
   } catch (e) {
-    console.error(e);
     res.status(400).send(e);
   }
 });

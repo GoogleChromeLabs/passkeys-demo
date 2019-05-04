@@ -51,6 +51,7 @@
 
       const makeCredential = async () => {
         registerCredential({
+          attestation: 'none',
           authenticatorSelection: {
             authenticatorAttachment: 'platform',
             userVerification: 'required'
@@ -76,8 +77,8 @@
         _fetch('/auth/getKey').then(res => {
           const list = document.querySelector('#list');
           const li = html`<ul>
-            ${repeat(res.credentials, cred => cred.id, (cred, index) => html`<li>${cred.id}
-              <button id="${cred.id}" @click=${removeCredential}>Remove</button>
+            ${repeat(res.credentials, cred => cred.credId, (cred, index) => html`<li>${cred.credId}
+              <button id="${cred.credId}" @click=${removeCredential}>Remove</button>
             </li>`)}
             </ul>
             <button @click=${makeCredential}>Register a new credential</button>`
