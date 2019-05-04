@@ -239,7 +239,15 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
   res.json({});
 });
 
-route.post('', 
+router.get('/resetDB', upload.array(), (req, res) => {
+  db.set('users', [])
+    .write();
+  console.log('db reset');
+  const users = db.get('users')
+    .value();
+  console.log(users);
+  res.json(users);  
+});
 
 /**
  * Respond with required information to call navigator.credential.create()
