@@ -351,11 +351,6 @@ router.post('/registerResponse', upload.array(), sessionCheck, async (req, res) 
   const challenge = coerceToArrayBuffer(req.cookies.challenge, 'challenge');
   const credId = req.body.id;
   const type = req.body.type;
-  const credential = req.body.response;
-  if (!credId || !type || !credential) {
-    res.status(400).send('`response` missing in request');
-    return;
-  }
 
   try {
     const clientAttestationResponse = { response: {} };
@@ -365,6 +360,7 @@ router.post('/registerResponse', upload.array(), sessionCheck, async (req, res) 
       coerceToArrayBuffer(req.body.response.clientDataJSON, "clientDataJSON");
     clientAttestationResponse.response.attestationObject =
       coerceToArrayBuffer(req.body.response.attestationObject, "attestationObject");
+
     const attestationExpectations = {
       challenge: challenge,
       origin: `https://${req.get('host')}`,
@@ -373,26 +369,22 @@ router.post('/registerResponse', upload.array(), sessionCheck, async (req, res) 
 
     const regResult = await f2l.attestationResult(clientAttestationResponse, attestationExpectations);
 
-    const user = {
-      id: id,
-      credential: coerceToBase64Url(regResult.authnrData.get("credId")),
+    const credential = {
+      credId: coerceToBase64Url(regResult.authnrData.get("credId")),
       publicKey: regResult.authnrData.get("credentialPublicKeyPem"),
       aaguid: regResult.authnrData.get("aaguid"),
       prevCounter: regResult.authnrData.get("counter")
     };
 
-    // Store user info
     const user = db.get('users')
       .find({ username: username })
       .value();
-    
-    user.credentials.push({
-      id: credId
-    });
+
+    user.credentials.push(credential);
 
     db.get('users')
       .find({ username: username })
-      .assign({ credentials: user.credentials })
+      .assign(user)
       .write();
 
     res.clearCookie('challenge');
@@ -418,34 +410,33 @@ router.post('/registerResponse', upload.array(), sessionCheck, async (req, res) 
      }, ...]
  * }```
  **/
-router.post('/signinRequest', upload.array(), sessionCheck, (req, res) => {
-  const credId = req.query.credId;
-  if (!credId) {
-    res.status(400).send('`credId` missing in request');
-    return;
-  }
+router.post('/signinRequest', upload.array(), sessionCheck, async (req, res) => {
+  try {
+    const user = db.get('users')
+      .find({ username: req.cookies.username })
+      .value();
 
-  const user = db.get('users')
-    .find({ username: req.cookies.username })
-    .value();
+    const response = await f2l.assertionOptions();
 
-  const response = {};
-  response.userVerification = req.body.userVerification || 'preferred';
-  response.challenge = base64url(crypto.randomBytes(32));
-  res.cookie('challenge', response.challenge);
-  response.allowCredentials = [];
+    // const response = {};
+    response.userVerification = req.body.userVerification || 'preferred';
+    response.challenge = coerceToBase64Url(response.challenge);
+    res.cookie('challenge', response.challenge);
+    
+    response.allowCredentials = [];
 
-  if (user.credentials.length > 0) {
     for (let cred of user.credentials) {
       response.allowCredentials.push({
-        id: cred.id,
+        id: cred.credId,
         type: 'public-key',
         transports: ['internal']
       });
     }
-  }
 
-  res.json(response);
+    res.json(response);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 /**
@@ -463,36 +454,50 @@ router.post('/signinRequest', upload.array(), sessionCheck, (req, res) => {
      }
  * }```
  **/
-router.post('/signinResponse', upload.array(), sessionCheck, (req, res) => {
+router.post('/signinResponse', upload.array(), sessionCheck, async (req, res) => {
   const credId = req.body.id;
-  const type = req.body.type;
-  const credential = req.body.response;
-  if (!credId || !type || !credential) {
-    res.status(400).send('`response` missing in request');
-    return;
-  }
 
   // Query the user
   const user = db.get('users')
     .find({ username: req.cookies.username })
     .value();
 
-  try {
-    const challenge = req.cookies.challenge;
-    const origin = `${req.schema}://${req.get('host')}`;
-    const response = verifyCredential(credential, challenge, origin);
-
-    switch (response.fmt) {
-      case 'none':
-      case 'packed':
-        // Ignore attestation
-        break;
-      case 'fido-u2f':
-      case 'android-safetynet':
-      default:
-        // Not implemented yet
-        throw 'Attestation not supported';
+  let credential = null;
+  for (let cred of user.credentials) {
+    if (cred.credId === req.body.id) {
+      credential = cred;
     }
+  }
+  
+  if (!credential) {
+    res.status(400).send('Authenticating credential not found.');
+    return;
+  }
+
+  try {
+    const challenge = coerceToArrayBuffer(req.cookies.challenge);
+    const origin = `https://${req.get('host')}`; // TODO: Temporary work around for scheme
+    
+    const clientAssertionResponse = { response: {} };
+    clientAssertionResponse.rawId =
+      coerceToArrayBuffer(req.body.rawId, "rawId");
+    clientAssertionResponse.response.clientDataJSON =
+      coerceToArrayBuffer(req.body.response.clientDataJSON, "clientDataJSON");
+    clientAssertionResponse.response.authenticatorData =
+      coerceToArrayBuffer(req.body.response.authenticatorData, "authenticatorData");
+    clientAssertionResponse.response.signature =
+      coerceToArrayBuffer(req.body.response.signature, "signature");
+    clientAssertionResponse.response.userHandle =
+      coerceToArrayBuffer(req.body.response.userHandle, "userHandle");
+    const assertionExpectations = {
+      challenge: challenge,
+      origin: origin,
+      factor: "either",
+      publicKey: credential.publicKey,
+      prevCounter: credential.prevCounter,
+      userHandle: credential.userId
+    };
+    const result = await f2l.assertionResult(clientAssertionResponse, assertionExpectations);
 
     res.clearCookie('challenge');
 
