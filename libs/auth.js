@@ -4,15 +4,88 @@ const multer = require('multer');
 const upload = multer();
 const base64url = require('base64url');
 const crypto = require('crypto');
+const { Fido2Lib } = require('fido2-lib');
 
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('.data/db.json');
 const db = low(adapter);
+
+const f2l = new Fido2Lib({
+    timeout: 30*1000*60,
+    rpId: "webauthn-codelab-resolution.glitch.me", // TODO: Auto generate
+    rpName: "WebAuthn Codelab",
+    challengeSize: 32,
+    cryptoParams: [-7]
+});
                                                                                                                               
 db.defaults({
   users: []
 }).write();
+
+const coerceToBase64Url = (thing, name) => {
+    name = name || "''";
+
+    // Array to Uint8Array
+    if (Array.isArray(thing)) {
+        thing = Uint8Array.from(thing);
+    }
+
+    // Uint8Array, etc. to ArrayBuffer
+    if (typeof thing === "object" &&
+                thing.buffer instanceof ArrayBuffer &&
+                !(thing instanceof Buffer)) {
+        thing = thing.buffer;
+    }
+
+    // ArrayBuffer to Buffer
+    if (thing instanceof ArrayBuffer && !(thing instanceof Buffer)) {
+        thing = new Buffer(thing);
+    }
+
+    // Buffer to base64 string
+    if (thing instanceof Buffer) {
+        thing = thing.toString("base64");
+    }
+
+    if (typeof thing !== "string") {
+        throw new Error(`could not coerce '${name}' to string`);
+    }
+
+    // base64 to base64url
+    // NOTE: "=" at the end of challenge is optional, strip it off here so that it's compatible with client
+    thing = thing.replace(/\+/g, "-").replace(/\//g, "_").replace(/=*$/g, "");
+
+    return thing;
+}
+
+const coerceToArrayBuffer = (buf, name) => {
+    name = name || "''";
+
+    if (typeof buf === "string") {
+        // base64url to base64
+        buf = buf.replace(/-/g, "+").replace(/_/g, "/");
+        // base64 to Buffer
+        buf = Buffer.from(buf, "base64");
+    }
+
+    // Buffer or Array to Uint8Array
+    if (buf instanceof Buffer || Array.isArray(buf)) {
+        buf = new Uint8Array(buf);
+    }
+
+    // Uint8Array to ArrayBuffer
+    if (buf instanceof Uint8Array) {
+        buf = buf.buffer;
+    }
+
+    // error if none of the above worked
+    if (!(buf instanceof ArrayBuffer)) {
+        throw new TypeError(`could not coerce '${name}' to ArrayBuffer`);
+    }
+
+    return buf;
+}
 
 /**
  * Checks CSRF protection using custom header `X-Requested-With`
@@ -82,6 +155,7 @@ router.post('/signin', upload.array(), (req, res) => {
     if (!user) {
       user = {
         username: username,
+        id: coerceToBase64Url(crypto.randomBytes(32)),
         credentials: []
       }
       db.get('users')
@@ -197,68 +271,64 @@ router.post('/removeKey', upload.array(), sessionCheck, (req, res) => {
      attestation: ('none'|'indirect'|'direct')
  * }```
  **/
-router.post('/registerRequest', sessionCheck, (req, res) => {
+router.post('/registerRequest', sessionCheck, async (req, res) => {
   const username = req.cookies.username;
   const user = db.get('users')
     .find({ username: username })
     .value();
+  
+  try {
+    const response = await f2l.attestationOptions();
+    
+    response.user = {
+      displayName: 'No name',
+      id: user.id,
+      name: user.username
+    };
+    response.challenge = coerceToBase64Url(response.challenge);
+    res.cookie('challenge', response.challenge);
+    response.excludeCredentials = [];
 
-  const response = {};
-  response.rp = {
-    id: req.host,
-    name: 'Polykart'
-  };
-  response.user = {
-    displayName: 'No name',
-    id: base64url(crypto.randomBytes(32)),
-    name: username
-  };
-  response.pubKeyCredParams = [{
-    type: 'public-key', alg: -7
-  }];
-  response.timeout = (req.body && req.body.timeout) || 1000 * 30;
-  response.challenge = base64url(crypto.randomBytes(32));
-  res.cookie('challenge', response.challenge);
-  response.excludeCredentials = [];
-
-  // Only specify `excludeCredentials` when reauthFlag is `false`
-  if (user.credentials.length > 0) {
-    for (let cred of user.credentials) {
-      response.excludeCredentials.push({
-        id: cred.id,
-        type: 'public-key',
-        transports: ['internal']
-      });
+    if (user.credentials.length > 0) {
+      for (let cred of user.credentials) {
+        response.excludeCredentials.push({
+          id: cred.id,
+          type: 'public-key',
+          transports: ['internal']
+        });
+      }
     }
-  }
 
-  const as = {}; // authenticatorSelection
-  const aa = req.body.authenticatorSelection.authenticatorAttachment;
-  const rr = req.body.authenticatorSelection.requireResidentKey;
-  const uv = req.body.authenticatorSelection.userVerification;
-  const cp = req.body.attestation; // attestationConveyancePreference
-  let asFlag = false;
+    const as = {}; // authenticatorSelection
+    const aa = req.body.authenticatorSelection.authenticatorAttachment;
+    const rr = req.body.authenticatorSelection.requireResidentKey;
+    const uv = req.body.authenticatorSelection.userVerification;
+    const cp = req.body.attestation; // attestationConveyancePreference
+    let asFlag = false;
 
-  if (aa && (aa == 'platform' || aa == 'cross-platform')) {
-    asFlag = true;
-    as.authenticatorAttachment = aa;
-  }
-  if (rr && typeof rr == 'boolean') {
-    asFlag = true;
-    as.requireResidentKey = rr;
-  }
-  if (uv && (uv == 'required' || uv == 'preferred' || uv == 'discouraged')) {
-    asFlag = true;
-    as.userVerification = uv;
-  }
-  if (asFlag) {
-    response.authenticatorSelection = as;
-  }
-  if (cp && (cp == 'none' || cp == 'indirect' || cp == 'direct')) {
-    response.attestation = cp;
-  }
+    if (aa && (aa == 'platform' || aa == 'cross-platform')) {
+      asFlag = true;
+      as.authenticatorAttachment = aa;
+    }
+    if (rr && typeof rr == 'boolean') {
+      asFlag = true;
+      as.requireResidentKey = rr;
+    }
+    if (uv && (uv == 'required' || uv == 'preferred' || uv == 'discouraged')) {
+      asFlag = true;
+      as.userVerification = uv;
+    }
+    if (asFlag) {
+      response.authenticatorSelection = as;
+    }
+    if (cp && (cp == 'none' || cp == 'indirect' || cp == 'direct')) {
+      response.attestation = cp;
+    }
 
-  res.json(response);
+    res.json(response);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 /**
@@ -276,9 +346,9 @@ router.post('/registerRequest', sessionCheck, (req, res) => {
      }
  * }```
  **/
-router.post('/registerResponse', upload.array(), sessionCheck, (req, res) => {
+router.post('/registerResponse', upload.array(), sessionCheck, async (req, res) => {
   const username = req.cookies.username;
-  const challenge = req.cookies.challenge;
+  const challenge = coerceToArrayBuffer(req.cookies.challenge, 'challenge');
   const credId = req.body.id;
   const type = req.body.type;
   const credential = req.body.response;
@@ -288,20 +358,28 @@ router.post('/registerResponse', upload.array(), sessionCheck, (req, res) => {
   }
 
   try {
-    const origin = `${req.schema}://${req.get('host')}`;
-    const response = verifyCredential(credential, challenge, origin);
+    const clientAttestationResponse = { response: {} };
+    clientAttestationResponse.rawId =
+      coerceToArrayBuffer(req.body.rawId, "rawId");
+    clientAttestationResponse.response.clientDataJSON =
+      coerceToArrayBuffer(req.body.response.clientDataJSON, "clientDataJSON");
+    clientAttestationResponse.response.attestationObject =
+      coerceToArrayBuffer(req.body.response.attestationObject, "attestationObject");
+    const attestationExpectations = {
+      challenge: challenge,
+      origin: `https://${req.get('host')}`,
+      factor: "either"
+    };
 
-    switch (response.fmt) {
-      case 'none':
-      case 'packed':
-        // Ignore attestation
-        break;
-      case 'fido-u2f':
-      case 'android-safetynet':
-      default:
-        // Not implemented yet
-        throw 'Attestation not supported';
-    }
+    const regResult = await f2l.attestationResult(clientAttestationResponse, attestationExpectations);
+
+    const user = {
+      id: id,
+      credential: coerceToBase64Url(regResult.authnrData.get("credId")),
+      publicKey: regResult.authnrData.get("credentialPublicKeyPem"),
+      aaguid: regResult.authnrData.get("aaguid"),
+      prevCounter: regResult.authnrData.get("counter")
+    };
 
     // Store user info
     const user = db.get('users')
