@@ -3,11 +3,14 @@ const router = express.Router();
 const base64url = require('base64url');
 const crypto = require('crypto');
 const { Fido2Lib } = require('fido2-lib');
+const bodyParser = require('body-parser');
 
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('.data/db.json');
 const db = low(adapter);
+
+router.use(bodyParser.json());
 
 const f2l = new Fido2Lib({
     timeout: 30*1000*60,
@@ -16,7 +19,7 @@ const f2l = new Fido2Lib({
     challengeSize: 32,
     cryptoParams: [-7]
 });
-                                                                                                                              
+
 db.defaults({
   users: []
 }).write();
@@ -98,7 +101,7 @@ const csrfCheck = (req, res, next) => {
  * If cookie doesn't contain `username`, consider the user is not authenticated.
  **/
 const sessionCheck = (req, res, next) => {
-  if (req.cookies['signed-in'] != 'yes') {
+  if (!req.cookies.username) {
     res.status(401).json({error: 'not signed in.'});
     return;
   }
@@ -132,8 +135,6 @@ router.post('/signin', csrfCheck, (req, res) => {
         .push(user)
         .write();
     }
-    // Simple session cookie
-    res.cookie('signed-in', 'yes');
     // If sign-in succeeded, redirect to `/home`.
     res.status(200).json(user);
   }
@@ -142,9 +143,8 @@ router.post('/signin', csrfCheck, (req, res) => {
 router.get('/signout', function(req, res) {
   // Remove cookies
   res.clearCookie('username');
-  res.clearCookie('signed-in');
   // Redirect to `/`
-  res.redirect(307, '/');
+  res.redirect(302, '/');
 });
 
 // For test purposes
@@ -479,7 +479,6 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     const result = await f2l.assertionResult(clientAssertionResponse, assertionExpectations);
 
     res.clearCookie('challenge');
-    res.cookie('signed-in', 'yes');
 
     credential.prevCounter = result.authnrData.get("counter");
 

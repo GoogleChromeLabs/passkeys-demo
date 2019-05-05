@@ -26,7 +26,6 @@ app.use((req, res, next) => {
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', (req, res) => {
-  res.clearCookie('signed-in');
   // Check cookie
   if (req.cookies.username) {
     // If user is signed in, redirect to `/reauth`.
