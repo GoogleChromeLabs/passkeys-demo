@@ -108,26 +108,6 @@ const sessionCheck = (req, res, next) => {
 };
 
 /**
- * Only check if valid username is entered
- */
-router.post('/username', upload.array(), csrfCheck, (req, res) => {
-  const username = req.body.username;
-  // If cookie doesn't contain a username, let in as long as `username` present (Ignore password)
-  if (!username) {
-    // If sign-in failed, return 401.
-    res.status(400).json({error: 'invalid username.'});
-  // If cookie contains a username (already signed in, this is reauth), let the user sign-in
-  } else {
-    res.cookie('username', username);
-    res.clearCookie('signed-in');
-    res.json({
-      username: username
-    });
-  }
-  return;
-});
-
-/**
  * Verifies user credential and let the user sign-in.
  * No preceding registration required.
  * This only checks if `username` is not empty string and ignores the password.

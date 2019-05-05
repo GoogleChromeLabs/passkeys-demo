@@ -45,12 +45,13 @@ app.get('/home', function(req, res) {
   res.render('home.html', {username: req.cookies.username});
 });
 
-app.post('/reauth', function(req, res) {
+app.all('/reauth', function(req, res) {
   const username = req.body.username;
   if (username == '') {
     res.redirect(307, '/');
     return;
   }
+  res.cookie('username', username);
   // Show `reauth.html`.
   // User is supposed to enter a password (which will be ignored)
   // Make XHR POST to `/signin`
