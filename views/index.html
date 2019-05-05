@@ -32,7 +32,7 @@
       <h2>
         Login with random id/password
       </h2>
-      <form id="form" method="POST" action="/auth/signin" >
+      <form id="form" method="POST" action="/auth/username" >
         username: <input type="text" name="username" placeholder="Whatever" value="" />
         <input type="submit" value="Next" />
       </form>
@@ -42,7 +42,7 @@
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
-        _fetch('/auth/signin', new FormData(e.target)).then(user => {
+        _fetch('/auth/username', new FormData(e.target)).then(user => {
           location.href = '/reauth';
         }).catch(e => {
           alert(e.error);

@@ -41,7 +41,6 @@ app.get('/home', function(req, res) {
     res.redirect(307, '/');
   }
   // `home.html` shows sign-out link
-  // TODO: When developed, allow user to register their authenticator
   res.render('home.html', {username: req.cookies.username});
 });
 
@@ -49,7 +48,6 @@ app.get('/reauth', function(req, res) {
   // Show `reauth.html`.
   // User is supposed to enter a password (which will be ignored)
   // Make XHR POST to `/signin`
-  // TODO: When developed, do fingerprint reauth
   res.render('reauth.html', {username: req.cookies.username});
 });
 
