@@ -96,45 +96,16 @@ const sessionCheck = (req, res, next) => {
     res.status(400).json({error: 'invalid access.'});
     return;
   }
-  if (!req.cookies.username) {
+  if (!req.cookies['signed-in']) {
     res.status(401).json({error: 'not signed in.'});
     return;
   }
   next();
 };
 
-// const verifyCredential = (credential, challenge, origin) => {
-//   const attestationObject = credential.attestationObject;
-//   const authenticatorData = credential.authenticatorData;
-//   if (!attestationObject && !authenticatorData)
-//     throw 'Invalid request.';
-
-//   const clientDataJSON = credential.clientDataJSON;
-//   // const signature = credential.signature;
-//   // const userHandle = credential.userHandle;
-//   const clientData = JSON.parse(base64url.decode(clientDataJSON));
-
-//   if (clientData.challenge !== challenge)
-//     throw 'Wrong challenge code.';
-
-//   if (clientData.origin !== origin)
-//     throw 'Wrong origin.';
-
-//   // Temporary workaround for inmature CBOR
-//   // const buffer = base64url.toBuffer(attestationObject || authenticatorData);
-//   // const response = cbor.decodeAllSync(buffer)[0];
-
-//   const response = {};
-//   response.fmt = 'none';
-
-//   return response;
-// };
-
 /**
- * Verifies user credential and let the user sign-in.
- * No preceding registration required.
- * This only checks if `username` is not empty string and ignores the password.
- **/
+ *
+ 
 router.post('/signin', upload.array(), (req, res) => {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
     res.status(400).json({error: 'invalid access.'});
@@ -146,6 +117,27 @@ router.post('/signin', upload.array(), (req, res) => {
     // If sign-in failed, return 401.
     res.status(400).json({error: 'invalid username.'});
   // If cookie contains a username (already signed in, this is reauth), let the user sign-in
+  } else {
+    res.cookie('username', username);
+    res.json({});
+  }
+  return;
+});
+
+/**
+ * Verifies user credential and let the user sign-in.
+ * No preceding registration required.
+ * This only checks if `username` is not empty string and ignores the password.
+ **/
+router.post('/password', upload.array(), (req, res) => {
+  if (req.header('X-Requested-With') != 'XMLHttpRequest') {
+    res.status(400).json({error: 'invalid access.'});
+    return;
+  }
+  const username = req.cookies.username;
+  if (!username) {
+    res.status(401).send('Unauthorized');
+    return;
   } else {
     // See if account already exists
     let user = db.get('users')
@@ -162,11 +154,11 @@ router.post('/signin', upload.array(), (req, res) => {
         .push(user)
         .write();
     }
-    res.cookie('username', username);
+    // Simple session cookie
+    res.cookie('signed-in', 'yes');
     // If sign-in succeeded, redirect to `/home`.
     res.status(200).json(user);
   }
-  return;
 });
 
 router.get('/signout', function(req, res) {
