@@ -124,13 +124,8 @@ export const verifyAssertion = async (opts) => {
       console.info('User Verifying Platform Authenticator not available.');
       return Promise.resolve(null);
     }
-    const credId = localStorage.getItem('credential');
-    if (!credId) {
-      console.info('No stored credential found on this browser.');
-      return Promise.resolve(null);
-    }
 
-    const options = await _fetch(`/auth/signinRequest?credId=${encodeURIComponent(credId)}`);
+    const options = await _fetch('/auth/signinRequest');
 
     options.challenge = base64url.decode(options.challenge);
 
