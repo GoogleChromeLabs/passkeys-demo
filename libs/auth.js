@@ -100,7 +100,7 @@ const csrfCheck = (req, res, next) => {
  * If cookie doesn't contain `username`, consider the user is not authenticated.
  **/
 const sessionCheck = (req, res, next) => {
-  if (!req.cookies['signed-in']) {
+  if (req.cookies['signed-in'] != 'yes') {
     res.status(401).json({error: 'not signed in.'});
     return;
   }
@@ -395,6 +395,7 @@ router.post('/registerResponse', upload.array(), csrfCheck, sessionCheck, async 
     // Respond with user info
     res.json(user);
   } catch (e) {
+    res.clearCookie('challenge');
     res.status(400).send(e);
   }
 });
@@ -505,8 +506,8 @@ router.post('/signinResponse', upload.array(), csrfCheck, async (req, res) => {
     res.clearCookie('challenge');
     res.cookie('signed-in', 'yes');
 
-    credential.counter = result.authnrData.get("counter");
-    
+    credential.prevCounter = result.authnrData.get("counter");
+
     db.get('users')
       .find({ id: req.cookies.id })
       .assign(user)
@@ -514,6 +515,7 @@ router.post('/signinResponse', upload.array(), csrfCheck, async (req, res) => {
 
     res.json(user);
   } catch (e) {
+    res.clearCookie('challenge');
     res.status(400).send(e);
   }
 });
