@@ -5,16 +5,15 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const hbs = require('hbs');
-const multer = require('multer');
-const upload = multer();
 const auth = require('./libs/auth');
 const app = express();
+const bodyParser = require('body-parser');
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 app.set('views', './views');
 app.use(cookieParser());
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
 app.use((req, res, next) => {
@@ -48,7 +47,7 @@ app.get('/home', (req, res) => {
   res.render('home.html', {username: req.cookies.username});
 });
 
-app.post('/reauth', express.json({type:'application/x-www-form-urlencoded'}), (req, res) => {
+app.all('/reauth', (req, res) => {
   const username = req.body.username || req.cookies.username;
   if (!username) {
     res.redirect(302, '/');

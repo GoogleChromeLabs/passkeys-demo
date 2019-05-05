@@ -18,7 +18,8 @@
     "lit-html": "^1.0.0",
     "crypto": "^1.0.1",
     "base64url": "^3.0.1",
-    "fido2-lib": "^2.1.1"
+    "fido2-lib": "^2.1.1",
+    "body-parser": "^1.19.0"
   },
   "engines": {
     "node": "8.x"

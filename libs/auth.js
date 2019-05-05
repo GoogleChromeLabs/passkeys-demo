@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const upload = multer();
 const base64url = require('base64url');
 const crypto = require('crypto');
 const { Fido2Lib } = require('fido2-lib');
@@ -112,7 +110,7 @@ const sessionCheck = (req, res, next) => {
  * No preceding registration required.
  * This only checks if `username` is not empty string and ignores the password.
  **/
-router.post('/signin', upload.array(), csrfCheck, (req, res) => {
+router.post('/signin', csrfCheck, (req, res) => {
   const username = req.cookies.username;
   // Only check username, no need to check password as this is a mock
   if (!username) {
@@ -181,7 +179,7 @@ router.get('/signout', function(req, res) {
  *   credential: String
  * }```
  **/
-router.post('/getKey', upload.array(), csrfCheck, sessionCheck, (req, res) => {
+router.post('/getKey', csrfCheck, sessionCheck, (req, res) => {
   const user = db.get('users')
     .find({ username: req.cookies.username })
     .value();
@@ -192,7 +190,7 @@ router.post('/getKey', upload.array(), csrfCheck, sessionCheck, (req, res) => {
  * Removes a credential id attached to the user
  * Responds with empty JSON `{}`
  **/
-router.post('/removeKey', upload.array(), csrfCheck, sessionCheck, (req, res) => {
+router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
   const credId = req.query.credId;
   const username = req.cookies.username;
   const user = db.get('users')
@@ -212,7 +210,7 @@ router.post('/removeKey', upload.array(), csrfCheck, sessionCheck, (req, res) =>
   res.json({});
 });
 
-router.get('/resetDB', upload.array(), (req, res) => {
+router.get('/resetDB', (req, res) => {
   db.set('users', [])
     .write();
   console.log('db reset');
@@ -329,7 +327,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
      }
  * }```
  **/
-router.post('/registerResponse', upload.array(), csrfCheck, sessionCheck, async (req, res) => {
+router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const username = req.cookies.username;
   const challenge = coerceToArrayBuffer(req.cookies.challenge, 'challenge');
   const credId = req.body.id;
@@ -394,7 +392,7 @@ router.post('/registerResponse', upload.array(), csrfCheck, sessionCheck, async 
      }, ...]
  * }```
  **/
-router.post('/signinRequest', upload.array(), csrfCheck, async (req, res) => {
+router.post('/signinRequest', csrfCheck, async (req, res) => {
   try {
     const user = db.get('users')
       .find({ username: req.cookies.username })
@@ -438,9 +436,7 @@ router.post('/signinRequest', upload.array(), csrfCheck, async (req, res) => {
      }
  * }```
  **/
-router.post('/signinResponse', upload.array(), csrfCheck, async (req, res) => {
-  const credId = req.body.id;
-
+router.post('/signinResponse', csrfCheck, async (req, res) => {
   // Query the user
   const user = db.get('users')
     .find({ username: req.cookies.username })
@@ -453,12 +449,11 @@ router.post('/signinResponse', upload.array(), csrfCheck, async (req, res) => {
     }
   }
 
-  if (!credential) {
-    res.status(400).send('Authenticating credential not found.');
-    return;
-  }
-
   try {
+    if (!credential) {
+      throw 'Authenticating credential not found.';
+    }
+
     const challenge = coerceToArrayBuffer(req.cookies.challenge);
     const origin = `https://${req.get('host')}`; // TODO: Temporary work around for scheme
     
