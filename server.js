@@ -47,12 +47,11 @@ app.get('/home', (req, res) => {
 });
 
 app.all('/reauth', (req, res) => {
-  const username = req.body.username || req.cookies.username;
+  const username = req.cookies.username;
   if (!username) {
     res.redirect(302, '/');
     return;
   }
-  res.cookie('username', username);
   // Show `reauth.html`.
   // User is supposed to enter a password (which will be ignored)
   // Make XHR POST to `/signin`

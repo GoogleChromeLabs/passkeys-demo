@@ -10,7 +10,6 @@ const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('.data/db.json');
 const db = low(adapter);
 
-router.use(bodyParser.json());
 
 const f2l = new Fido2Lib({
     timeout: 30*1000*60,
@@ -108,6 +107,8 @@ const sessionCheck = (req, res, next) => {
   next();
 };
 
+router.use(bodyParser.urlencoded({ extended: true }));
+
 /**
  * Verifies user credential and let the user sign-in.
  * No preceding registration required.
@@ -141,10 +142,10 @@ router.post('/signin', csrfCheck, (req, res) => {
 });
 
 router.post('/username', (req, res) => {
-  const username = req.cookies.username;
+  const username = req.body.username;
   // Only check username, no need to check password as this is a mock
   if (!username) {
-    res.status(401).send('Unauthorized');
+    res.status(400).send('Bad request');
     return;
   } else {
     // See if account already exists
@@ -162,15 +163,24 @@ router.post('/username', (req, res) => {
         .push(user)
         .write();
     }
+    // Set username cookie
+    res.cookie('username', username);
     // If sign-in succeeded, redirect to `/home`.
     res.status(200).json(user);
   }
 });
 
 router.post('/password', (req, res) => {
-  if (req.body.password != '') {
-    res.cookie('signed-in', 'yes');
+  if (!req.body.password) {
+    res.status(401).send('Unauthorized');
+    return;
   }
+  const user = db.get('users')
+    .find({ username: req.cookies.username })
+    .value();
+
+  res.cookie('signed-in', 'yes');
+  res.status(200).send(user);
 });
 
 router.get('/signout', (req, res) => {
@@ -202,6 +212,8 @@ router.get('/signout', (req, res) => {
 
 //   res.json(user);
 // });
+
+router.use(bodyParser.json());
 
 /**
  * Returns a credential id
