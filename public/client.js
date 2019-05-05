@@ -118,6 +118,10 @@ export const verifyAssertion = async (opts) => {
     }
 
     const options = await _fetch('/auth/signinRequest');
+    
+    if (!options.challenge) {
+      return;
+    }
 
     options.challenge = base64url.decode(options.challenge);
 

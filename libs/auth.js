@@ -140,7 +140,40 @@ router.post('/signin', csrfCheck, (req, res) => {
   }
 });
 
-router.get('/signout', function(req, res) {
+router.post('/username', (req, res) => {
+  const username = req.cookies.username;
+  // Only check username, no need to check password as this is a mock
+  if (!username) {
+    res.status(401).send('Unauthorized');
+    return;
+  } else {
+    // See if account already exists
+    let user = db.get('users')
+      .find({ username: username })
+      .value();
+    // If user entry is not created yet, create one
+    if (!user) {
+      user = {
+        username: username,
+        id: coerceToBase64Url(crypto.randomBytes(32)),
+        credentials: []
+      }
+      db.get('users')
+        .push(user)
+        .write();
+    }
+    // If sign-in succeeded, redirect to `/home`.
+    res.status(200).json(user);
+  }
+});
+
+router.post('/password', (req, res) => {
+  if (req.body.password != '') {
+    res.cookie('signed-in', 'yes');
+  }
+});
+
+router.get('/signout', (req, res) => {
   // Remove cookies
   res.clearCookie('username');
   // Redirect to `/`
@@ -397,6 +430,12 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     const user = db.get('users')
       .find({ username: req.cookies.username })
       .value();
+    
+    if (!user) {
+      // Send empty response if user is not registered yet.
+      res.json({error: 'User not found.'});
+      return;
+    }
 
     const response = await f2l.assertionOptions();
 
