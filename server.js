@@ -48,7 +48,7 @@ app.get('/home', (req, res) => {
   res.render('home.html', {username: req.cookies.username});
 });
 
-app.all('/reauth', upload.array(), (req, res) => {
+app.post('/reauth', upload.array(), (req, res) => {
   const username = req.body.username || req.cookies.username;
   if (!username) {
     res.redirect(307, '/');
