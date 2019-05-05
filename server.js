@@ -5,6 +5,8 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const hbs = require('hbs');
+const multer = require('multer');
+const upload = multer();
 const auth = require('./libs/auth');
 const app = express();
 
@@ -24,7 +26,7 @@ app.use((req, res, next) => {
 });
 
 // http://expressjs.com/en/starter/basic-routing.html
-app.get('/', function(req, res) {
+app.all('/', (req, res) => {
   res.clearCookie('signed-in');
   // Check cookie
   if (req.cookies.username) {
@@ -36,7 +38,7 @@ app.get('/', function(req, res) {
   res.render('index.html');
 });
 
-app.get('/home', function(req, res) {
+app.get('/home', (req, res) => {
   if (!req.cookies.username) {
     // If user is not signed in, redirect to `/`.
     res.redirect(307, '/');
@@ -46,9 +48,9 @@ app.get('/home', function(req, res) {
   res.render('home.html', {username: req.cookies.username});
 });
 
-app.all('/reauth', function(req, res) {
-  const username = req.body.username;
-  if (username == '') {
+app.all('/reauth', upload.array(), (req, res) => {
+  const username = req.body.username || req.cookies.username;
+  if (!username) {
     res.redirect(307, '/');
     return;
   }
@@ -62,6 +64,6 @@ app.all('/reauth', function(req, res) {
 app.use('/auth', auth);
 
 // listen for req :)
-const listener = app.listen(process.env.PORT, function() {
+const listener = app.listen(process.env.PORT, () => {
   console.log('Your app is listening on port ' + listener.address().port);
 });
