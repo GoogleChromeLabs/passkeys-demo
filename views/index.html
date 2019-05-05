@@ -32,22 +32,10 @@
       <h2>
         Login with random id/password
       </h2>
-      <form id="form" method="POST" action="/auth/username" >
+      <form id="form" method="POST" action="/reauth" >
         username: <input type="text" name="username" placeholder="Whatever" value="" />
         <input type="submit" value="Next" />
       </form>
     </main>
-    <script type="module">
-      import { _fetch } from '/client.js';
-      const form = document.querySelector('#form');
-      form.addEventListener('submit', e => {
-        e.preventDefault();
-        _fetch('/auth/username', new FormData(e.target)).then(user => {
-          location.href = '/reauth';
-        }).catch(e => {
-          alert(e.error);
-        });        
-      });
-    </script>
   </body>
 </html>
