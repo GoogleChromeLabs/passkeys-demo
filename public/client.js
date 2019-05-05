@@ -9,7 +9,7 @@ export const _fetch = async (path, payload = '') => {
   try {
     const res = await fetch(path, {
       method: 'POST',
-      credentials: 'include',
+      credentials: 'same-origin',
       headers: headers,
       body: payload
     });
@@ -37,15 +37,9 @@ const encodeAuthenticatorAttestationResponse = (atts) => {
       base64url.encode(atts.response.clientDataJSON);
     const attestationObject =
       base64url.encode(atts.response.attestationObject);
-    const signature =
-      base64url.encode(atts.response.signature);
-    const userHandle =
-      base64url.encode(atts.response.userHandle);
     credential.response = {
       clientDataJSON,
-      attestationObject,
-      signature,
-      userHandle
+      attestationObject
     };
   }
   return credential;
@@ -79,8 +73,6 @@ export const registerCredential = async (opts) => {
     });
 
     const parsedCred = await encodeAuthenticatorAttestationResponse(cred);
-    
-    localStorage.setItem('credential', parsedCred.id);
 
     return await _fetch('/auth/registerResponse' , parsedCred);
   } catch (e) {
@@ -150,13 +142,5 @@ export const verifyAssertion = async (opts) => {
 };
 
 export const unregisterCredential = async (credId) => {
-  try {
-    const _credId = localStorage.getItem('credential');
-    if (credId === _credId) {
-      localStorage.removeItem('credential');
-    }
-    return _fetch(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
-  } catch (e) {
-    throw e;
-  }
+  return _fetch(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
 };
