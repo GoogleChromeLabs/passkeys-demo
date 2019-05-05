@@ -40,7 +40,9 @@
         const form = document.querySelector('#form');
         form.addEventListener('submit', e => {
           e.preventDefault();
-          _fetch('/auth/username', new FormData(e.target)).then(user => {
+          const form = new FormData(e.target);
+          form.forEach(
+          _fetch('/auth/username', { username: e.target.username }).then(user => {
             location.href = '/reauth';
           }).catch(e => {
             alert(e.error);

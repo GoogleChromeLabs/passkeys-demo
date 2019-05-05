@@ -3,7 +3,6 @@ const router = express.Router();
 const base64url = require('base64url');
 const crypto = require('crypto');
 const { Fido2Lib } = require('fido2-lib');
-const bodyParser = require('body-parser');
 
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
@@ -106,8 +105,6 @@ const sessionCheck = (req, res, next) => {
   }
   next();
 };
-
-router.use(bodyParser.urlencoded({ extended: true }));
 
 /**
  * Verifies user credential and let the user sign-in.
@@ -213,7 +210,7 @@ router.get('/signout', (req, res) => {
 //   res.json(user);
 // });
 
-router.use(bodyParser.json());
+router.use(express.json());
 
 /**
  * Returns a credential id
