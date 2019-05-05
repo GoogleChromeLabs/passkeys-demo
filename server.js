@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 });
 
 // http://expressjs.com/en/starter/basic-routing.html
-app.all('/', (req, res) => {
+app.get('/', (req, res) => {
   res.clearCookie('signed-in');
   // Check cookie
   if (req.cookies.username) {
@@ -48,10 +48,10 @@ app.get('/home', (req, res) => {
   res.render('home.html', {username: req.cookies.username});
 });
 
-app.post('/reauth', upload.array(), (req, res) => {
+app.post('/reauth', express.json({type:'application/x-www-form-urlencoded'}), (req, res) => {
   const username = req.body.username || req.cookies.username;
   if (!username) {
-    res.redirect(307, '/');
+    res.redirect(302, '/');
     return;
   }
   res.cookie('username', username);
