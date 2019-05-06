@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const base64url = require('base64url');
 const crypto = require('crypto');
 const { Fido2Lib } = require('fido2-lib');
 
@@ -108,42 +107,14 @@ const sessionCheck = (req, res, next) => {
 };
 
 /**
- * Verifies user credential and let the user sign-in.
- * No preceding registration required.
- * This only checks if `username` is not empty string and ignores the password.
+ * Check username, create a new account if it doesn't exist.
+ * Set a `username` cookie.
  **/
-router.post('/signin', csrfCheck, (req, res) => {
-  const username = req.cookies.username;
-  // Only check username, no need to check password as this is a mock
-  if (!username) {
-    res.status(401).send('Unauthorized');
-    return;
-  } else {
-    // See if account already exists
-    let user = db.get('users')
-      .find({ username: username })
-      .value();
-    // If user entry is not created yet, create one
-    if (!user) {
-      user = {
-        username: username,
-        id: coerceToBase64Url(crypto.randomBytes(32)),
-        credentials: []
-      }
-      db.get('users')
-        .push(user)
-        .write();
-    }
-    // If sign-in succeeded, redirect to `/home`.
-    res.status(200).json(user);
-  }
-});
-
 router.post('/username', (req, res) => {
   const username = req.body.username;
   // Only check username, no need to check password as this is a mock
   if (!username) {
-    res.status(400).send('Bad request');
+    res.status(400).send({ error: 'Bad request' });
     return;
   } else {
     // See if account already exists
@@ -164,11 +135,20 @@ router.post('/username', (req, res) => {
     // Set username cookie
     res.cookie('username', username);
     // If sign-in succeeded, redirect to `/home`.
-    res.status(200).json(user);
+    res.json(user);
   }
 });
 
+/**
+ * Verifies user credential and let the user sign-in.
+ * No preceding registration required.
+ * This only checks if `username` is not empty string and ignores the password.
+ **/
 router.post('/password', (req, res) => {
+  if (!req.cookies.username) {
+    res.status(400).json({error: 'Enter username first.'});
+    return;
+  }
   if (!req.body.password) {
     res.status(401).json({error: 'Enter at least one random letter.'});
     return;
@@ -178,7 +158,7 @@ router.post('/password', (req, res) => {
     .value();
 
   res.cookie('signed-in', 'yes');
-  res.status(200).send(user);
+  res.json(user);
 });
 
 router.get('/signout', (req, res) => {
@@ -253,13 +233,9 @@ router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
 });
 
 router.get('/resetDB', (req, res) => {
-  db.set('users', [])
-    .write();
-  console.log('db reset');
-  const users = db.get('users')
-    .value();
-  console.log(users);
-  res.json(users);  
+  db.set('users', []).write();
+  const users = db.get('users').value();
+  res.json(users);
 });
 
 /**
@@ -350,7 +326,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 
     res.json(response);
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).send({ error: e });
   }
 });
 
@@ -416,7 +392,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     res.json(user);
   } catch (e) {
     res.clearCookie('challenge');
-    res.status(400).send(e);
+    res.status(400).send({ error: e });
   }
 });
 
@@ -465,7 +441,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     res.json(response);
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).json({ error: e });
   }
 });
 
@@ -538,7 +514,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     res.json(user);
   } catch (e) {
     res.clearCookie('challenge');
-    res.status(400).send(e);
+    res.status(400).json({ error: e });
   }
 });
 
