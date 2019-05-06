@@ -35,7 +35,11 @@
       <h3>
         Your registered credentials:
       </h3>
-      <section id="list">
+      <section>
+        <ul id="list">
+          
+        </ul>
+        <button id="register">Register a new credential</button>
       </section>
       <p>
         <a href="/">Try reauth</a>
@@ -49,7 +53,7 @@
       import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
       import { repeat } from 'https://unpkg.com/lit-html@1.0.0/directives/repeat.js?module';
 
-      const makeCredential = async () => {
+      document.querySelector('#register', e => {
         registerCredential({
           attestation: 'none',
           authenticatorSelection: {
@@ -59,7 +63,7 @@
         })
         .then(user => {
           if (user) {
-            getCredential();
+            getCredentials();
           } else {
             console.info('Registering credential silently failed.');
           }
@@ -71,10 +75,24 @@
             alert('Unkown error.');
           }
         });
+      });
+
+      const removeCredential = e => {
+        unregisterCredential(e.target.id)
+        .then(() => {
+          getCredentials();
+        })
+        .catch(e => {
+          if (e.error) {
+            alert(e.error);
+          } else {
+            alert('Unkown error.');
+          }
+        });
       };
 
-      const getCredential = () => {
-        _fetch('/auth/getKey').then(res => {
+      const getCredentials = () => {
+        _fetch('/auth/getKeys').then(res => {
           const list = document.querySelector('#list');
           const li = html`<ul>
             ${repeat(res.credentials, cred => cred.credId, (cred, index) => html`<li>${cred.credId}
@@ -86,20 +104,7 @@
         });
       };
 
-      const removeCredential = e => {
-        unregisterCredential(e.target.id)
-        .then(() => {
-          getCredential();
-        })
-        .catch(e => {
-          if (e) {
-            alert(e.error);
-          } else {
-            alert('Unkown error.');
-          }
-        });
-      };
-      getCredential();
+      getCredentials();
     </script>
   </body>
 </html>

@@ -202,7 +202,7 @@ router.get('/signout', (req, res) => {
  *   credential: String
  * }```
  **/
-router.post('/getKey', csrfCheck, sessionCheck, (req, res) => {
+router.post('/getKeys', csrfCheck, sessionCheck, (req, res) => {
   const user = db.get('users')
     .find({ username: req.cookies.username })
     .value();
