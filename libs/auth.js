@@ -9,6 +9,7 @@ const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('.data/db.json');
 const db = low(adapter);
 
+router.use(express.json());
 
 const f2l = new Fido2Lib({
     timeout: 30*1000*60,
@@ -99,7 +100,7 @@ const csrfCheck = (req, res, next) => {
  * If cookie doesn't contain `username`, consider the user is not authenticated.
  **/
 const sessionCheck = (req, res, next) => {
-  if (!req.cookies.username) {
+  if (!req.cookies['signed-in']) {
     res.status(401).json({error: 'not signed in.'});
     return;
   }
@@ -169,7 +170,7 @@ router.post('/username', (req, res) => {
 
 router.post('/password', (req, res) => {
   if (!req.body.password) {
-    res.status(401).send('Unauthorized');
+    res.status(401).json({error: 'Enter at least one random letter.'});
     return;
   }
   const user = db.get('users')
@@ -183,6 +184,7 @@ router.post('/password', (req, res) => {
 router.get('/signout', (req, res) => {
   // Remove cookies
   res.clearCookie('username');
+  res.clearCookie('signed-in');
   // Redirect to `/`
   res.redirect(302, '/');
 });
@@ -209,8 +211,6 @@ router.get('/signout', (req, res) => {
 
 //   res.json(user);
 // });
-
-router.use(express.json());
 
 /**
  * Returns a credential id
@@ -526,8 +526,6 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     };
     const result = await f2l.assertionResult(clientAssertionResponse, assertionExpectations);
 
-    res.clearCookie('challenge');
-
     credential.prevCounter = result.authnrData.get("counter");
 
     db.get('users')
@@ -535,6 +533,8 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
       .assign(user)
       .write();
 
+    res.clearCookie('challenge');
+    res.cookie('signed-in', 'yes');
     res.json(user);
   } catch (e) {
     res.clearCookie('challenge');

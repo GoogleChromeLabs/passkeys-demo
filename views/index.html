@@ -41,8 +41,10 @@
         form.addEventListener('submit', e => {
           e.preventDefault();
           const form = new FormData(e.target);
-          form.forEach(
-          _fetch('/auth/username', { username: e.target.username }).then(user => {
+          const cred = {};
+          form.forEach((v, k) => cred[k] = v);
+          _fetch('/auth/username', cred)
+          .then(user => {
             location.href = '/reauth';
           }).catch(e => {
             alert(e.error);

@@ -31,7 +31,10 @@
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
-        _fetch('/auth/password', new FormData(e.target))
+        const form = new FormData(e.target);
+        const cred = {};
+        form.forEach((v, k) => cred[k] = v);
+        _fetch('/auth/password', cred)
         .then(user => {
           location.href = '/home';
         })
