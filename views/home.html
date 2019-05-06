@@ -50,8 +50,6 @@
     </main>
     <script type="module">
       import { _fetch, registerCredential, unregisterCredential } from '/client.js';
-      import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
-      import { repeat } from 'https://unpkg.com/lit-html@1.0.0/directives/repeat.js?module';
 
       const register = document.querySelector('#register');
       register.addEventListener('click', e => {
@@ -70,11 +68,7 @@
           }
         })
         .catch(e => {
-          if (e) {
-            alert(e);
-          } else {
-            alert('Unkown error.');
-          }
+          alert(e.error);
         });
       });
 
@@ -84,19 +78,19 @@
           getCredentials();
         })
         .catch(e => {
-          if (e.error) {
-            alert(e.error);
-          } else {
-            alert('Unkown error.');
-          }
+          alert(e.error);
         });
       };
 
       const getCredentials = () => {
         _fetch('/auth/getKeys').then(res => {
           const list = document.querySelector('#list');
-          for (let cred of res.credentials) {
+          if (res.credentials.length === 0) {
+            list.innerHTML = '<li>No credentials found.</li>';
+          } else {
             list.innerText = '';
+          }
+          for (let cred of res.credentials) {
             const li = document.createElement('li');
             const span = document.createElement('span');
             span.innerText = cred.credId;

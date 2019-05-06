@@ -21,7 +21,9 @@ h1 {
 }
 
 #list li {
-  margin: 4px 8px;
+  margin: 4px 0px;
+  padding: 8px;
+  background-color: #eee;
 }
 
 span {
@@ -33,6 +35,9 @@ span {
 
 .public-key {
   font-family: monospace;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .bold {

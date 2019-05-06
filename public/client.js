@@ -76,7 +76,7 @@ export const registerCredential = async (opts) => {
 
     return await _fetch('/auth/registerResponse' , parsedCred);
   } catch (e) {
-    throw e;
+    return Promise.reject({ error: e });
   }
 };
 
@@ -141,7 +141,7 @@ export const verifyAssertion = async (opts) => {
 
     return await _fetch(`/auth/signinResponse`, parsedCred);
   } catch (e) {
-    throw 'Authentication failed. Use password to sign-in.';
+    return Promise.reject({ error:'Authentication failed. Use password to sign-in.' });
   }
 };
 
