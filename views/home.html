@@ -98,8 +98,12 @@
           for (let cred of res.credentials) {
             list.innerText = '';
             const li = document.createElement('li');
+            const span = document.createElement('span');
+            span.innerText = cred.credId;
             const div = document.createElement('div');
-            li.innerText = cred.credId;
+            div.innerText = cred.publicKey;
+            li.appendChild(span);
+            li.appendChild(div);
             const button = document.createElement('button');
             button.innerText = 'Remove';
             button.id = cred.credId;
