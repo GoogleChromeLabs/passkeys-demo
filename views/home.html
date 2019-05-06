@@ -53,7 +53,8 @@
       import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
       import { repeat } from 'https://unpkg.com/lit-html@1.0.0/directives/repeat.js?module';
 
-      document.querySelector('#register', e => {
+      const register = document.querySelector('#register');
+      register.addEventListener('click', e => {
         registerCredential({
           attestation: 'none',
           authenticatorSelection: {
@@ -94,13 +95,17 @@
       const getCredentials = () => {
         _fetch('/auth/getKeys').then(res => {
           const list = document.querySelector('#list');
-          const li = html`<ul>
-            ${repeat(res.credentials, cred => cred.credId, (cred, index) => html`<li>${cred.credId}
-              <button id="${cred.credId}" @click=${removeCredential}>Remove</button>
-            </li>`)}
-            </ul>
-            <button @click=${makeCredential}>Register a new credential</button>`
-          render(li, list);
+          for (let cred of res.credentials) {
+            list.innerText = '';
+            const li = document.createElement('li');
+            li.innerText = cred.credId;
+            const button = document.createElement('button');
+            button.innerText = 'Remove';
+            button.id = cred.credId;
+            button.addEventListener('click', removeCredential);
+            li.appendChild(button);
+            list.appendChild(li);
+          }
         });
       };
 
