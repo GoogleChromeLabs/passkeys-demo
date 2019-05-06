@@ -15,11 +15,24 @@ h1 {
   color: #373fff;
 }
 
+#list {
+  list-style: none;
+  padding-left: 0;
+}
+
+#list li {
+  margin: 4px 8px;
+}
+
 span {
   display: block;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.public-key {
+  font-family: monospace;
 }
 
 .bold {
