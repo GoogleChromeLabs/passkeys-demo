@@ -145,10 +145,6 @@ router.post('/username', (req, res) => {
  * This only checks if `username` is not empty string and ignores the password.
  **/
 router.post('/password', (req, res) => {
-  if (!req.cookies.username) {
-    res.status(400).json({error: 'Enter username first.'});
-    return;
-  }
   if (!req.body.password) {
     res.status(401).json({error: 'Enter at least one random letter.'});
     return;
@@ -156,6 +152,11 @@ router.post('/password', (req, res) => {
   const user = db.get('users')
     .find({ username: req.cookies.username })
     .value();
+  
+  if (!user) {
+    res.status(401).json({error: 'Enter username first.'});
+    return;
+  }
 
   res.cookie('signed-in', 'yes');
   res.json(user);
