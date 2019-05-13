@@ -22,25 +22,6 @@ export const _fetch = async (path, payload = '') => {
   }
 };
 
-const encodeAuthenticatorAttestationResponse = (atts) => {
-  const credential = {};
-  if (atts.id)    credential.id =     atts.id;
-  if (atts.type)  credential.type =   atts.type;
-  if (atts.rawId) credential.rawId =  base64url.encode(atts.rawId);
-
-  if (atts.response) {
-    const clientDataJSON =
-      base64url.encode(atts.response.clientDataJSON);
-    const attestationObject =
-      base64url.encode(atts.response.attestationObject);
-    credential.response = {
-      clientDataJSON,
-      attestationObject
-    };
-  }
-  return credential;
-};
-
 export const registerCredential = async (opts) => {
   if (!window.PublicKeyCredential) {
     console.info();
@@ -67,34 +48,27 @@ export const registerCredential = async (opts) => {
     publicKey: options
   });
 
-  const parsedCred = await encodeAuthenticatorAttestationResponse(cred);
+  const credential = {};
+  credential.id =     cred.id;
+  credential.type =   cred.type;
+  credential.rawId =  base64url.encode(cred.rawId);
 
-  return await _fetch('/auth/registerResponse' , parsedCred);
+  if (cred.response) {
+    const clientDataJSON =
+      base64url.encode(cred.response.clientDataJSON);
+    const attestationObject =
+      base64url.encode(cred.response.attestationObject);
+    credential.response = {
+      clientDataJSON,
+      attestationObject
+    };
+  }
+
+  return await _fetch('/auth/registerResponse' , credential);
 };
 
 const encodeAuthenticatorAssertionResponse = asst => {
-  const credential = {};
-  if (asst.id)    credential.id =     asst.id;
-  if (asst.type)  credential.type =   asst.type;
-  if (asst.rawId) credential.rawId =  base64url.encode(asst.rawId);
 
-  if (asst.response) {
-    const clientDataJSON =
-      base64url.encode(asst.response.clientDataJSON);
-    const authenticatorData =
-      base64url.encode(asst.response.authenticatorData);
-    const signature =
-      base64url.encode(asst.response.signature);
-    const userHandle =
-      base64url.encode(asst.response.userHandle);
-    credential.response = {
-      clientDataJSON,
-      authenticatorData,
-      signature,
-      userHandle
-    };
-  }
-  return credential;
 };
 
 export const verifyAssertion = async (opts) => {
@@ -124,9 +98,29 @@ export const verifyAssertion = async (opts) => {
     publicKey: options
   });
 
-  const parsedCred = await encodeAuthenticatorAssertionResponse(cred);
+  const credential = {};
+  credential.id =     cred.id;
+  credential.type =   cred.type;
+  credential.rawId =  base64url.encode(cred.rawId);
 
-  return await _fetch(`/auth/signinResponse`, parsedCred);
+  if (cred.response) {
+    const clientDataJSON =
+      base64url.encode(cred.response.clientDataJSON);
+    const authenticatorData =
+      base64url.encode(cred.response.authenticatorData);
+    const signature =
+      base64url.encode(cred.response.signature);
+    const userHandle =
+      base64url.encode(cred.response.userHandle);
+    credential.response = {
+      clientDataJSON,
+      authenticatorData,
+      signature,
+      userHandle
+    };
+  }
+
+  return await _fetch(`/auth/signinResponse`, credential);
 };
 
 export const unregisterCredential = async (credId) => {
