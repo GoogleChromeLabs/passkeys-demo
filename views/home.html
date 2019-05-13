@@ -67,9 +67,7 @@
             console.info('Registering credential silently failed.');
           }
         })
-        .catch(e => {
-          alert(e.error);
-        });
+        .catch(e => alert(e));
       });
 
       const removeCredential = e => {

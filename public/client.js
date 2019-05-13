@@ -6,23 +6,19 @@ export const _fetch = async (path, payload = '') => {
     headers['Content-Type'] = 'application/json';
     payload = JSON.stringify(payload);
   }
-  try {
-    const res = await fetch(path, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: headers,
-      body: payload
-    });
-    if (res.status === 200) {
-      // Server authentication succeeded
-      return res.json();
-    } else {
-      // Server authentication failed
-      const result = await res.json();
-      throw result.error;
-    }
-  } catch (e) {
-    return Promise.reject({error: e});
+  const res = await fetch(path, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: headers,
+    body: payload
+  });
+  if (res.status === 200) {
+    // Server authentication succeeded
+    return res.json();
+  } else {
+    // Server authentication failed
+    const result = await res.json();
+    throw result.error;
   }
 };
 
@@ -46,38 +42,34 @@ const encodeAuthenticatorAttestationResponse = (atts) => {
 };
 
 export const registerCredential = async (opts) => {
-  try {
-    if (!window.PublicKeyCredential) {
-      console.info();
-      throw 'WebAuthn not supported on this browser.';
-    }
-    const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-    if (!UVPAA) {
-      console.info();
-      throw 'User Verifying Platform Authenticator not available.';
-    }
-
-    const options = await _fetch('/auth/registerRequest', opts);
-
-    options.user.id = base64url.decode(options.user.id);
-    options.challenge = base64url.decode(options.challenge);
-
-    if (options.excludeCredentials) {
-      for (let cred of options.excludeCredentials) {
-        cred.id = base64url.decode(cred.id);
-      }
-    }
-
-    const cred = await navigator.credentials.create({
-      publicKey: options
-    });
-
-    const parsedCred = await encodeAuthenticatorAttestationResponse(cred);
-
-    return await _fetch('/auth/registerResponse' , parsedCred);
-  } catch (e) {
-    return Promise.reject({ error: e });
+  if (!window.PublicKeyCredential) {
+    console.info();
+    throw 'WebAuthn not supported on this browser.';
   }
+  const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  if (!UVPAA) {
+    console.info();
+    throw 'User Verifying Platform Authenticator not available.';
+  }
+
+  const options = await _fetch('/auth/registerRequest', opts);
+
+  options.user.id = base64url.decode(options.user.id);
+  options.challenge = base64url.decode(options.challenge);
+
+  if (options.excludeCredentials) {
+    for (let cred of options.excludeCredentials) {
+      cred.id = base64url.decode(cred.id);
+    }
+  }
+
+  const cred = await navigator.credentials.create({
+    publicKey: options
+  });
+
+  const parsedCred = await encodeAuthenticatorAttestationResponse(cred);
+
+  return await _fetch('/auth/registerResponse' , parsedCred);
 };
 
 const encodeAuthenticatorAssertionResponse = asst => {
