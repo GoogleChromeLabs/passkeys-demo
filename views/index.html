@@ -31,7 +31,7 @@
       <h2>
         Login with a random username
       </h2>
-      <form id="form" method="POST" action="/reauth" >
+      <form id="form" method="POST" action="/auth/username" >
         username: <input type="text" name="username" placeholder="Whatever" value="" />
         <input type="submit" value="Next" />
       </form>
@@ -43,7 +43,7 @@
           const form = new FormData(e.target);
           const cred = {};
           form.forEach((v, k) => cred[k] = v);
-          _fetch('/auth/username', cred)
+          _fetch(e.target.action, cred)
           .then(user => {
             location.href = '/reauth';
           }).catch(e => {

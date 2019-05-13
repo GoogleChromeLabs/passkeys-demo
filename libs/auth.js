@@ -222,7 +222,7 @@ router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
 
   const newCreds = user.credentials.filter(cred => {
     // Leave credential ids that do not match
-    return cred.id !== credId;
+    return cred.credId !== credId;
   });
 
   db.get('users')
@@ -432,13 +432,13 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     
     response.allowCredentials = [];
 
-    // for (let cred of user.credentials) {
-    //   response.allowCredentials.push({
-    //     id: cred.credId,
-    //     type: 'public-key',
-    //     transports: ['internal']
-    //   });
-    // }
+    for (let cred of user.credentials) {
+      response.allowCredentials.push({
+        id: cred.credId,
+        type: 'public-key',
+        transports: ['internal']
+      });
+    }
 
     res.json(response);
   } catch (e) {

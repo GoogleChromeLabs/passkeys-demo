@@ -100,37 +100,33 @@ const encodeAuthenticatorAssertionResponse = asst => {
 export const verifyAssertion = async (opts) => {
   if (!window.PublicKeyCredential) {
     console.info('WebAuthn not supported on this browser.');
-    return Promise.resolve(null);
+    return null;
   }
   const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
   if (!UVPAA) {
     console.info('User Verifying Platform Authenticator not available.');
-    return Promise.resolve(null);
+    return null;
   }
 
-  try {
-    const options = await _fetch('/auth/signinRequest');
-    
-    options.challenge = base64url.decode(options.challenge);
+  const options = await _fetch('/auth/signinRequest');
 
-    // if (options.allowCredentials.length === 0) {
-    //   console.info("Credential not stored on server side");
-    //   return Promise.resolve(null);
-    // }
-    for (let cred of options.allowCredentials) {
-      cred.id = base64url.decode(cred.id);
-    }
+  options.challenge = base64url.decode(options.challenge);
 
-    const cred = await navigator.credentials.get({
-      publicKey: options
-    });
-
-    const parsedCred = await encodeAuthenticatorAssertionResponse(cred);
-
-    return await _fetch(`/auth/signinResponse`, parsedCred);
-  } catch (e) {
-    return Promise.reject('Authentication failed. Use password to sign-in.');
+  // if (options.allowCredentials.length === 0) {
+  //   console.info("Credential not stored on server side");
+  //   return null;
+  // }
+  for (let cred of options.allowCredentials) {
+    cred.id = base64url.decode(cred.id);
   }
+
+  const cred = await navigator.credentials.get({
+    publicKey: options
+  });
+
+  const parsedCred = await encodeAuthenticatorAssertionResponse(cred);
+
+  return await _fetch(`/auth/signinResponse`, parsedCred);
 };
 
 export const unregisterCredential = async (credId) => {

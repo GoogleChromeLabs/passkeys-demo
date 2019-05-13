@@ -20,7 +20,7 @@
     </header>
 
     <main>
-      <form id="form" method="POST" action="/auth/signin" >
+      <form id="form" method="POST" action="/auth/password" >
         <input type="hidden" name="username" value="{{username}}" />
         password (this will be ignored): <input type="password" name="password" value="" />
         <input type="submit" value="Sign-In" />
@@ -34,7 +34,7 @@
         const form = new FormData(e.target);
         const cred = {};
         form.forEach((v, k) => cred[k] = v);
-        _fetch('/auth/password', cred)
+        _fetch(e.target.action, cred)
         .then(user => {
           location.href = '/home';
         })
@@ -45,7 +45,10 @@
         if (user) {
           location.href = '/home';
         }
-      }).catch(e => alert(e));
+      }).catch(e => {
+        console.error(e);
+        alert('Authentication failed. Use password to sign-in.');
+      });
     </script>
   </body>
 </html>
