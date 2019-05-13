@@ -102,25 +102,21 @@ export const verifyAssertion = async (opts) => {
     console.info('WebAuthn not supported on this browser.');
     return Promise.resolve(null);
   }
-  try {
-    const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-    if (!UVPAA) {
-      console.info('User Verifying Platform Authenticator not available.');
-      return Promise.resolve(null);
-    }
+  const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  if (!UVPAA) {
+    console.info('User Verifying Platform Authenticator not available.');
+    return Promise.resolve(null);
+  }
 
+  try {
     const options = await _fetch('/auth/signinRequest');
     
-    if (!options.challenge) {
-      return;
-    }
-
     options.challenge = base64url.decode(options.challenge);
 
-    if (options.allowCredentials.length === 0) {
-      console.info("Credential not stored on server side");
-      return Promise.resolve(null);
-    }
+    // if (options.allowCredentials.length === 0) {
+    //   console.info("Credential not stored on server side");
+    //   return Promise.resolve(null);
+    // }
     for (let cred of options.allowCredentials) {
       cred.id = base64url.decode(cred.id);
     }
@@ -133,7 +129,7 @@ export const verifyAssertion = async (opts) => {
 
     return await _fetch(`/auth/signinResponse`, parsedCred);
   } catch (e) {
-    return Promise.reject({ error:'Authentication failed. Use password to sign-in.' });
+    return Promise.reject('Authentication failed. Use password to sign-in.');
   }
 };
 

@@ -38,18 +38,14 @@
         .then(user => {
           location.href = '/home';
         })
-        .catch(e => {
-          alert(e.error);
-        });        
+        .catch(e => alert(e));
       });
 
       verifyAssertion({}).then(user => {
         if (user) {
           location.href = '/home';
         }
-      }).catch(e => {
-        alert(e);
-      });
+      }).catch(e => alert(e));
     </script>
   </body>
 </html>

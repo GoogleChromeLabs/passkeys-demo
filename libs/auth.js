@@ -432,13 +432,13 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     
     response.allowCredentials = [];
 
-    for (let cred of user.credentials) {
-      response.allowCredentials.push({
-        id: cred.credId,
-        type: 'public-key',
-        transports: ['internal']
-      });
-    }
+    // for (let cred of user.credentials) {
+    //   response.allowCredentials.push({
+    //     id: cred.credId,
+    //     type: 'public-key',
+    //     transports: ['internal']
+    //   });
+    // }
 
     res.json(response);
   } catch (e) {

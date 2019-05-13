@@ -75,9 +75,7 @@
         .then(() => {
           getCredentials();
         })
-        .catch(e => {
-          alert(e.error);
-        });
+        .catch(e => alert(e));
       };
 
       const getCredentials = () => {
