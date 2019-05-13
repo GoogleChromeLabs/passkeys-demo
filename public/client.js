@@ -46,15 +46,15 @@ const encodeAuthenticatorAttestationResponse = (atts) => {
 };
 
 export const registerCredential = async (opts) => {
-  if (!window.PublicKeyCredential) {
-    console.info('WebAuthn not supported on this browser.');
-    return Promise.resolve(null);
-  }
   try {
+    if (!window.PublicKeyCredential) {
+      console.info();
+      throw 'WebAuthn not supported on this browser.';
+    }
     const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
     if (!UVPAA) {
-      console.info('User Verifying Platform Authenticator not available.');
-      return Promise.resolve(null);
+      console.info();
+      throw 'User Verifying Platform Authenticator not available.';
     }
 
     const options = await _fetch('/auth/registerRequest', opts);
