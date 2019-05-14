@@ -51,6 +51,7 @@
     </main>
     <script type="module">
       import { _fetch, registerCredential, unregisterCredential } from '/client.js';
+      import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
 
       const register = document.querySelector('#register');
       register.addEventListener('click', e => {
@@ -88,20 +89,12 @@
             list.innerText = '';
           }
           for (let cred of res.credentials) {
-            const li = document.createElement('li');
-            const span = document.createElement('span');
-            span.innerText = cred.credId;
-            const div = document.createElement('div');
-            div.classList.add('public-key');
-            div.innerText = cred.publicKey;
-            li.appendChild(span);
-            li.appendChild(div);
-            const button = document.createElement('button');
-            button.innerText = 'Remove';
-            button.id = cred.credId;
-            button.addEventListener('click', removeCredential);
-            li.appendChild(button);
-            list.appendChild(li);
+            const li = html`<li class="elevation-demo-surface mdc-elevation--z1">
+              <span>${cred.credId}</span>
+              <div class="public-key">${cred.publicKey}</div>
+              <button id="${cred.credId}" class="" @click="${removeCredential}">Remove</button>
+            </li>`;
+            render(li, list);
           }
         });
       };
