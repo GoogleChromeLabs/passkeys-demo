@@ -14,17 +14,25 @@ body {
   margin: 0 16px;
 }
 
-.public-key {
-  font-family: monospace;
-}
-
 .credential {
   margin: 10px 0 20px 0;
   padding: 10px;
 }
 
+.credential > span {
+  overflow: hidden;
+  font-weight: bold;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.public-key {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 #register {
   position: fixed;
-  right: 50px;
-  bottom: 50px;
+  right: 30px;
+  bottom: 30px;
 }

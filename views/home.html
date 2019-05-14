@@ -41,7 +41,7 @@
           
         </div>
         <button id="register" class="mdc-fab mdc-ripple-upgraded">
-          <i class="mdc-fab__icon material-icons">add</i>
+          <i class="mdc-fab__icon material-icons">+</i>
         </button>
       </section>
       <p>
@@ -95,7 +95,7 @@
         const creds = html`${repeat(res.credentials, cred => cred.credId,(cred, index) =>
           html`<div class="mdc-card credential">
             <span class="mdc-typography mdc-typography--body2">${cred.credId}</span>
-            <div class="public-key">${cred.publicKey}</div>
+            <pre class="public-key">${cred.publicKey}</pre>
             <div class="mdc-card__actions">
               <button id="${cred.credId}" class="mdc-button mdc-button--raised" @click="${removeCredential}">Remove</button>
             </div>
