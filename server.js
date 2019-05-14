@@ -58,6 +58,11 @@ app.get('/reauth', (req, res) => {
   res.render('reauth.html', {username: username});
 });
 
+app.get('/.well-known/assetlinks.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.render('assetlinks.html');
+});
+
 app.use('/auth', auth);
 
 // listen for req :)
