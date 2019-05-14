@@ -92,7 +92,7 @@
             const li = html`<li class="elevation-demo-surface mdc-elevation--z1">
               <span>${cred.credId}</span>
               <div class="public-key">${cred.publicKey}</div>
-              <button id="${cred.credId}" class="" @click="${removeCredential}">Remove</button>
+              <button id="${cred.credId}" class="mdc-button mdc-button--raised" @click="${removeCredential}">Remove</button>
             </li>`;
             render(li, list);
           }
