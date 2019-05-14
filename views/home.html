@@ -18,22 +18,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- import the webpage's stylesheet -->
-<!--     <link rel="stylesheet" href="/style.css"> -->
+    <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <script src="/base64url-arraybuffer.js"></script>
   </head>
   <body class="mdc-typography">
-    <header class="mdc-top-app-bar catalog-top-app-bar">
+    <header class="mdc-top-app-bar">
       <h1 class="mdc-top-app-bar__title">
         WebAuthn codelab
       </h1>
     </header>
 
-    <main>
+    <main class="content">
       <h2 class="mdc-typography mdc-typography--headline4">
         Welcome, {{username}}!
       </h2>
-      <h3 class="mdc-typography mdc-typography--headline5">
+      <h3 class="mdc-typography mdc-typography--headline6">
         Your registered credentials:
       </h3>
       <section>
@@ -89,10 +89,12 @@
             list.innerText = '';
           }
           for (let cred of res.credentials) {
-            const li = html`<li class="mdc-list-item mdc-ripple-upgraded elevation-demo-surface mdc-elevation--z1">
-              <span>${cred.credId}</span>
+            const li = html`<li class="mdc-card">
+              <span class="mdc-typography mdc-typography--body2">${cred.credId}</span>
               <div class="public-key">${cred.publicKey}</div>
-              <button id="${cred.credId}" class="mdc-button mdc-button--raised" @click="${removeCredential}">Remove</button>
+              <div class="mdc-card__actions">
+                <button id="${cred.credId}" class="mdc-button mdc-button--raised" @click="${removeCredential}">Remove</button>
+              </div>
             </li>`;
             render(li, list);
           }
