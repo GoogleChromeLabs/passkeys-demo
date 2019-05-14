@@ -19,11 +19,17 @@
         WebAuthn codelab
       </h1>
     </header>
-
     <main class="content mdc-top-app-bar--fixed-adjust">
+      <h2>
+        Enter ignored password
+      </h2>
       <form id="form" method="POST" action="/auth/password" >
         <input type="hidden" name="username" value="{{username}}" />
-        password (this will be ignored): <input type="password" name="password" value="" />
+        <div  class="mdc-text-field">
+          <input type="password" class="mdc-text-field__input" name="password" />
+          <div class="mdc-line-ripple"></div>
+          <label class="mdc-floating-label">password</label>
+        </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Sign-In" />
       </form>
     </main>

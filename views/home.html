@@ -84,7 +84,7 @@
         _fetch('/auth/getKeys').then(res => {
           const list = document.querySelector('#list');
           if (res.credentials.length === 0) {
-            list.innerHTML = '<li>No credentials found.</li>';
+            list.innerHTML = '<div>No credentials found.</div>';
           } else {
             list.innerText = '';
           }
