@@ -273,24 +273,19 @@ router.get('/resetDB', (req, res) => {
  **/
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   const username = req.cookies.username;
-  console.log('a ' + username);
   const user = db.get('users')
     .find({ username: username })
     .value();
-  console.log('b ' + user);
   try {
     const response = await f2l.attestationOptions();
-    console.log('c');
     response.user = {
       displayName: 'No name',
       id: user.id,
       name: user.username
     };
-    console.log('d');
     response.challenge = coerceToBase64Url(response.challenge);
     res.cookie('challenge', response.challenge);
     response.excludeCredentials = [];
-    console.log('e');
     if (user.credentials.length > 0) {
       for (let cred of user.credentials) {
         response.excludeCredentials.push({
@@ -300,7 +295,6 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
         });
       }
     }
-    console.log('f');
     const as = {}; // authenticatorSelection
     const aa = req.body.authenticatorSelection.authenticatorAttachment;
     const rr = req.body.authenticatorSelection.requireResidentKey;
@@ -329,7 +323,6 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 
     res.json(response);
   } catch (e) {
-    console.log('error');
     res.status(400).send({ error: e });
   }
 });
