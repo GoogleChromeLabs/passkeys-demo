@@ -37,9 +37,9 @@
         Your registered credentials:
       </h3>
       <section>
-        <ul id="list" class="mdc-list">
+        <div id="list">
           
-        </ul>
+        </div>
         <button id="register" class="mdc-button mdc-button--raised">Register a new credential</button>
       </section>
       <p>
@@ -89,14 +89,14 @@
             list.innerText = '';
           }
           for (let cred of res.credentials) {
-            const li = html`<li class="mdc-card">
+            const div = html`<div class="mdc-card">
               <span class="mdc-typography mdc-typography--body2">${cred.credId}</span>
               <div class="public-key">${cred.publicKey}</div>
               <div class="mdc-card__actions">
                 <button id="${cred.credId}" class="mdc-button mdc-button--raised" @click="${removeCredential}">Remove</button>
               </div>
-            </li>`;
-            render(li, list);
+            </div>`;
+            render(div, list);
           }
         });
       };
