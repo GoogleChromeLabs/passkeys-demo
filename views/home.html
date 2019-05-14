@@ -52,6 +52,7 @@
     <script type="module">
       import { _fetch, registerCredential, unregisterCredential } from '/client.js';
       import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
+      import { repeat } from 'https://unpkg.com/lit-html@1.0.0/directives/repeat.js?module';
 
       const register = document.querySelector('#register');
       register.addEventListener('click', e => {
@@ -72,12 +73,13 @@
         .catch(e => alert(e));
       });
 
-      const removeCredential = e => {
-        unregisterCredential(e.target.id)
-        .then(() => {
+      const removeCredential = async e => {
+        try {
+          const res = await _fetch(`/auth/removeKey?credId=${encodeURIComponent(e.target.id)}`)
           getCredentials();
-        })
-        .catch(e => alert(e));
+        } catch (e) {
+          alert(e); 
+        }
       };
 
       const getCredentials = async () => {
@@ -88,16 +90,15 @@
         } else {
           list.innerText = '';
         }
-        for (let cred of res.credentials) {
-          const div = html`<div class="mdc-card credential">
+        const creds = html`${repeat(res.credentials, cred => cred.credId,(cred, index) =>
+          html`<div class="mdc-card credential">
             <span class="mdc-typography mdc-typography--body2">${cred.credId}</span>
             <div class="public-key">${cred.publicKey}</div>
             <div class="mdc-card__actions">
               <button id="${cred.credId}" class="mdc-button mdc-button--raised" @click="${removeCredential}">Remove</button>
             </div>
-          </div>`;
-          render(div, list);
-        }
+          </div>`)}`;
+        render(creds, list);
       };
 
       getCredentials();
