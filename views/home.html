@@ -89,7 +89,7 @@
             list.innerText = '';
           }
           for (let cred of res.credentials) {
-            const div = html`<div class="mdc-card">
+            const div = html`<div class="mdc-card credential">
               <span class="mdc-typography mdc-typography--body2">${cred.credId}</span>
               <div class="public-key">${cred.publicKey}</div>
               <div class="mdc-card__actions">
