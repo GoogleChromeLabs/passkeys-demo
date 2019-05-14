@@ -67,10 +67,6 @@ export const registerCredential = async (opts) => {
   return await _fetch('/auth/registerResponse' , credential);
 };
 
-const encodeAuthenticatorAssertionResponse = asst => {
-
-};
-
 export const verifyAssertion = async (opts) => {
   if (!window.PublicKeyCredential) {
     console.info('WebAuthn not supported on this browser.');
