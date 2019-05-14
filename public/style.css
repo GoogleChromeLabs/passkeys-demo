@@ -22,3 +22,9 @@ body {
   margin: 10px 0 20px 0;
   padding: 10px;
 }
+
+#register {
+  position: fixed;
+  right: 50px;
+  bottom: 50px;
+}
