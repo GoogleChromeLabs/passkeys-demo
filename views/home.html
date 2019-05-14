@@ -89,8 +89,7 @@
         const list = document.querySelector('#list');
         if (res.credentials.length === 0) {
           list.innerHTML = '<div>No credentials found.</div>';
-        } else {
-          list.innerText = '';
+          return;
         }
         const creds = html`${repeat(res.credentials, cred => cred.credId,(cred, index) =>
           html`<div class="mdc-card credential">
