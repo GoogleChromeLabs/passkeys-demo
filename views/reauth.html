@@ -10,20 +10,21 @@
 
     <!-- import the webpage's stylesheet -->
     <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <script src="/base64url-arraybuffer.js"></script>
   </head>
-  <body>
-    <header>
-      <h1>
+  <body class="mdc-typography">
+    <header class="mdc-top-app-bar" style="top:0px">
+      <h1 class="mdc-top-app-bar__title">
         WebAuthn codelab
       </h1>
     </header>
 
-    <main>
+    <main class="content mdc-top-app-bar--fixed-adjust">
       <form id="form" method="POST" action="/auth/password" >
         <input type="hidden" name="username" value="{{username}}" />
         password (this will be ignored): <input type="password" name="password" value="" />
-        <input type="submit" value="Sign-In" />
+        <input type="submit" class="mdc-button mdc-button--raised" value="Sign-In" />
       </form>
     </main>
     <script type="module">

@@ -19,21 +19,26 @@
 
     <!-- import the webpage's stylesheet -->
     <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <script src="/base64url-arraybuffer.js"></script>
   </head>
-  <body>
-    <header>
-      <h1>
+  <body class="mdc-typography">
+    <header class="mdc-top-app-bar" style="top:0px">
+      <h1 class="mdc-top-app-bar__title">
         WebAuthn codelab
       </h1>
     </header>
-    <main>
+    <main class="content mdc-top-app-bar--fixed-adjust">
       <h2>
         Login with a random username
       </h2>
       <form id="form" method="POST" action="/auth/username" >
-        username: <input type="text" name="username" placeholder="Whatever" value="" />
-        <input type="submit" value="Next" />
+        <div  class="mdc-text-field">
+          <input type="text" class="mdc-text-field__input" name="username" />
+          <div class="mdc-line-ripple"></div>
+          <label class="mdc-floating-label">username</label>
+        </div>
+        <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
       </form>
       <script type="module">
         import { _fetch } from '/client.js';
