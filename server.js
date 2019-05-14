@@ -60,7 +60,7 @@ app.get('/reauth', (req, res) => {
 
 app.get('/.well-known/assetlinks.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  res.render('assetlinks.html');
+  res.sendFile(`${__dirname}/views/assetlinks.json`);
 });
 
 app.use('/auth', auth);
