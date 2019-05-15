@@ -367,9 +367,16 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     clientAttestationResponse.response.attestationObject =
       coerceToArrayBuffer(req.body.response.attestationObject, "attestationObject");
 
+    const origin = '';
+    if (req.get('User-Agent') == '') {
+      origin = `android:apk-key-hash:lvddYHnbc_TT-5QSitlDFu7t5I_Wh7f263uB_avskuc`; // TODO: Generate
+    } else {
+      origin = `https://${req.get('host')}`;
+    }
+
     const attestationExpectations = {
       challenge: challenge,
-      origin: `https://${req.get('host')}`,
+      origin: origin,
       factor: "either"
     };
 
