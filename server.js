@@ -58,10 +58,10 @@ app.get('/reauth', (req, res) => {
   res.render('reauth.html', {username: username});
 });
 
-// app.get('/.well-known/assetlinks.json', (req, res) => {
-//   res.setHeader('Content-Type', 'application/json');
-//   res.sendFile(`${__dirname}/views/assetlinks.json`);
-// });
+app.get('/.well-known/assetlinks.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.sendFile(`${__dirname}/views/assetlinks.json`);
+});
 
 app.use('/auth', auth);
 
