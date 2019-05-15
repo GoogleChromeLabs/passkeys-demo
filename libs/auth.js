@@ -301,7 +301,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const credential = {
       credId: coerceToBase64Url(regResult.authnrData.get("credId"), 'credId'),
       publicKey: regResult.authnrData.get("credentialPublicKeyPem"),
-      aaguid: regResult.authnrData.get("aaguid"),
+      aaguid: coerceToBase64Url(regResult.authnrData.get("aaguid"), 'aaguid'),
       prevCounter: regResult.authnrData.get("counter")
     };
 
