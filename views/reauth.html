@@ -34,7 +34,7 @@
       </form>
     </main>
     <script type="module">
-      import { _fetch, verifyAssertion } from '/client.js';
+      import { _fetch, authenticate } from '/client.js';
       const form = document.querySelector('#form');
       form.addEventListener('submit', e => {
         e.preventDefault();
@@ -48,7 +48,7 @@
         .catch(e => alert(e));
       });
 
-      verifyAssertion({}).then(user => {
+      authenticate({}).then(user => {
         if (user) {
           location.href = '/home';
         }
