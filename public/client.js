@@ -77,7 +77,7 @@ export const authenticate = async (opts) => {
     console.info('User Verifying Platform Authenticator not available.');
     return Promise.resolve(null);
   }
-  
+
   let url = '/auth/signinRequest';
   const credId = localStorage.getItem(`credId`);
   if (credId) {
@@ -117,6 +117,8 @@ export const authenticate = async (opts) => {
       userHandle
     };
   }
+  
+  localStorage.setItem(`credId`, credential.id);
 
   return await _fetch(`/auth/signinResponse`, credential);
 };
