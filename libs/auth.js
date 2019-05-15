@@ -368,7 +368,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       coerceToArrayBuffer(req.body.response.attestationObject, "attestationObject");
 
     const origin = '';
-    if (req.get('User-Agent') == '') {
+    if (req.get('User-Agent').indexOf('okhttp') == 'okhttp') {
       origin = `android:apk-key-hash:lvddYHnbc_TT-5QSitlDFu7t5I_Wh7f263uB_avskuc`; // TODO: Generate
     } else {
       origin = `https://${req.get('host')}`;
