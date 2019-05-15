@@ -37,7 +37,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/home', (req, res) => {
-  if (!req.cookies.username) {
+  if (!req.cookies.username ||
+      req.cookies['signed-in'] != 'yes') {
     // If user is not signed in, redirect to `/`.
     res.redirect(307, '/');
     return;
