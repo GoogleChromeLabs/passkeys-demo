@@ -82,10 +82,6 @@ export const verifyAssertion = async (opts) => {
 
   options.challenge = base64url.decode(options.challenge);
 
-  // if (options.allowCredentials.length === 0) {
-  //   console.info("Credential not stored on server side");
-  //   return null;
-  // }
   for (let cred of options.allowCredentials) {
     cred.id = base64url.decode(cred.id);
   }
