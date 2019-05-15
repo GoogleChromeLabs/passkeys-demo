@@ -7,13 +7,12 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "cookie-parser": "^1.4.4",
-    "crypto": "^1.0.1",
     "express": "^4.16.4",
-    "fido2-lib": "git+https://git@github.com/agektmr/fido2-lib.git",
     "hbs": "^4.0.4",
-    "https://git@github.com/agektmr/fido2-lib.git": "^2.1.1",
-    "lowdb": "^1.0.0"
+    "cookie-parser": "^1.4.4",
+    "lowdb": "^1.0.0",
+    "crypto": "^1.0.1",
+    "fido2-lib": "^2.1.1"
   },
   "engines": {
     "node": "8.x"
