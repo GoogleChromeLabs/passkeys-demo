@@ -199,8 +199,18 @@ router.get('/signout', (req, res) => {
  * Response format:
  * ```{
  *   username: String,
- *   credential: String
+ *   credentials: [Credential]
  * }```
+ 
+ Credential
+ ```
+ {
+   credId: String,
+   publicKey: String,
+   aaguid: ??,
+   prevCounter: Int
+ };
+ ```
  **/
 router.post('/getKeys', csrfCheck, sessionCheck, (req, res) => {
   const user = db.get('users')
