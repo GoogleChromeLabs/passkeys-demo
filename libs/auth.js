@@ -406,7 +406,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     res.json(user);
   } catch (e) {
     res.clearCookie('challenge');
-    res.status(400).send({ error: e });
+    res.status(400).send({ error: e.message });
   }
 });
 
@@ -442,7 +442,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     response.userVerification = req.body.userVerification || 'preferred';
     response.challenge = coerceToBase64Url(response.challenge);
     res.cookie('challenge', response.challenge);
-    
+
     response.allowCredentials = [];
 
     for (let cred of user.credentials) {

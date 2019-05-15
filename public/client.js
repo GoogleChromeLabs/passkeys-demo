@@ -76,7 +76,7 @@ export const authenticate = async (opts) => {
     throw 'User Verifying Platform Authenticator not available.';
   }
 
-  const options = await _fetch('/auth/signinRequest');
+  const options = await _fetch('/auth/signinRequest', opts);
 
   options.challenge = base64url.decode(options.challenge);
 
