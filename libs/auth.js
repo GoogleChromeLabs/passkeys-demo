@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const { Fido2Lib } = require('fido2-lib');
+const { coerceToArrayBuffer } = require('fido2-lib/lib/util');
 
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
