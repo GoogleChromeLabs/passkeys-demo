@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const { Fido2Lib } = require('fido2-lib');
-const { coerceToArrayBuffer } = require('fido2-lib/lib/util');
+const { coerceToBase64Url,
+        coerceToArrayBuffer
+      } = require('fido2-lib/lib/utils');
 
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
@@ -22,70 +24,6 @@ const f2l = new Fido2Lib({
 db.defaults({
   users: []
 }).write();
-
-const coerceToBase64Url = (thing, name) => {
-    name = name || "''";
-
-    // Array to Uint8Array
-    if (Array.isArray(thing)) {
-        thing = Uint8Array.from(thing);
-    }
-
-    // Uint8Array, etc. to ArrayBuffer
-    if (typeof thing === "object" &&
-                thing.buffer instanceof ArrayBuffer &&
-                !(thing instanceof Buffer)) {
-        thing = thing.buffer;
-    }
-
-    // ArrayBuffer to Buffer
-    if (thing instanceof ArrayBuffer && !(thing instanceof Buffer)) {
-        thing = new Buffer(thing);
-    }
-
-    // Buffer to base64 string
-    if (thing instanceof Buffer) {
-        thing = thing.toString("base64");
-    }
-
-    if (typeof thing !== "string") {
-        throw new Error(`could not coerce '${name}' to string`);
-    }
-
-    // base64 to base64url
-    // NOTE: "=" at the end of challenge is optional, strip it off here so that it's compatible with client
-    thing = thing.replace(/\+/g, "-").replace(/\//g, "_").replace(/=*$/g, "");
-
-    return thing;
-}
-
-const coerceToArrayBuffer = (buf, name) => {
-    name = name || "''";
-
-    if (typeof buf === "string") {
-        // base64url to base64
-        buf = buf.replace(/-/g, "+").replace(/_/g, "/");
-        // base64 to Buffer
-        buf = Buffer.from(buf, "base64");
-    }
-
-    // Buffer or Array to Uint8Array
-    if (buf instanceof Buffer || Array.isArray(buf)) {
-        buf = new Uint8Array(buf);
-    }
-
-    // Uint8Array to ArrayBuffer
-    if (buf instanceof Uint8Array) {
-        buf = buf.buffer;
-    }
-
-    // error if none of the above worked
-    if (!(buf instanceof ArrayBuffer)) {
-        throw new TypeError(`could not coerce '${name}' to ArrayBuffer`);
-    }
-
-    return buf;
-}
 
 const csrfCheck = (req, res, next) => {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
@@ -126,7 +64,7 @@ router.post('/username', (req, res) => {
     if (!user) {
       user = {
         username: username,
-        id: coerceToBase64Url(crypto.randomBytes(32)),
+        id: coerceToBase64Url(crypto.randomBytes(32), 'user.id'),
         credentials: []
       }
       db.get('users')
@@ -170,29 +108,6 @@ router.get('/signout', (req, res) => {
   // Redirect to `/`
   res.redirect(302, '/');
 });
-
-// For test purposes
-// router.post('/putKey', upload.array(), sessionCheck, (req, res) => {
-//   if (!req.body.credential) {
-//     res.status(400).json({ error: 'invalid request' });
-//     return;
-//   }
-//   const username = req.cookies.username;
-//   const credId = req.body.credential;
-//   const user = db.get('users')
-//     .find({ username: username })
-//     .value();
-//   user.credentials.push({
-//     id: credId
-//   });
-
-//   db.get('users')
-//     .find({ username: username })
-//     .assign({ credentials: user.credentials })
-//     .write();
-
-//   res.json(user);
-// });
 
 /**
  * Returns a credential id
@@ -294,7 +209,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       id: user.id,
       name: user.username
     };
-    response.challenge = coerceToBase64Url(response.challenge);
+    response.challenge = coerceToBase64Url(response.challenge, 'challenge');
     res.cookie('challenge', response.challenge);
     response.excludeCredentials = [];
     if (user.credentials.length > 0) {
@@ -384,7 +299,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const regResult = await f2l.attestationResult(clientAttestationResponse, attestationExpectations);
 
     const credential = {
-      credId: coerceToBase64Url(regResult.authnrData.get("credId")),
+      credId: coerceToBase64Url(regResult.authnrData.get("credId"), 'credId'),
       publicKey: regResult.authnrData.get("credentialPublicKeyPem"),
       aaguid: regResult.authnrData.get("aaguid"),
       prevCounter: regResult.authnrData.get("counter")
@@ -441,7 +356,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     // const response = {};
     response.userVerification = req.body.userVerification || 'preferred';
-    response.challenge = coerceToBase64Url(response.challenge);
+    response.challenge = coerceToBase64Url(response.challenge, 'challenge');
     res.cookie('challenge', response.challenge);
 
     response.allowCredentials = [];
@@ -493,7 +408,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
       throw 'Authenticating credential not found.';
     }
 
-    const challenge = coerceToArrayBuffer(req.cookies.challenge);
+    const challenge = coerceToArrayBuffer(req.cookies.challenge, 'challenge');
     const origin = `https://${req.get('host')}`; // TODO: Temporary work around for scheme
     
     const clientAssertionResponse = { response: {} };
@@ -513,7 +428,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
       factor: "either",
       publicKey: credential.publicKey,
       prevCounter: credential.prevCounter,
-      userHandle: coerceToArrayBuffer(user.id)
+      userHandle: coerceToArrayBuffer(user.id, 'userHandle')
     };
     const result = await f2l.assertionResult(clientAssertionResponse, assertionExpectations);
 
