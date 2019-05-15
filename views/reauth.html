@@ -53,7 +53,8 @@
           location.href = '/home';
         }
       }).catch(e => {
-        console.error('Authentication failed. Use password to sign-in.');
+        console.error(e);
+        alert('Authentication failed. Use password to sign-in.');
       });
     </script>
   </body>
