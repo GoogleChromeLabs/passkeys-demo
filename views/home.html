@@ -66,11 +66,7 @@
           }
         })
         .then(user => {
-          if (user) {
-            getCredentials();
-          } else {
-            console.info('Registering credential silently failed.');
-          }
+          getCredentials();
         })
         .catch(e => alert(e));
       });
