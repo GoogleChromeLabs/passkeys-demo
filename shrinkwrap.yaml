@@ -2,7 +2,7 @@ dependencies:
   cookie-parser: 1.4.4
   crypto: 1.0.1
   express: 4.16.4
-  fido2-lib: github.com/agektmr/fido2-lib/55a84bf5300cf914394db5834683b4ba9c5b53b7
+  fido2-lib: 2.1.1
   hbs: 4.0.4
   lowdb: 1.0.0
 packages:
@@ -41,12 +41,21 @@ packages:
     dev: false
     resolution:
       integrity: sha512-H1qVYh1MYhEEFLsP97cVKqCGo7KfCyTt6uEWqsTBr9SO84oK9Uwbyd/yCW+6rKJLHksBNUVWZDAjfS+Ccx0Bbg==
-  /base64url/3.0.1:
+  /babel-polyfill/6.26.0:
+    dependencies:
+      babel-runtime: 6.26.0
+      core-js: 2.6.5
+      regenerator-runtime: 0.10.5
     dev: false
-    engines:
-      node: '>=6.0.0'
     resolution:
-      integrity: sha512-ir1UPr3dkwexU7FdV8qBBbNDRUhMmIekYMFZfi+C/sLNnRESKPl23nB9b2pltqfOQNnGzsDdId90AEtG5tCx4A==
+      integrity: sha1-N5k3q8Z9eJWXCtxiHyhM2WbPIVM=
+  /babel-runtime/6.26.0:
+    dependencies:
+      core-js: 2.6.5
+      regenerator-runtime: 0.11.1
+    dev: false
+    resolution:
+      integrity: sha1-llxwWGaOgrVde/4E/yM3vItWR/4=
   /bignumber.js/8.1.1:
     dev: false
     resolution:
@@ -135,6 +144,10 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha1-5+Ch+e9DtMi6klxcWpboBtFoc7s=
+  /core-js/2.6.5:
+    dev: false
+    resolution:
+      integrity: sha512-klh/kDpwX8hryYL14M9w/xei6vrv6sE8gTHDG7/T/+SEovB/G4ejwcfE/CBzO6Edsu+OETZMZ3wcX/EjUkrl5A==
   /cose-to-jwk/1.1.0:
     dependencies:
       cbor: 4.1.5
@@ -188,10 +201,6 @@ packages:
       node: '>= 0.8'
     resolution:
       integrity: sha1-rT/0yG7C0CkyL1oCw6mmBslbP1k=
-  /es6-promise/4.2.6:
-    dev: false
-    resolution:
-      integrity: sha512-aRVgGdnmW2OiySVPUC9e6m+plolMAJKjZnQlCwNSuK5yQ0JN61DZSO1X1Ufd1foqWRAlig0rhduTCHe7sVtK5Q==
   /escape-html/1.0.3:
     dev: false
     resolution:
@@ -239,6 +248,19 @@ packages:
       node: '>= 0.10.0'
     resolution:
       integrity: sha512-j12Uuyb4FMrd/qQAm6uCHAkPtO8FDTRJZBDd5D2KOL2eLaz1yUNdUB/NOIyq0iU4q4cFarsUCrnFDPBcnksuOg==
+  /fido2-lib/2.1.1:
+    dependencies:
+      asn1js: 2.0.22
+      babel-polyfill: 6.26.0
+      cbor: 4.1.5
+      cose-to-jwk: 1.1.0
+      jwk-to-pem: 2.0.1
+      node-webcrypto-ossl: 1.0.44
+      pkijs: 2.1.77
+      psl: 1.1.31
+    dev: false
+    resolution:
+      integrity: sha512-Cdnp3FNXnw7XmwSiKbjTCthyDRBFGlEKZOnP3x8quxA9teHSi36a8TQ4aXd9uROEzN4brgyeCoUMA8Te746+fw==
   /finalhandler/1.1.1:
     dependencies:
       debug: 2.6.9
@@ -361,10 +383,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
-  /long/4.0.0:
-    dev: false
-    resolution:
-      integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
   /lowdb/1.0.0:
     dependencies:
       graceful-fs: 4.1.15
@@ -449,21 +467,6 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
-  /node-forge/0.8.2:
-    dev: false
-    resolution:
-      integrity: sha512-mXQ9GBq1N3uDCyV1pdSzgIguwgtVpM7f5/5J4ipz12PKWElmPpVWLDuWl8iXmhysr21+WmX/OJ5UKx82wjomgg==
-  /node-jose/1.1.3:
-    dependencies:
-      base64url: 3.0.1
-      es6-promise: 4.2.6
-      lodash: 4.17.11
-      long: 4.0.0
-      node-forge: 0.8.2
-      uuid: 3.3.2
-    dev: false
-    resolution:
-      integrity: sha512-kupfi4uGWhRjnOmtie2T64cLge5a1TZyalEa8uWWWBgtKBcu41A4IGKpI9twZAxRnmviamEUQRK7LSyfFb2w8A==
   /node-webcrypto-ossl/1.0.44:
     dependencies:
       mkdirp: 0.5.1
@@ -511,7 +514,7 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY=
-  /pkijs/2.1.58:
+  /pkijs/2.1.77:
     dependencies:
       asn1js: 2.0.22
       bytestreamjs: 1.0.27
@@ -520,7 +523,7 @@ packages:
     engines:
       node: '>=6.0.0'
     resolution:
-      integrity: sha512-HEcJ4SbZNdyB7Jb1G7Ot3Y/gd7kZyTDJBMIIZOFselrKrCouhGbQu4rm9Lg8bumBACckq724G9uNsZbNJ6d2gw==
+      integrity: sha512-uXSiiO9aHoBEc4SadeSzso8yJesUrRI66C1frJ61gVP9CCqTNAxt4o9lRhQkVm6BP59F1Nwb/TIHHwJx+2P8Zg==
   /proxy-addr/2.0.5:
     dependencies:
       forwarded: 0.1.2
@@ -563,6 +566,14 @@ packages:
       node: '>= 0.8'
     resolution:
       integrity: sha512-9esiElv1BrZoI3rCDuOuKCBRbuApGGaDPQfjSflGxdy4oyzqghxu6klEkkVIvBje+FF0BX9coEv8KqW6X/7njw==
+  /regenerator-runtime/0.10.5:
+    dev: false
+    resolution:
+      integrity: sha1-M2w+/BIgrc7dosn6tntaeVWjNlg=
+  /regenerator-runtime/0.11.1:
+    dev: false
+    resolution:
+      integrity: sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg==
   /safe-buffer/5.1.2:
     dev: false
     resolution:
@@ -666,11 +677,6 @@ packages:
       node: '>= 0.4.0'
     resolution:
       integrity: sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
-  /uuid/3.3.2:
-    dev: false
-    hasBin: true
-    resolution:
-      integrity: sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
   /vary/1.1.2:
     dev: false
     engines:
@@ -695,21 +701,6 @@ packages:
       node: '>=0.4.0'
     resolution:
       integrity: sha1-o9XabNXAvAAI03I0u68b7WMFkQc=
-  github.com/agektmr/fido2-lib/55a84bf5300cf914394db5834683b4ba9c5b53b7:
-    dependencies:
-      asn1js: 2.0.22
-      cbor: 4.1.5
-      cose-to-jwk: 1.1.0
-      jwk-to-pem: 2.0.1
-      node-jose: 1.1.3
-      node-webcrypto-ossl: 1.0.44
-      pkijs: 2.1.58
-      psl: 1.1.31
-    dev: false
-    name: fido2-lib
-    resolution:
-      tarball: 'https://codeload.github.com/agektmr/fido2-lib/tar.gz/55a84bf5300cf914394db5834683b4ba9c5b53b7'
-    version: 2.3.0
 registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
@@ -717,6 +708,6 @@ specifiers:
   cookie-parser: ^1.4.4
   crypto: ^1.0.1
   express: ^4.16.4
-  fido2-lib: 'git+https://github.com/agektmr/fido2-lib.git'
+  fido2-lib: ^2.1.1
   hbs: ^4.0.4
   lowdb: ^1.0.0
