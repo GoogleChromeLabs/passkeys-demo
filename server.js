@@ -18,7 +18,7 @@ app.use(express.static('public'));
 app.use((req, res, next) => {
   if (req.get('x-forwarded-proto') &&
      (req.get('x-forwarded-proto')).split(',')[0] !== 'https') {
-    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+    return res.redirect(301, `https://${process.env.HOSTNAME}`);
   }
   req.schema = 'https';
   next();
