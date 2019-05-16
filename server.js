@@ -7,7 +7,6 @@ const cookieParser = require('cookie-parser');
 const hbs = require('hbs');
 const auth = require('./libs/auth');
 const app = express();
-const { coerceToBase64Url } = require('fido2-lib/lib/utils');
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
@@ -15,10 +14,6 @@ app.set('views', './views');
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
-
-      const octArray = process.env.ANDROID_SHA256HASH.split(':').map(h => parseInt(h, 16));
-      const androidHash = coerceToBase64Url(octArray, 'Android Hash');
-      coorigin = `android:apk-key-hash:${androidHash}`;
 
 app.use((req, res, next) => {
   if (req.get('x-forwarded-proto') &&
@@ -65,8 +60,24 @@ app.get('/reauth', (req, res) => {
 });
 
 app.get('/.well-known/assetlinks.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.sendFile(`${__dirname}/views/assetlinks.json`);
+  const assetlinks = [];
+  const relation = ['delegate_permission/common.handle_all_urls', 'delegate_permission/common.get_login_creds'];
+  assetlinks.push({
+    relation: relation,
+    target: {
+      namespace: 'web',
+      site: `https://${process.env.HOSTNAME}`
+    }
+  });
+  assetlinks.push({
+    relation: relation,
+    target: {
+      namespace: 'android_app',
+      package_name: process.env.ANDROID_PACKAGENAME,
+      sha256_cert_fingerprints: [process.env.ANDROID_SHA256HASH]
+    }
+  });
+  res.json(assetlinks);
 });
 
 app.use('/auth', auth);
