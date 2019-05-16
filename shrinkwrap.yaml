@@ -2,7 +2,7 @@ dependencies:
   cookie-parser: 1.4.4
   crypto: 1.0.1
   express: 4.16.4
-  fido2-lib: 2.1.1
+  fido2-lib: github.com/agektmr/fido2-lib/14e40461c644920af4eb19b695f84c98233153ca
   hbs: 4.0.4
   lowdb: 1.0.0
 packages:
@@ -248,19 +248,6 @@ packages:
       node: '>= 0.10.0'
     resolution:
       integrity: sha512-j12Uuyb4FMrd/qQAm6uCHAkPtO8FDTRJZBDd5D2KOL2eLaz1yUNdUB/NOIyq0iU4q4cFarsUCrnFDPBcnksuOg==
-  /fido2-lib/2.1.1:
-    dependencies:
-      asn1js: 2.0.22
-      babel-polyfill: 6.26.0
-      cbor: 4.1.5
-      cose-to-jwk: 1.1.0
-      jwk-to-pem: 2.0.1
-      node-webcrypto-ossl: 1.0.44
-      pkijs: 2.1.77
-      psl: 1.1.31
-    dev: false
-    resolution:
-      integrity: sha512-Cdnp3FNXnw7XmwSiKbjTCthyDRBFGlEKZOnP3x8quxA9teHSi36a8TQ4aXd9uROEzN4brgyeCoUMA8Te746+fw==
   /finalhandler/1.1.1:
     dependencies:
       debug: 2.6.9
@@ -701,6 +688,21 @@ packages:
       node: '>=0.4.0'
     resolution:
       integrity: sha1-o9XabNXAvAAI03I0u68b7WMFkQc=
+  github.com/agektmr/fido2-lib/14e40461c644920af4eb19b695f84c98233153ca:
+    dependencies:
+      asn1js: 2.0.22
+      babel-polyfill: 6.26.0
+      cbor: 4.1.5
+      cose-to-jwk: 1.1.0
+      jwk-to-pem: 2.0.1
+      node-webcrypto-ossl: 1.0.44
+      pkijs: 2.1.77
+      psl: 1.1.31
+    dev: false
+    name: fido2-lib
+    resolution:
+      tarball: 'https://codeload.github.com/agektmr/fido2-lib/tar.gz/14e40461c644920af4eb19b695f84c98233153ca'
+    version: 2.1.1
 registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
@@ -708,6 +710,6 @@ specifiers:
   cookie-parser: ^1.4.4
   crypto: ^1.0.1
   express: ^4.16.4
-  fido2-lib: ^2.1.1
+  fido2-lib: 'github:agektmr/fido2-lib#android-compatible'
   hbs: ^4.0.4
   lowdb: ^1.0.0
