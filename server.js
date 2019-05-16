@@ -15,6 +15,10 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
 
+const hexArray = process.env.ANDROID_SHA256HASH.split(':');
+const octArray = hexArray.map(h => parseInt(h, 16));
+console.log((btoa(new Uint8Array(octArray)).buffer));
+
 app.use((req, res, next) => {
   if (req.get('x-forwarded-proto') &&
      (req.get('x-forwarded-proto')).split(',')[0] !== 'https') {
