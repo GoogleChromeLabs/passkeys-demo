@@ -285,7 +285,9 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
 
     let origin = '';
     if (req.get('User-Agent').indexOf('okhttp') > -1) {
-      origin = `android:apk-key-hash:lvddYHnbc_TT-5QSitlDFu7t5I_Wh7f263uB_avskuc`; // TODO: Generate
+      const octArray = process.env.ANDROID_SHA256HASH.split(':').map(h => parseInt(h, 16));
+      const androidHash = coerceToBase64Url(octArray, 'Android Hash');
+      origin = `android:apk-key-hash:${androidHash}`; // TODO: Generate
     } else {
       origin = `https://${req.get('host')}`;
     }

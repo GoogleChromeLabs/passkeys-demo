@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const hbs = require('hbs');
 const auth = require('./libs/auth');
 const app = express();
+const { coerceToBase64Url } = require('fido2-lib/lib/utils');
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
@@ -15,9 +16,9 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
 
-const hexArray = process.env.ANDROID_SHA256HASH.split(':');
-const octArray = hexArray.map(h => parseInt(h, 16));
-console.log((btoa(new Uint8Array(octArray)).buffer));
+      const octArray = process.env.ANDROID_SHA256HASH.split(':').map(h => parseInt(h, 16));
+      const androidHash = coerceToBase64Url(octArray, 'Android Hash');
+      coorigin = `android:apk-key-hash:${androidHash}`;
 
 app.use((req, res, next) => {
   if (req.get('x-forwarded-proto') &&
