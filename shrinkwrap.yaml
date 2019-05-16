@@ -2,7 +2,7 @@ dependencies:
   cookie-parser: 1.4.4
   crypto: 1.0.1
   express: 4.16.4
-  fido2-lib: github.com/agektmr/fido2-lib/14e40461c644920af4eb19b695f84c98233153ca
+  fido2-lib: github.com/agektmr/fido2-lib/d590df0968e281d38270e278343227833fcde844
   hbs: 4.0.4
   lowdb: 1.0.0
 packages:
@@ -688,7 +688,7 @@ packages:
       node: '>=0.4.0'
     resolution:
       integrity: sha1-o9XabNXAvAAI03I0u68b7WMFkQc=
-  github.com/agektmr/fido2-lib/14e40461c644920af4eb19b695f84c98233153ca:
+  github.com/agektmr/fido2-lib/d590df0968e281d38270e278343227833fcde844:
     dependencies:
       asn1js: 2.0.22
       babel-polyfill: 6.26.0
@@ -701,7 +701,7 @@ packages:
     dev: false
     name: fido2-lib
     resolution:
-      tarball: 'https://codeload.github.com/agektmr/fido2-lib/tar.gz/14e40461c644920af4eb19b695f84c98233153ca'
+      tarball: 'https://codeload.github.com/agektmr/fido2-lib/tar.gz/d590df0968e281d38270e278343227833fcde844'
     version: 2.1.1
 registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 9
@@ -710,6 +710,6 @@ specifiers:
   cookie-parser: ^1.4.4
   crypto: ^1.0.1
   express: ^4.16.4
-  fido2-lib: 'github:agektmr/fido2-lib#android-compatible'
+  fido2-lib: 'github:agektmr/fido2-lib#android-compatible2'
   hbs: ^4.0.4
   lowdb: ^1.0.0
