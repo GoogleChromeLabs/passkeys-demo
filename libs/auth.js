@@ -15,7 +15,7 @@ router.use(express.json());
 
 const f2l = new Fido2Lib({
     timeout: 30*1000*60,
-    rpId: "webauthn-codelab-resolution.glitch.me", // TODO: Auto generate
+    rpId: process.env.HOSTNAME,
     rpName: "WebAuthn Codelab",
     challengeSize: 32,
     cryptoParams: [-7]
