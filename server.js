@@ -75,22 +75,29 @@ app.get('/reauth', (req, res) => {
 
 app.get('/.well-known/assetlinks.json', (req, res) => {
   const assetlinks = [];
-  const relation = ['delegate_permission/common.handle_all_urls', 'delegate_permission/common.get_login_creds'];
-  assetlinks.push({
-    relation: relation,
-    target: {
-      namespace: 'web',
-      site: `https://${process.env.HOSTNAME}`
-    }
-  });
-  assetlinks.push({
-    relation: relation,
-    target: {
-      namespace: 'android_app',
-      package_name: process.env.ANDROID_PACKAGENAME,
-      sha256_cert_fingerprints: [process.env.ANDROID_SHA256HASH]
-    }
-  });
+  const relation = [
+    'delegate_permission/common.handle_all_urls',
+    'delegate_permission/common.get_login_creds'
+  ];
+  if (process.env.HOSTNAME) {
+    assetlinks.push({
+      relation: relation,
+      target: {
+        namespace: 'web',
+        site: `https://${process.env.HOSTNAME}`
+      }
+    });
+  }
+  if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
+    assetlinks.push({
+      relation: relation,
+      target: {
+        namespace: 'android_app',
+        package_name: process.env.ANDROID_PACKAGENAME,
+        sha256_cert_fingerprints: [process.env.ANDROID_SHA256HASH]
+      }
+    });
+  }
   res.json(assetlinks);
 });
 
