@@ -25,11 +25,8 @@ const fs = require('fs');
 
 const low = require('lowdb');
 
-try {
-  fs.readFileSync('./.data/db.json');
-} catch (e) {
+if (!fs.existsSync('./.data')) {
   fs.mkdirSync('./.data');
-  fs.writeFileSync('./.data/db.json', '');
 }
 
 const FileSync = require('lowdb/adapters/FileSync');

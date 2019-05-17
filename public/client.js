@@ -138,7 +138,3 @@ export const authenticate = async (opts) => {
 
   return await _fetch(`/auth/signinResponse`, credential);
 };
-
-export const unregisterCredential = async (credId) => {
-  return _fetch(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
-};
