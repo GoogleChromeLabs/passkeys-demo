@@ -102,13 +102,13 @@ export const authenticate = async (opts) => {
 
   const options = await _fetch(url, opts);
 
-  options.challenge = base64url.decode(options.challenge);
-
   if (!options.allowCredentials) {
     console.info('No registered credentials found.');
     return Promise.resolve(null);
   }
   
+  options.challenge = base64url.decode(options.challenge);
+
   for (let cred of options.allowCredentials) {
     cred.id = base64url.decode(cred.id);
   }
