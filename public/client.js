@@ -106,7 +106,7 @@ export const authenticate = async (opts) => {
 
   if (!options.allowCredentials) {
     console.info('No registered credentials found.');
-    throw Promise.resolve(null);
+    return Promise.resolve(null);
   }
   
   for (let cred of options.allowCredentials) {
