@@ -86,7 +86,7 @@ export const registerCredential = async (opts) => {
 export const authenticate = async (opts) => {
   if (!window.PublicKeyCredential) {
     console.info('WebAuthn not supported on this browser.');
-    return Promise.resolve(null)
+    return Promise.resolve(null);
   }
   const UVPAA = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
   if (!UVPAA) {
@@ -104,6 +104,11 @@ export const authenticate = async (opts) => {
 
   options.challenge = base64url.decode(options.challenge);
 
+  if (!options.allowCredentials) {
+    console.info('No registered credentials found.');
+    throw Promise.resolve(null);
+  }
+  
   for (let cred of options.allowCredentials) {
     cred.id = base64url.decode(cred.id);
   }

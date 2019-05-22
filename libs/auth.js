@@ -385,16 +385,18 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     response.challenge = coerceToBase64Url(response.challenge, 'challenge');
     res.cookie('challenge', response.challenge);
 
-    response.allowCredentials = [];
-
-    if (credId) {
-      for (let cred of user.credentials) {
-        if (cred.credId == credId) {
-          response.allowCredentials.push({
-            id: cred.credId,
-            type: 'public-key',
-            transports: ['internal']
-          });
+    // Leave `allowCredentials` empty unless there's registered credentials
+    if (user.credentials.length > 0) {
+      response.allowCredentials = [];
+      if (credId) {
+        for (let cred of user.credentials) {
+          if (cred.credId == credId) {
+            response.allowCredentials.push({
+              id: cred.credId,
+              type: 'public-key',
+              transports: ['internal']
+            });
+          }
         }
       }
     }
