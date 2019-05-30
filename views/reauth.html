@@ -70,7 +70,7 @@
           location.href = '/home';
         }
       }).catch(e => {
-        console.error(e);
+        console.error(e.message || e);
         alert('Authentication failed. Use password to sign-in.');
       });
     </script>

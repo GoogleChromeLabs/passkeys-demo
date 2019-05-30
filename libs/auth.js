@@ -385,7 +385,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     response.challenge = coerceToBase64Url(response.challenge, 'challenge');
     res.cookie('challenge', response.challenge);
 
-    // Leave `allowCredentials` empty unless credentials
+    // Leave `allowCredentials` empty unless `credId` is specified
     if (user.credentials.length > 0) {
       response.allowCredentials = [];
       if (credId) {
