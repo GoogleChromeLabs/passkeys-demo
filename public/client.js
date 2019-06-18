@@ -106,7 +106,7 @@ export const authenticate = async (opts) => {
     console.info('No registered credentials found.');
     return Promise.resolve(null);
   }
-  
+
   options.challenge = base64url.decode(options.challenge);
 
   for (let cred of options.allowCredentials) {
