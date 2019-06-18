@@ -243,6 +243,11 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
         });
       }
     }
+    response.pubKeyCredParams = [];
+    const params = [-7, -35, -36, -257, -258, -259, -37, -38, -39, -8];
+    for (let param of params) {
+      response.pubKeyCredParams.push({type:'public-key', alg: param});
+    }
     const as = {}; // authenticatorSelection
     const aa = req.body.authenticatorSelection.authenticatorAttachment;
     const rr = req.body.authenticatorSelection.requireResidentKey;
