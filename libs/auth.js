@@ -391,30 +391,15 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     response.challenge = coerceToBase64Url(response.challenge, 'challenge');
     res.cookie('challenge', response.challenge);
 
-    // Fill `allowCredentials` with all known credentials
-    // or one that is specified.
-    if (user.credentials.length > 0) {
-      response.allowCredentials = [];
-      for (let cred of user.credentials) {
-        // When credId is not specified, or matches the one specified
-        if (!credId || cred.credId == credId) {
-          response.allowCredentials.push({
-            id: cred.credId,
-            type: 'public-key',
-            transports: ['internal']
-          });
-        }
-      }
-      // If credId was specified but empty, means no matching credential was found.
-      // Fill them rather than sending empty in this case.
-      if (credId && response.allowCredentials.length === 0) {
-        for (let cred of user.credentials) {
-          response.allowCredentials.push({
-            id: cred.credId,
-            type: 'public-key',
-            transports: ['internal']
-          });
-        }
+    response.allowCredentials = [];
+    for (let cred of user.credentials) {
+      // When credId is not specified, or matches the one specified
+      if (!credId || cred.credId == credId) {
+        response.allowCredentials.push({
+          id: cred.credId,
+          type: 'public-key',
+          transports: ['internal']
+        });
       }
     }
 

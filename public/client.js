@@ -102,7 +102,7 @@ export const authenticate = async (opts) => {
 
   const options = await _fetch(url, opts);
 
-  if (!options.allowCredentials) {
+  if (options.allowCredentials.length === 0) {
     console.info('No registered credentials found.');
     return Promise.resolve(null);
   }
