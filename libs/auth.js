@@ -408,7 +408,13 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
       // If credId was specified but empty, means no matching credential was found.
       // Fill them rather than sending empty in this case.
       if (credId && response.allowCredentials.length === 0) {
-        response.allowCredentials = [...user.credentials];
+        for (let cred of user.credentials) {
+          response.allowCredentials.push({
+            id: cred.credId,
+            type: 'public-key',
+            transports: ['internal']
+          });
+        }
       }
     }
 
