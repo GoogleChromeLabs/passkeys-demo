@@ -404,8 +404,11 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
           });
         }
       }
-      // TODO: What if there is no credentials filled at this point?
-      // TODO: Should we fill?
+      // If credId was specified but empty, means no matching credential was found.
+      // Fill them rather than sending empty in this case.
+      if (credId && response.allowCredentials.length === 0) {
+        response.allowCredentials = [...user.credentials];
+      }
     }
 
     res.json(response);
