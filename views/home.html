@@ -62,7 +62,8 @@
           attestation: 'none',
           authenticatorSelection: {
             authenticatorAttachment: 'platform',
-            userVerification: 'required'
+            userVerification: 'required',
+            requireResidentKey: true
           }
         })
         .then(user => {
