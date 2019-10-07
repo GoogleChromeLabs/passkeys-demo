@@ -109,18 +109,18 @@ export const authenticate = async (opts) => {
 
   options.challenge = base64url.decode(options.challenge);
 
-  // for (let cred of options.allowCredentials) {
-  //   cred.id = base64url.decode(cred.id);
-  // }
+  for (let cred of options.allowCredentials) {
+    cred.id = base64url.decode(cred.id);
+  }
 
   // ↓ Added for resident key support
-  if (!credId) {
-    options.allowCredentials = [];
-  } else {
-    for (let cred of options.allowCredentials) {
-      cred.id = base64url.decode(cred.id);
-    }    
-  }
+  // if (!credId) {
+  //   options.allowCredentials = [];
+  // } else {
+  //   for (let cred of options.allowCredentials) {
+  //     cred.id = base64url.decode(cred.id);
+  //   }    
+  // }
   // ↑ Added for resident key support
 
   const cred = await navigator.credentials.get({
