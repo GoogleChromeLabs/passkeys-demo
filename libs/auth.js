@@ -387,7 +387,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     const response = await f2l.assertionOptions();
 
     // const response = {};
-    response.userVerification = req.body.userVerification || 'preferred';
+    response.userVerification = req.body.userVerification || 'required';
     response.challenge = coerceToBase64Url(response.challenge, 'challenge');
     res.cookie('challenge', response.challenge);
 
