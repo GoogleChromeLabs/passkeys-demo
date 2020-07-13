@@ -59,11 +59,11 @@
       const register = document.querySelector('#register');
       register.addEventListener('click', e => {
         registerCredential({
-          attestation: 'none',
+          attestation: 'direct',
           authenticatorSelection: {
             authenticatorAttachment: 'platform',
-            userVerification: 'required',
-            requireResidentKey: true // Added for resident keys support
+            // userVerification: 'required',
+            // requireResidentKey: true // Added for resident keys support
           }
         })
         .then(user => {
