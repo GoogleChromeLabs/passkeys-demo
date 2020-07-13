@@ -15,7 +15,7 @@
     "fido2-lib": "agektmr/fido2-lib#android-compatible3"
   },
   "engines": {
-    "node": "8.x"
+    "node": "10.x"
   },
   "repository": {
     "url": "https://glitch.com/edit/#!/hello-express"
