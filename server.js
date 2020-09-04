@@ -29,10 +29,15 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
 
+const HOSTNAME = `${process.env.PROJECT_DOMAIN}.glitch.me`;
+const ORIGIN = `https://${HOSTNAME}`;
+console.log(HOSTNAME);
+console.log(ORIGIN);
+
 app.use((req, res, next) => {
   if (req.get('x-forwarded-proto') &&
      (req.get('x-forwarded-proto')).split(',')[0] !== 'https') {
-    return res.redirect(301, `https://${process.env.HOSTNAME}`);
+    return res.redirect(301, ORIGIN);
   }
   req.schema = 'https';
   next();
@@ -79,15 +84,13 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
     'delegate_permission/common.handle_all_urls',
     'delegate_permission/common.get_login_creds'
   ];
-  if (process.env.HOSTNAME) {
-    assetlinks.push({
-      relation: relation,
-      target: {
-        namespace: 'web',
-        site: `https://${process.env.HOSTNAME}`
-      }
-    });
-  }
+  assetlinks.push({
+    relation: relation,
+    target: {
+      namespace: 'web',
+      site: ORIGIN
+    }
+  });
   if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
     assetlinks.push({
       relation: relation,
