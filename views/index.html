@@ -38,10 +38,11 @@
         Login with a random username
       </h2>
       <form id="form" method="POST" action="/auth/username" >
-        <div  class="mdc-text-field">
-          <input type="text" class="mdc-text-field__input" name="username" />
-          <div class="mdc-line-ripple"></div>
-          <label class="mdc-floating-label">username</label>
+        <div class="mdc-text-field mdc-text-field--filled">
+          <span class="mdc-text-field__ripple"></span>
+          <label class="mdc-floating-label" id="username-label">username</label>
+          <input type="text" class="mdc-text-field__input" aria-labelledby="username-label" name="username" />
+          <span class="mdc-line-ripple"></span>
         </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
       </form>

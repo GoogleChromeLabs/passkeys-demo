@@ -40,10 +40,11 @@
       </h2>
       <form id="form" method="POST" action="/auth/password" >
         <input type="hidden" name="username" value="{{username}}" />
-        <div  class="mdc-text-field">
-          <input type="password" class="mdc-text-field__input" name="password" />
-          <div class="mdc-line-ripple"></div>
-          <label class="mdc-floating-label">password</label>
+        <div class="mdc-text-field mdc-text-field--filled">
+          <span class="mdc-text-field__ripple"></span>
+          <label class="mdc-floating-label" id="password-label">password</label>
+          <input type="password" class="mdc-text-field__input" aria-labelledby="password-label" name="password" />
+          <span class="mdc-line-ripple"></span>
         </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Sign-In" />
       </form>
