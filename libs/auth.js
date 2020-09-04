@@ -25,6 +25,8 @@ const fs = require('fs');
 
 const low = require('lowdb');
 
+const HOSTNAME = `${process.env.PROJECT_DOMAIN}.glitch.me`;
+
 if (!fs.existsSync('./.data')) {
   fs.mkdirSync('./.data');
 }
@@ -37,7 +39,7 @@ router.use(express.json());
 
 const f2l = new Fido2Lib({
     timeout: 30*1000*60,
-    rpId: process.env.HOSTNAME,
+    rpId: HOSTNAME,
     rpName: "WebAuthn Codelab",
     challengeSize: 32,
     cryptoParams: [-7]
