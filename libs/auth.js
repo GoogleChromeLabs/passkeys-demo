@@ -45,6 +45,11 @@ const f2l = new Fido2Lib({
     cryptoParams: [-7]
 });
 
+const sameSite = {
+  sameSite: 'none',
+  secure: true
+};
+
 db.defaults({
   users: []
 }).write();
@@ -96,7 +101,7 @@ router.post('/username', (req, res) => {
         .write();
     }
     // Set username cookie
-    res.cookie('username', username);
+    res.cookie('username', username, sameSite);
     // If sign-in succeeded, redirect to `/home`.
     res.json(user);
   }
@@ -121,7 +126,7 @@ router.post('/password', (req, res) => {
     return;
   }
 
-  res.cookie('signed-in', 'yes');
+  res.cookie('signed-in', 'yes', sameSite);
   res.json(user);
 });
 
@@ -234,7 +239,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       name: user.username
     };
     response.challenge = coerceToBase64Url(response.challenge, 'challenge');
-    res.cookie('challenge', response.challenge);
+    res.cookie('challenge', response.challenge, sameSite);
     response.excludeCredentials = [];
     if (user.credentials.length > 0) {
       for (let cred of user.credentials) {
@@ -391,7 +396,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     // const response = {};
     response.userVerification = req.body.userVerification || 'required';
     response.challenge = coerceToBase64Url(response.challenge, 'challenge');
-    res.cookie('challenge', response.challenge);
+    res.cookie('challenge', response.challenge, sameSite);
 
     response.allowCredentials = [];
     for (let cred of user.credentials) {
@@ -476,7 +481,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
       .write();
 
     res.clearCookie('challenge');
-    res.cookie('signed-in', 'yes');
+    res.cookie('signed-in', 'yes', sameSite);
     res.json(user);
   } catch (e) {
     res.clearCookie('challenge');
