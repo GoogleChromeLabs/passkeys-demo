@@ -28,6 +28,7 @@ app.set('views', './views');
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
+app.use(express.static('dist'));
 
 const HOSTNAME = `${process.env.PROJECT_DOMAIN}.glitch.me`;
 const ORIGIN = `https://${HOSTNAME}`;
