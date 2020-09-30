@@ -14,53 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-// export const _fetch = async (path, payload = '') => {
-//   const headers = {
-//     'X-Requested-With': 'XMLHttpRequest'
-//   };
-//   if (payload && !(payload instanceof FormData)) {
-//     headers['Content-Type'] = 'application/json';
-//     payload = JSON.stringify(payload);
-//   }
-//   const res = await fetch(path, {
-//     method: 'POST',
-//     credentials: 'same-origin',
-//     headers: headers,
-//     body: payload
-//   });
-//   if (res.status === 200) {
-//     // Server authentication succeeded
-//     return res.json();
-//   } else {
-//     // Server authentication failed
-//     const result = await res.json();
-//     throw result.error;
-//   }
-// };
-
-// Until Safari's gesture propagation issue will be resolved
-// We'll have to use `XMLHttpRequest` instead of `fetch`.
 export const _fetch = async (path, payload = '') => {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', path);
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    if (payload && !(payload instanceof FormData)) {
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      payload = JSON.stringify(payload);
-    }
-    xhr.withCredentials = true;
-    xhr.responseType = 'json';
-    xhr.onload = e => {
-      console.log(xhr.response);
-      if (xhr.status === 200) {
-        resolve(xhr.response);
-      } else {
-        reject(xhr.response.error);
-      }
-    }
-    xhr.send(payload);
+  const headers = {
+    'X-Requested-With': 'XMLHttpRequest'
+  };
+  if (payload && !(payload instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+    payload = JSON.stringify(payload);
+  }
+  const res = await fetch(path, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: headers,
+    body: payload
   });
+  if (res.status === 200) {
+    // Server authentication succeeded
+    return res.json();
+  } else {
+    // Server authentication failed
+    const result = await res.json();
+    throw result.error;
+  }
 };
 
 export const registerCredential = async (opts) => {
