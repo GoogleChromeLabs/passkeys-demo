@@ -24,21 +24,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- import the webpage's stylesheet -->
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="/bundle.css">
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@7.0.0/dist/material-components-web.min.css">
     <script src="https://cdn.jsdelivr.net/gh/herrjemand/Base64URL-ArrayBuffer@latest/lib/base64url-arraybuffer.js"></script>
+    <script src="components-bundle.js"></script>
   </head>
   <body class="mdc-typography">
-    <header class="mdc-top-app-bar" style="top:0px">
-      <h1 class="mdc-top-app-bar__title">
-        WebAuthn codelab
-      </h1>
-    </header>
-    <main class="content mdc-top-app-bar--fixed-adjust">
-      <h2>
-        Enter a password
-      </h2>
-      <form id="form" method="POST" action="/auth/password" >
+    <mwc-top-app-bar-fixed>
+      <span slot="title">WebAuthn codelab</span>
+    </mwc-top-app-bar-fixed>
+    <main class="content">
+      <div id="uvpa_available" class="hidden">
+        <h2>
+          Verify your identity
+        </h2>
+        <div>
+          <mwc-button id="reauth" raised>Authenticate</mwc-button>
+        </div>
+        <div>
+          <mwc-button id="cancel">Sign-in with password</mwc-button>
+        </div>
+      </div>
+      <form id="form" method="POST" action="/auth/password" class="hidden">
+        <h2>
+          Enter a password
+        </h2>
         <input type="hidden" name="username" value="{{username}}" />
         <div class="mdc-text-field mdc-text-field--filled">
           <span class="mdc-text-field__ripple"></span>
@@ -66,13 +76,43 @@
         .catch(e => alert(e));
       });
 
-      authenticate({}).then(user => {
-        if (user) {
-          location.href = '/home';
-        }
-      }).catch(e => {
-        console.error(e.message || e);
-        alert('Authentication failed. Use password to sign-in.');
+      if (window.PublicKeyCredential) {
+        PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+        .then(UVPAA => {
+          if (UVPAA && localStorage.getItem(`credId`)) {
+            document
+              .querySelector('#uvpa_available')
+              .classList.remove('hidden');
+          } else {
+            form.classList.remove('hidden');
+          }
+        });        
+      } else {
+        form.classList.remove('hidden');
+      }
+
+      const cancel = document.querySelector('#cancel');
+      cancel.addEventListener('click', e => {
+        form.classList.remove('hidden');
+        document
+          .querySelector('#uvpa_available')
+          .classList.add('hidden');        
+      });
+
+      const button = document.querySelector('#reauth');
+      button.addEventListener('click', e => {
+        authenticate({}).then(user => {
+          if (user) {
+            location.href = '/home';
+          } else {
+            throw 'User not found.';
+          }
+        }).catch(e => {
+          console.error(e.message || e);
+          alert('Authentication failed. Use password to sign-in.');
+          form.classList.remove('hidden');
+          document.querySelector('#uvpa_available').classList.add('hidden');
+        });        
       });
     </script>
   </body>

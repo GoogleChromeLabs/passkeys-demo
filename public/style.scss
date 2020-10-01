@@ -15,9 +15,6 @@
  * limitations under the License
  */
 
-/* styles */
-/* called by your view template */
-
 * {
   box-sizing: border-box;
 }
@@ -27,6 +24,10 @@ body {
   padding: 0;
 }
 
+.hidden {
+  display: none;
+}
+
 .content {
   margin: 0 16px;
 }
@@ -34,13 +35,12 @@ body {
 .credential {
   margin: 10px 0 20px 0;
   padding: 10px;
-}
-
-.credential > span {
-  overflow: hidden;
-  font-weight: bold;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  > span {
+    overflow: hidden;
+    font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;    
+  }
 }
 
 .public-key {
@@ -52,4 +52,14 @@ body {
   position: fixed;
   right: 30px;
   bottom: 30px;
+}
+
+#uvpa_available div {
+  margin: 30px 0;
+  display:flex;
+  justify-content: center;
+}
+
+#uvpa_unavailable {
+  color: red;
 }
