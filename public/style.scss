@@ -47,6 +47,11 @@ body {
   }
 }
 
+mwc-button > a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .public-key {
   overflow: hidden;
   text-overflow: ellipsis;
