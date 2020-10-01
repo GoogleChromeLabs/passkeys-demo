@@ -72,7 +72,7 @@ const sessionCheck = (req, res, next) => {
 router.post('/username', (req, res) => {
   const username = req.body.username;
   // Only check username, no need to check password as this is a mock
-  if (!username) {
+  if (!username || !/[a-zA-Z0-9-_]+/.test(username)) {
     res.status(400).send({ error: 'Bad request' });
     return;
   } else {
