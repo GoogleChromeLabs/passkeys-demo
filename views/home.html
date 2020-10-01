@@ -110,7 +110,7 @@
               <mwc-button id="${cred.credId}" @click="${removeCredential}" raised>Remove</mwc-button>
             </div>
           </div>`) : html`
-          <div>No credentials found.</div>
+          <div class="instructions">Click the button to the right bottom to register a new credential.</div>
           `}`;
         render(creds, list);
       };
