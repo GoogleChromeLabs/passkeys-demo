@@ -264,7 +264,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       // Prompt users for additional information about the authenticator.
       attestationType: attestation,
       // Prevent users from re-registering existing authenticators
-      excludedCredentialIDs: excludeCredentials,
+      excludeCredentials,
       authenticatorSelection,
     });
 
@@ -393,19 +393,17 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     for (let cred of user.credentials) {
       // When credId is not specified, or matches the one specified
       if (!credId || cred.credId == credId) {
-        allowCredentials.push(cred.credId);
-        // TODO: Waiting for [this issue](https://github.com/MasterKale/SimpleWebAuthn/issues/57) to be fixed.
-        // allowCredentials.push({
-        //   id: cred.credId,
-        //   type: 'public-key',
-        //   transports: ['internal']
-        // });
+        allowCredentials.push({
+          id: cred.credId,
+          type: 'public-key',
+          transports: ['internal']
+        });
       }
     }
 
     const options = fido2.generateAssertionOptions({
       timeout: TIMEOUT,
-      allowedCredentialIDs: allowCredentials,
+      allowCredentials,
       /**
        * This optional value controls whether or not the authenticator needs be able to uniquely
        * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
