@@ -72,7 +72,7 @@ const getOrigin = (userAgent) => {
       parseInt(h, 16),
     );
     const androidHash = base64url.encode(octArray);
-    origin = `android:apk-key-hash:${androidHash}`; // TODO: Generate
+    origin = `android:apk-key-hash:${androidHash}`;
   } else {
     origin = process.env.ORIGIN;
   }
@@ -314,7 +314,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const username = req.cookies.username;
   const expectedChallenge = req.cookies.challenge;
-  const expectedOrigin = process.env.ORIGIN;
+  const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
   const credId = req.body.id;
   const type = req.body.type;
@@ -322,13 +322,11 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   try {
     const { body } = req;
 
-    const origin = getOrigin(req.get('User-Agent'));
-
     const verification = await fido2.verifyAttestationResponse({
       credential: body,
       expectedChallenge,
-      expectedOrigin: origin,
-      expectedRPID: process.env.HOSTNAME,
+      expectedOrigin,
+      expectedRPID,
     });
 
     const { verified, authenticatorInfo } = verification;
@@ -451,11 +449,12 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   const { body } = req;
   const expectedChallenge = req.cookies.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
+  const expectedRPID = process.env.HOSTNAME;
 
   // Query the user
   const user = db.get('users').find({ username: req.cookies.username }).value();
 
-  let credential = user.credentials.find((cred) => cred.credId === body.id);
+  let credential = user.credentials.find((cred) => cred.credId === req.body.id);
 
   try {
     if (!credential) {
@@ -466,7 +465,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
       credential: body,
       expectedChallenge,
       expectedOrigin,
-      expectedRPID: process.env.HOSTNAME,
+      expectedRPID,
       authenticator: credential,
     });
 
