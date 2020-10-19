@@ -269,6 +269,12 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     });
 
     res.cookie('challenge', options.challenge, sameSite);
+    
+    // const params = [-7, -35, -36, -257, -258, -259, -37, -38, -39, -8];
+    options.pubKeyCredParams = [];
+    for (let param of params) {
+      options.pubKeyCredParams.push({ type: 'public-key', alg: param });
+    }
 
     res.json(options);
   } catch (e) {
