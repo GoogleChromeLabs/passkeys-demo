@@ -17,7 +17,6 @@
 
 // init project
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const hbs = require('hbs');
 const auth = require('./libs/auth');
@@ -26,7 +25,6 @@ const app = express();
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 app.set('views', './views');
-app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
 app.use(express.static('dist'));
@@ -62,9 +60,8 @@ app.use((req, res, next) => {
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', (req, res) => {
-  // Check cookie
+  // Check session
   if (req.session.username) {
-  // if (req.cookies.username) {
     // If user is signed in, redirect to `/reauth`.
     res.redirect(307, '/reauth');
     return;
@@ -75,18 +72,16 @@ app.get('/', (req, res) => {
 
 app.get('/home', (req, res) => {
   if (!req.session.username || req.session['signed-in'] != 'yes') {
-  // if (!req.cookies.username || req.cookies['signed-in'] != 'yes') {
     // If user is not signed in, redirect to `/`.
     res.redirect(307, '/');
     return;
   }
   // `home.html` shows sign-out link
-  res.render('home.html', { username: req.cookies.username });
+  res.render('home.html', { username: req.session.username });
 });
 
 app.get('/reauth', (req, res) => {
   const username = req.session.username;
-  // const username = req.cookies.username;
   if (!username) {
     res.redirect(302, '/');
     return;

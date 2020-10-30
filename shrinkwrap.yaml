@@ -8,7 +8,6 @@ dependencies:
   babel-loader: 8.1.0
   babel-preset-env: 1.7.0
   base64url: 3.0.1
-  cookie-parser: 1.4.5
   css-loader: 4.3.0
   express: 4.17.1
   express-session: 1.17.1
@@ -1720,15 +1719,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-4FJkXzKXEDB1snCFZlLP4gpC3JILicCpGbzG9f9G7tGqGCzETQ2hWPrcinA9oU4wtf2biUaEH5065UnMeR33oA==
-  /cookie-parser/1.4.5:
-    dependencies:
-      cookie: 0.4.0
-      cookie-signature: 1.0.6
-    dev: false
-    engines:
-      node: '>= 0.8.0'
-    resolution:
-      integrity: sha512-f13bPUj/gG/5mDr+xLmSxxDsB9DQiTIfhJS/sqjrmfAWiAN+x2O4i/XguTL9yDZ+/IFDanJ+5x7hC4CXT9Tdzw==
   /cookie-signature/1.0.6:
     dev: false
     resolution:
@@ -4781,7 +4771,6 @@ specifiers:
   babel-loader: ^8.1.0
   babel-preset-env: ^1.7.0
   base64url: ^3.0.1
-  cookie-parser: ^1.4.5
   css-loader: ^4.3.0
   express: ^4.17.1
   express-session: ^1.17.1
