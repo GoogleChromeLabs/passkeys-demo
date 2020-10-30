@@ -84,6 +84,7 @@ app.get('/home', (req, res) => {
 });
 
 app.get('/reauth', (req, res) => {
+  console.log(req.session);
   const username = req.session.username;
   // const username = req.cookies.username;
   if (!username) {

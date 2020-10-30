@@ -20,7 +20,6 @@ const crypto = require('crypto');
 const fido2 = require('@simplewebauthn/server');
 const base64url = require('base64url');
 const fs = require('fs');
-
 const low = require('lowdb');
 
 if (!fs.existsSync('./.data')) {
@@ -128,7 +127,7 @@ router.post('/password', (req, res) => {
     return;
   }
 
-  res.session['signed-in'] = 'yes';
+  req.session['signed-in'] = 'yes';
   // res.cookie('signed-in', 'yes', sameSite);
   res.json(user);
 });
@@ -291,7 +290,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       authenticatorSelection,
     });
 
-    res.session.challenge = options.challenge;
+    req.session.challenge = options.challenge;
     // res.cookie('challenge', options.challenge, sameSite);
 
     // Temporary hack until SimpleWebAuthn supports `pubKeyCredParams`
