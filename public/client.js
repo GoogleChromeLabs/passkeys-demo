@@ -93,16 +93,6 @@ export const authenticate = async (opts) => {
     cred.id = base64url.decode(cred.id);
   }
 
-  // ↓ Added for resident key support
-  // if (!credId) {
-  //   options.allowCredentials = [];
-  // } else {
-  //   for (let cred of options.allowCredentials) {
-  //     cred.id = base64url.decode(cred.id);
-  //   }
-  // }
-  // ↑ Added for resident key support
-
   const cred = await navigator.credentials.get({
     publicKey: options,
   });

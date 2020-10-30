@@ -395,7 +395,6 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     const credId = req.query.credId;
 
-    // const response = {};
     const userVerification = req.body.userVerification || 'required';
 
     const allowCredentials = [];
