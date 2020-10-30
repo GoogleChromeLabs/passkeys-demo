@@ -54,11 +54,10 @@ const csrfCheck = (req, res, next) => {
 
 /**
  * Checks CSRF protection using custom header `X-Requested-With`
- * If cookie doesn't contain `username`, consider the user is not authenticated.
+ * If the session doesn't contain `signed-in`, consider the user is not authenticated.
  **/
 const sessionCheck = (req, res, next) => {
   if (!req.session['signed-in']) {
-  // if (!req.cookies['signed-in']) {
     res.status(401).json({ error: 'not signed in.' });
     return;
   }
@@ -81,7 +80,7 @@ const getOrigin = (userAgent) => {
 
 /**
  * Check username, create a new account if it doesn't exist.
- * Set a `username` cookie.
+ * Set a `username` in the session.
  **/
 router.post('/username', (req, res) => {
   const username = req.body.username;
@@ -101,9 +100,8 @@ router.post('/username', (req, res) => {
       };
       db.get('users').push(user).write();
     }
-    // Set username cookie
+    // Set username in the session
     req.session.username = username;
-    // res.cookie('username', username, sameSite);
     // If sign-in succeeded, redirect to `/home`.
     res.json(user);
   }
@@ -120,7 +118,6 @@ router.post('/password', (req, res) => {
     return;
   }
   const user = db.get('users').find({ username: req.session.username }).value();
-  // const user = db.get('users').find({ username: req.cookies.username }).value();
 
   if (!user) {
     res.status(401).json({ error: 'Enter username first.' });
@@ -128,16 +125,13 @@ router.post('/password', (req, res) => {
   }
 
   req.session['signed-in'] = 'yes';
-  // res.cookie('signed-in', 'yes', sameSite);
   res.json(user);
 });
 
 router.get('/signout', (req, res) => {
-  // Remove cookies
+  // Remove the session
   delete req.session.username;
-  // res.clearCookie('username');
   delete req.session['signed-in'];
-  // res.clearCookie('signed-in');
   // Redirect to `/`
   res.redirect(302, '/');
 });
@@ -163,7 +157,6 @@ router.get('/signout', (req, res) => {
  **/
 router.post('/getKeys', csrfCheck, sessionCheck, (req, res) => {
   const user = db.get('users').find({ username: req.session.username }).value();
-  // const user = db.get('users').find({ username: req.cookies.username }).value();
   res.json(user || {});
 });
 
@@ -174,7 +167,6 @@ router.post('/getKeys', csrfCheck, sessionCheck, (req, res) => {
 router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
   const credId = req.query.credId;
   const username = req.session.username;
-  // const username = req.cookies.username;
   const user = db.get('users').find({ username: username }).value();
 
   const newCreds = user.credentials.filter((cred) => {
@@ -230,7 +222,6 @@ router.get('/resetDB', (req, res) => {
  **/
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   const username = req.session.username;
-  // const username = req.cookies.username;
   const user = db.get('users').find({ username: username }).value();
   try {
     const excludeCredentials = [];
@@ -291,7 +282,6 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     });
 
     req.session.challenge = options.challenge;
-    // res.cookie('challenge', options.challenge, sameSite);
 
     // Temporary hack until SimpleWebAuthn supports `pubKeyCredParams`
     options.pubKeyCredParams = [];
@@ -322,9 +312,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
  **/
 router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const username = req.session.username;
-  // const username = req.cookies.username;
   const expectedChallenge = req.session.challenge;
-  // const expectedChallenge = req.cookies.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
   const credId = req.body.id;
@@ -368,13 +356,11 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     db.get('users').find({ username: username }).assign(user).write();
 
     delete req.session.challenge;
-    // res.clearCookie('challenge');
 
     // Respond with user info
     res.json(user);
   } catch (e) {
     delete req.session.challenge;
-    // res.clearCookie('challenge');
     res.status(400).send({ error: e.message });
   }
 });
@@ -399,7 +385,6 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
       .get('users')
       .find({ username: req.session.username })
       .value();
-      // .find({ username: req.cookies.username })
 
     if (!user) {
       // Send empty response if user is not registered yet.
@@ -433,8 +418,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
        */
       userVerification,
     });
-    res.cookie.challenge = options.challenge;
-    // res.cookie('challenge', options.challenge, sameSite);
+    req.session.challenge = options.challenge;
 
     res.json(options);
   } catch (e) {
@@ -460,13 +444,11 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 router.post('/signinResponse', csrfCheck, async (req, res) => {
   const { body } = req;
   const expectedChallenge = req.session.challenge;
-  // const expectedChallenge = req.cookies.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
 
   // Query the user
   const user = db.get('users').find({ username: req.session.username }).value();
-  // const user = db.get('users').find({ username: req.cookies.username }).value();
 
   let credential = user.credentials.find((cred) => cred.credId === req.body.id);
 
@@ -493,16 +475,12 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
     //TODO: Why `id`? Shouldn't this be `username`?
     db.get('users').find({ id: req.session.id }).assign(user).write();
-    // db.get('users').find({ id: req.cookies.id }).assign(user).write();
 
     delete req.session.challenge;
-    // res.clearCookie('challenge');
     req.session['signed-in'] = 'yes';
-    // res.cookie('signed-in', 'yes', sameSite);
     res.json(user);
   } catch (e) {
     delete req.session.challenge;
-    // res.clearCookie('challenge');
     res.status(400).json({ error: e });
   }
 });
