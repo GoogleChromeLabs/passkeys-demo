@@ -63,7 +63,8 @@ app.use((req, res, next) => {
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', (req, res) => {
   // Check cookie
-  if (req.cookies.username) {
+  if (req.session.username) {
+  // if (req.cookies.username) {
     // If user is signed in, redirect to `/reauth`.
     res.redirect(307, '/reauth');
     return;
@@ -84,7 +85,6 @@ app.get('/home', (req, res) => {
 });
 
 app.get('/reauth', (req, res) => {
-  console.log(req.session);
   const username = req.session.username;
   // const username = req.cookies.username;
   if (!username) {
