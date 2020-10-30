@@ -57,7 +57,6 @@ export const registerCredential = async (opts) => {
   const credential = {};
   credential.id = cred.id;
   credential.type = cred.type;
-  credential.rawId = base64url.encode(cred.rawId);
 
   if (cred.response) {
     const clientDataJSON = base64url.encode(cred.response.clientDataJSON);
