@@ -400,8 +400,8 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     const allowCredentials = [];
     for (let cred of user.credentials) {
-      // When credId is not specified, or matches the one specified
-      if (!credId || cred.credId == credId) {
+      // `credId` is specified and matches
+      if (credId && cred.credId == credId) {
         allowCredentials.push({
           id: cred.credId,
           type: 'public-key',
