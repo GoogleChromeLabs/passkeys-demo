@@ -1,7 +1,7 @@
 {
   "name": "webauthn-codelab",
-  "version": "0.0.1",
-  "description": "A simple Node app built on Express, instantly up and running.",
+  "version": "0.0.3",
+  "description": "Your First WebAuthn App",
   "main": "server.js",
   "scripts": {
     "build": "webpack -p",
@@ -17,7 +17,7 @@
     "@material/mwc-top-app-bar-fixed": "^0.19.1",
     "@material/mwc-textfield": "^0.19.1",
     "webpack": "^4.44.1",
-    "webpack-cli": "^4.1.0",
+    "webpack-cli": "^3.3.12",
     "@babel/core": "^7.12.3",
     "babel-loader": "^8.1.0",
     "babel-preset-env": "^1.7.0",
@@ -35,10 +35,11 @@
   "repository": {
     "url": "https://github.com/googlecodelabs/fido2-codelab"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "node",
-    "glitch",
-    "express"
+    "express",
+    "webauthn",
+    "fido2"
   ]
 }
