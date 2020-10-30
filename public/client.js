@@ -115,8 +115,6 @@ export const authenticate = async (opts) => {
     };
   }
 
-  localStorage.setItem(`credId`, credential.id);
-
   return await _fetch(`/auth/signinResponse`, credential);
 };
 

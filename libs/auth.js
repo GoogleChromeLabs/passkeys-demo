@@ -468,8 +468,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
     credential.prevCounter = authenticatorInfo.counter;
 
-    //TODO: Why `id`? Shouldn't this be `username`?
-    db.get('users').find({ id: req.session.id }).assign(user).write();
+    db.get('users').find({ username: req.session.username }).assign(user).write();
 
     delete req.session.challenge;
     req.session['signed-in'] = 'yes';
