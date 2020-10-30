@@ -35,11 +35,6 @@ router.use(express.json());
 const RP_NAME = 'WebAuthn Codelab';
 const TIMEOUT = 30 * 1000 * 60;
 
-const sameSite = {
-  sameSite: 'none',
-  secure: true,
-};
-
 db.defaults({
   users: [],
 }).write();
