@@ -31,7 +31,7 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use(express.static('dist'));
 app.use(session({
-  secret: 'secret',
+  secret: 'secret', // You should specify a real secret here
   resave: true,
   saveUninitialized: false,
   proxy: true,
@@ -73,7 +73,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/home', (req, res) => {
-  if (!req.cookies.username || req.cookies['signed-in'] != 'yes') {
+  if (!req.session.username || req.session['signed-in'] != 'yes') {
+  // if (!req.cookies.username || req.cookies['signed-in'] != 'yes') {
     // If user is not signed in, redirect to `/`.
     res.redirect(307, '/');
     return;
@@ -83,7 +84,8 @@ app.get('/home', (req, res) => {
 });
 
 app.get('/reauth', (req, res) => {
-  const username = req.cookies.username;
+  const username = req.session.username;
+  // const username = req.cookies.username;
   if (!username) {
     res.redirect(302, '/');
     return;
