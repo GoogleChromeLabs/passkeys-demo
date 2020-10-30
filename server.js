@@ -18,6 +18,7 @@
 // init project
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const hbs = require('hbs');
 const auth = require('./libs/auth');
 const app = express();
@@ -29,6 +30,17 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
 app.use(express.static('dist'));
+app.use(session({
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: false,
+  proxy: true,
+  cookie:{
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none'
+  }
+}));
 
 app.use((req, res, next) => {
   if (process.env.PROJECT_DOMAIN) {

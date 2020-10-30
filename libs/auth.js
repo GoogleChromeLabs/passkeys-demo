@@ -411,6 +411,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     const options = fido2.generateAssertionOptions({
       timeout: TIMEOUT,
+      rpID: process.env.HOSTNAME,
       allowCredentials,
       /**
        * This optional value controls whether or not the authenticator needs be able to uniquely
@@ -419,9 +420,6 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
       userVerification,
     });
     res.cookie('challenge', options.challenge, sameSite);
-
-    // Temporary hack until SimpleWebAuthn supports `rpID`
-    options.rpId = process.env.HOSTNAME;
 
     res.json(options);
   } catch (e) {
