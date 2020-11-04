@@ -103,10 +103,14 @@ export const authenticate = async (opts) => {
   credential.rawId = base64url.encode(cred.rawId);
 
   if (cred.response) {
-    const clientDataJSON = base64url.encode(cred.response.clientDataJSON);
-    const authenticatorData = base64url.encode(cred.response.authenticatorData);
-    const signature = base64url.encode(cred.response.signature);
-    const userHandle = base64url.encode(cred.response.userHandle);
+    const clientDataJSON =
+      base64url.encode(cred.response.clientDataJSON);
+    const authenticatorData =
+      base64url.encode(cred.response.authenticatorData);
+    const signature =
+      base64url.encode(cred.response.signature);
+    const userHandle =
+      base64url.encode(cred.response.userHandle);
     credential.response = {
       clientDataJSON,
       authenticatorData,
