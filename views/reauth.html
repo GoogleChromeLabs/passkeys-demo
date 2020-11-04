@@ -79,8 +79,8 @@
 
       if (window.PublicKeyCredential) {
         PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-        .then(UVPAA => {
-          if (UVPAA && localStorage.getItem(`credId`)) {
+        .then(uvpaa => {
+          if (uvpaa && localStorage.getItem(`credId`)) {
             document
               .querySelector('#uvpa_available')
               .classList.remove('hidden');
