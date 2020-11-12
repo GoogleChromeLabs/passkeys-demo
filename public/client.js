@@ -38,7 +38,15 @@ export const _fetch = async (path, payload = '') => {
   }
 };
 
-export const registerCredential = async (opts) => {
+export const registerCredential = async () => {
+  const opts = {
+    attestation: 'none',
+    authenticatorSelection: {
+      authenticatorAttachment: 'platform',
+      userVerification: 'required',
+      requireResidentKey: false
+    }
+  };
   const options = await _fetch('/auth/registerRequest', opts);
 
   options.user.id = base64url.decode(options.user.id);
@@ -56,12 +64,14 @@ export const registerCredential = async (opts) => {
 
   const credential = {};
   credential.id = cred.id;
-  credential.type = cred.type;
   credential.rawId = base64url.encode(cred.rawId);
+  credential.type = cred.type;
 
   if (cred.response) {
-    const clientDataJSON = base64url.encode(cred.response.clientDataJSON);
-    const attestationObject = base64url.encode(cred.response.attestationObject);
+    const clientDataJSON =
+      base64url.encode(cred.response.clientDataJSON);
+    const attestationObject =
+      base64url.encode(cred.response.attestationObject);
     credential.response = {
       clientDataJSON,
       attestationObject,
@@ -73,7 +83,9 @@ export const registerCredential = async (opts) => {
   return await _fetch('/auth/registerResponse', credential);
 };
 
-export const authenticate = async (opts) => {
+export const authenticate = async () => {
+  const opts = {};
+
   let url = '/auth/signinRequest';
   const credId = localStorage.getItem(`credId`);
   if (credId) {

@@ -39,10 +39,6 @@
       <h2>
         Welcome, {{username}}!
       </h2>
-      <p class="instructions">
-        Tap the button to the right bottom to register a new credential.
-        Then tap the "TRY REAUTH" button to emulate reauthentication.
-      </p>
       <p id="uvpa_unavailable" class="hidden">
         This device does not support User Verifying Platform Authenticator. You can't register a credential.
       </p>
@@ -107,18 +103,9 @@
       };
 
       register.addEventListener('click', e => {
-        registerCredential({
-          attestation: 'none',
-          authenticatorSelection: {
-            authenticatorAttachment: 'platform',
-            userVerification: 'required',
-            requireResidentKey: false
-          }
-        })
-        .then(user => {
+        registerCredential().then(user => {
           getCredentials();
-        })
-        .catch(e => alert(e));
+        }).catch(e => alert(e));
       });
     </script>
   </body>
