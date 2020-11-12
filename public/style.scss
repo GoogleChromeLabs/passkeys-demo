@@ -59,9 +59,7 @@ mwc-button > a {
 }
 
 #register {
-  position: fixed;
-  right: 30px;
-  bottom: 30px;
+  --mdc-theme-primary: red;
 }
 
 #uvpa_available div {
