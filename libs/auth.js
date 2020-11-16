@@ -125,8 +125,7 @@ router.post('/password', (req, res) => {
 
 router.get('/signout', (req, res) => {
   // Remove the session
-  delete req.session.username;
-  delete req.session['signed-in'];
+  req.session.destroy()
   // Redirect to `/`
   res.redirect(302, '/');
 });
