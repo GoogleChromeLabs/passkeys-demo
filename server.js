@@ -20,6 +20,7 @@ const express = require('express');
 const session = require('express-session');
 const hbs = require('hbs');
 const auth = require('./libs/auth');
+const cors = require('cors');
 const app = express();
 
 app.set('view engine', 'html');
@@ -39,6 +40,7 @@ app.use(session({
     sameSite: 'none'
   }
 }));
+app.use(cors());
 
 app.use((req, res, next) => {
   if (process.env.PROJECT_DOMAIN) {

@@ -8,6 +8,7 @@ dependencies:
   babel-loader: 8.2.2
   babel-preset-env: 1.7.0
   base64url: 3.0.1
+  cors: 2.8.5
   css-loader: 4.3.0
   express: 4.17.1
   express-session: 1.17.1
@@ -1785,6 +1786,15 @@ packages:
     dev: false
     resolution:
       integrity: sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
+  /cors/2.8.5:
+    dependencies:
+      object-assign: 4.1.1
+      vary: 1.1.2
+    dev: false
+    engines:
+      node: '>= 0.10'
+    resolution:
+      integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==
   /create-ecdh/4.0.4:
     dependencies:
       bn.js: 4.12.0
@@ -4884,6 +4894,7 @@ specifiers:
   babel-loader: ^8.1.0
   babel-preset-env: ^1.7.0
   base64url: ^3.0.1
+  cors: ^2.8.5
   css-loader: ^4.3.0
   express: ^4.17.1
   express-session: ^1.17.1
