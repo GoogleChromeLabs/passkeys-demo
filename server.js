@@ -20,7 +20,6 @@ const express = require('express');
 const session = require('express-session');
 const hbs = require('hbs');
 const auth = require('./libs/auth');
-const cors = require('cors');
 const app = express();
 
 app.set('view engine', 'html');
@@ -39,9 +38,6 @@ app.use(session({
     secure: true,
     sameSite: 'none'
   }
-}));
-app.use(cors({
-  origin: 'https://webauthn-iframe.glitch.me'
 }));
 
 app.use((req, res, next) => {
