@@ -40,7 +40,9 @@ app.use(session({
     sameSite: 'none'
   }
 }));
-app.use(cors());
+app.use(cors({
+  origin: 'https://webauthn-iframe.glitch.me'
+}));
 
 app.use((req, res, next) => {
   if (process.env.PROJECT_DOMAIN) {
