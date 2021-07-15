@@ -127,7 +127,7 @@ router.get('/signout', (req, res) => {
   // Remove the session
   req.session.destroy()
   // Redirect to `/`
-  res.redirect(302, '/');
+  res.redirect(307, '/');
 });
 
 /**
