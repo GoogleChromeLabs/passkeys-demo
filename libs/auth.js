@@ -59,9 +59,15 @@ const sessionCheck = (req, res, next) => {
   next();
 };
 
-const getOrigin = (userAgent) => {
+const getOrigin = (userAgent, packageName) => {
   let origin = '';
-  if (userAgent.indexOf('okhttp') === 0) {
+  if (userAgent.indexOf('okhttp') === 0 && packageName) {
+    const packages = process.env.ANDROID_PACKAGENAME.split(",")
+    const hashes = process.env.ANDROID_SHA256HASH.split(",")
+    const index = packages.indexOf(packageName)
+    if (index !== -1) {
+      
+    }
     const octArray = process.env.ANDROID_SHA256HASH.split(':').map((h) =>
       parseInt(h, 16),
     );
@@ -307,7 +313,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const username = req.session.username;
   const expectedChallenge = req.session.challenge;
-  const expectedOrigin = getOrigin(req.get('User-Agent'));
+  const expectedOrigin = getOrigin(req.get('User-Agent'), req.get('Package-Name'));
   const expectedRPID = process.env.HOSTNAME;
   const credId = req.body.id;
   const type = req.body.type;
@@ -438,7 +444,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 router.post('/signinResponse', csrfCheck, async (req, res) => {
   const { body } = req;
   const expectedChallenge = req.session.challenge;
-  const expectedOrigin = getOrigin(req.get('User-Agent'));
+  const expectedOrigin = getOrigin(req.get('User-Agent'), req.get('Package-Name'));
   const expectedRPID = process.env.HOSTNAME;
 
   // Query the user
