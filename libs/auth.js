@@ -61,13 +61,7 @@ const sessionCheck = (req, res, next) => {
 
 const getOrigin = (userAgent, packageName) => {
   let origin = '';
-  if (userAgent.indexOf('okhttp') === 0 && packageName) {
-    const packages = process.env.ANDROID_PACKAGENAME.split(",")
-    const hashes = process.env.ANDROID_SHA256HASH.split(",")
-    const index = packages.indexOf(packageName)
-    if (index !== -1) {
-      
-    }
+  if (userAgent.indexOf('okhttp') === 0) {
     const octArray = process.env.ANDROID_SHA256HASH.split(':').map((h) =>
       parseInt(h, 16),
     );
