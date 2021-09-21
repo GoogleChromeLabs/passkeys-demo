@@ -307,7 +307,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const username = req.session.username;
   const expectedChallenge = req.session.challenge;
-  const expectedOrigin = getOrigin(req.get('User-Agent'), req.get('Package-Name'));
+  const expectedOrigin = getOrigin(req.get('User-Agent'), req.get('X-Android-Package'));
   const expectedRPID = process.env.HOSTNAME;
   const credId = req.body.id;
   const type = req.body.type;
@@ -438,7 +438,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 router.post('/signinResponse', csrfCheck, async (req, res) => {
   const { body } = req;
   const expectedChallenge = req.session.challenge;
-  const expectedOrigin = getOrigin(req.get('User-Agent'), req.get('Package-Name'));
+  const expectedOrigin = getOrigin(req.get('User-Agent'), req.get('X-Android-Package'));
   const expectedRPID = process.env.HOSTNAME;
 
   // Query the user
