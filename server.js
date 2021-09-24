@@ -105,18 +105,9 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
       site: process.env.ORIGIN,
     },
   });
-  assetlinks.push({
-    relation: relation,
-    target: {
-      namespace: 'android_app',
-      package_name: 'com.google.android.gms.identity.sample.fido2',
-      sha256_cert_fingerprints: ['47:CC:4E:EE:B9:50:59:A5:8B:E0:19:45:CA:0A:6D:59:16:F9:A9:C2:96:75:F8:F3:64:86:92:46:2B:7D:5D:5C'],
-    },
-  });
   if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
-    /*
-    const package_names = process.env.ANDROID_PACKAGENAME.split(",")
-    const hashes = process.env.ANDROID_SHA256HASH.split(",")
+    const package_names = process.env.ANDROID_PACKAGENAME.split(",");
+    const hashes = process.env.ANDROID_SHA256HASH.split(",");
     for (let i = 0; i < package_names.length; i++) {
       assetlinks.push({
         relation: relation,
@@ -127,15 +118,6 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
         },
       });
     }
-    */
-    assetlinks.push({
-      relation: relation,
-      target: {
-        namespace: 'android_app',
-        package_name: process.env.ANDROID_PACKAGENAME,
-        sha256_cert_fingerprints: [process.env.ANDROID_SHA256HASH],
-      },
-    });
   }
   res.json(assetlinks);
 });
