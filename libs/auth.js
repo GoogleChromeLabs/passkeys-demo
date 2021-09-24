@@ -59,26 +59,31 @@ const sessionCheck = (req, res, next) => {
   next();
 };
 
-const getOrigin = (userAgent, packageName) => {
-  let origin = '';
+const getOrigin = (userAgent) => {
+  let origin = process.env.ORIGIN;
+  
   const appRe = /^[a-zA-z.]+/;
-  let appName = userAgent.match(appRe);
-  if (appName) {
-    
+  const match = userAgent.match(appRe);
+  if (match) {
+    // Check if UserAgent comes from a supported Android app.
+    if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
+      const package_names = process.env.ANDROID_PACKAGENAME.split(",");
+      const hashes = process.env.ANDROID_SHA256HASH.split(",");
+      const appName = match[0];
+      for (let i = 0; i < package_names.length; i++) {
+        if (appName === package_names[i]) {
+          // We recognize this app, so use the corresponding hash.
+          const octArray = hashes[i].split(':').map((h) =>
+            parseInt(h, 16),
+          );
+          const androidHash = base64url.encode(octArray);
+          origin = `android:apk-key-hash:${androidHash}`;
+          break;
+        }
+      }
+    }
   }
-  if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
-    const package_names = process.env.ANDROID_PACKAGENAME.split(",");
-    const hashes = process.env.ANDROID_SHA256HASH.split(",");
-  }
-  if (userAgent.indexOf('okhttp') === 0) {
-    const octArray = process.env.ANDROID_SHA256HASH.split(':').map((h) =>
-      parseInt(h, 16),
-    );
-    const androidHash = base64url.encode(octArray);
-    origin = `android:apk-key-hash:${androidHash}`;
-  } else {
-    origin = process.env.ORIGIN;
-  }
+  
   return origin;
 }
 
