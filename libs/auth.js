@@ -67,8 +67,8 @@ const getOrigin = (userAgent) => {
   if (match) {
     // Check if UserAgent comes from a supported Android app.
     if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
-      const package_names = process.env.ANDROID_PACKAGENAME.split(",");
-      const hashes = process.env.ANDROID_SHA256HASH.split(",");
+      const package_names = process.env.ANDROID_PACKAGENAME.split(",").map(name => name.trim());
+      const hashes = process.env.ANDROID_SHA256HASH.split(",").map(hash => hash.trim());
       const appName = match[0];
       for (let i = 0; i < package_names.length; i++) {
         if (appName === package_names[i]) {

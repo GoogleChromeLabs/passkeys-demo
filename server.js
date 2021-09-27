@@ -106,8 +106,8 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
     },
   });
   if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
-    const package_names = process.env.ANDROID_PACKAGENAME.split(",");
-    const hashes = process.env.ANDROID_SHA256HASH.split(",");
+    const package_names = process.env.ANDROID_PACKAGENAME.split(",").map(name => name.trim());
+    const hashes = process.env.ANDROID_SHA256HASH.split(",").map(hash => hash.trim());
     for (let i = 0; i < package_names.length; i++) {
       assetlinks.push({
         relation: relation,
