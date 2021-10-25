@@ -62,7 +62,7 @@ const sessionCheck = (req, res, next) => {
 const getOrigin = (userAgent) => {
   let origin = process.env.ORIGIN;
   
-  const appRe = /^[a-zA-z.]+/;
+  const appRe = /^[a-zA-z0-9_.]+/;
   const match = userAgent.match(appRe);
   if (match) {
     // Check if UserAgent comes from a supported Android app.
