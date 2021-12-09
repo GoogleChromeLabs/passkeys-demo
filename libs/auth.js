@@ -236,7 +236,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     if (user.credentials.length > 0) {
       for (let cred of user.credentials) {
         excludeCredentials.push({
-          id: cred.credId,
+          id: base64url.toBuffer(cred.credId),
           type: 'public-key',
           transports: ['internal'],
         });
@@ -276,7 +276,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       attestation = cp;
     }
 
-    const options = fido2.generateAttestationOptions({
+    const options = fido2.generateRegistrationOptions({
       rpName: RP_NAME,
       rpID: process.env.HOSTNAME,
       userID: user.id,
@@ -329,20 +329,22 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   try {
     const { body } = req;
 
-    const verification = await fido2.verifyAttestationResponse({
+    const verification = await fido2.verifyRegistrationResponse({
       credential: body,
       expectedChallenge,
       expectedOrigin,
       expectedRPID,
     });
 
-    const { verified, authenticatorInfo } = verification;
+    const { verified, registrationInfo } = verification;
 
     if (!verified) {
       throw 'User verification failed.';
     }
 
-    const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
+    const { credentialPublicKey, credentialID, counter } = registrationInfo;
+    const base64PublicKey = base64url.encode(credentialPublicKey);
+    const base64CredentialID = base64url.encode(credentialID);
 
     const user = db.get('users').find({ username: username }).value();
 
@@ -409,14 +411,14 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
       // `credId` is specified and matches
       if (credId && cred.credId == credId) {
         allowCredentials.push({
-          id: cred.credId,
+          id: base64url.toBuffer(cred.credId),
           type: 'public-key',
           transports: ['internal']
         });
       }
     }
 
-    const options = fido2.generateAssertionOptions({
+    const options = fido2.generateAuthenticationOptions({
       timeout: TIMEOUT,
       rpID: process.env.HOSTNAME,
       allowCredentials,
@@ -459,13 +461,17 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   const user = db.get('users').find({ username: req.session.username }).value();
 
   let credential = user.credentials.find((cred) => cred.credId === req.body.id);
+  
+  credential.credentialPublicKey = base64url.toBuffer(credential.publicKey);
+  credential.credentialID = base64url.toBuffer(credential.credId);
+  credential.counter = credential.prevCounter;
 
   try {
     if (!credential) {
       throw 'Authenticating credential not found.';
     }
 
-    const verification = fido2.verifyAssertionResponse({
+    const verification = fido2.verifyAuthenticationResponse({
       credential: body,
       expectedChallenge,
       expectedOrigin,
@@ -473,13 +479,13 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
       authenticator: credential,
     });
 
-    const { verified, authenticatorInfo } = verification;
+    const { verified, authenticationInfo } = verification;
 
     if (!verified) {
       throw 'User verification failed.';
     }
 
-    credential.prevCounter = authenticatorInfo.counter;
+    credential.prevCounter = authenticationInfo.newCounter;
 
     db.get('users').find({ username: req.session.username }).assign(user).write();
 

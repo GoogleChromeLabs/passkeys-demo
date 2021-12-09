@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "hbs": "^4.1.1",
+    "hbs": "^4.2.0",
     "lowdb": "^1.0.0",
     "@material/mwc-button": "^0.25.2",
     "@material/mwc-fab": "^0.25.2",
@@ -20,14 +20,14 @@
     "@babel/core": "^7.12.3",
     "babel-loader": "^8.1.0",
     "babel-preset-env": "^1.7.0",
-    "@simplewebauthn/server": "^0.10.3",
+    "@simplewebauthn/server": "^4.1.0",
     "base64url": "^3.0.1",
     "css-loader": "^4.3.0",
     "sass-loader": "^10.0.4",
     "sass": "^1.27.2",
     "extract-loader": "^5.1.0",
     "file-loader": "^6.1.1",
-    "express-session": "^1.17.1"
+    "express-session": "^1.17.2"
   },
   "engines": {
     "node": "10.x"
