@@ -80,16 +80,17 @@
       const getCredentials = async () => {
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
-        const creds = html`${res.credentials.length > 0 ? res.credentials.map(cred => html`
-          <div class="mdc-card credential">
-            <span class="mdc-typography mdc-typography--body2">${cred.credId}</span>
-            <pre class="public-key">${cred.publicKey}</pre>
-            <div class="mdc-card__actions">
-              <mwc-button id="${cred.credId}" @click="${removeCredential}" raised>Remove</mwc-button>
-            </div>
-          </div>`) : html`
-          <p>No credentials found.</p>
-          `}`;
+        const creds = html`${res.credentials.length > 0 ? html`
+        <ul class="mdc-deprecated-list mdc-deprecated-list--two-line">
+          ${res.credentials.map(cred => html`
+          <li class="mdc-deprecated-list-item" tabindex="0">
+            <span class="mdc-deprecated-list-item__ripple"></span>
+            <span class="mdc-deprecated-list-item__text">
+              <span class="mdc-deprecated-list-item__primary-text">${cred.name}</span>
+              <span class="mdc-deprecated-list-item__secondary-text">Secondary text</span>
+            </span>
+          </li>`)}
+        </ul>` : html`<p>No credentials found.</p>`}`;
         render(creds, list);
       };
 

@@ -74,9 +74,11 @@ export const registerCredential = async () => {
       base64url.encode(cred.response.clientDataJSON);
     const attestationObject =
       base64url.encode(cred.response.attestationObject);
+    const transports = cred.response.getTransports();
     credential.response = {
       clientDataJSON,
       attestationObject,
+      transports,
     };
   }
 

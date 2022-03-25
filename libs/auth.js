@@ -362,7 +362,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
         credId: base64CredentialID,
         prevCounter: counter,
         name: req.useragent.platform || 'Unknown platform',
-        transports: ['internal']
+        transports: body.transports || ['internal']
       });
     }
 
