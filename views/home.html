@@ -54,9 +54,11 @@
       <mwc-button id="register" class="hidden" icon="fingerprint" raised>Add a credential</mwc-button>
       <mwc-button><a href="/auth/signout">Sign out</a></mwc-button>
     </main>
+    <script src="https://unpkg.com/material-components-web@7.0.0/dist/material-components-web.min.js"></script>
     <script type="module">
       import { $, _fetch, registerCredential, unregisterCredential } from '/client.js';
       import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
+      new mdc.list.MDCList($('.mdc-list'));
 
       const register = $('#register');
 
@@ -81,14 +83,16 @@
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
         const creds = html`${res.credentials.length > 0 ? html`
-        <ul class="mdc-deprecated-list mdc-deprecated-list--two-line">
+        <ul class="mdc-list mdc-list--two-line">
           ${res.credentials.map(cred => html`
-          <li class="mdc-deprecated-list-item" tabindex="0">
-            <span class="mdc-deprecated-list-item__ripple"></span>
-            <span class="mdc-deprecated-list-item__text">
-              <span class="mdc-deprecated-list-item__primary-text">${cred.name}</span>
-              <span class="mdc-deprecated-list-item__secondary-text">Secondary text</span>
+          <li class="mdc-list-item" tabindex="0">
+            <span class="mdc-list-item__ripple"></span>
+            <span class="mdc-list-item--with-leading-icon">cable</span>
+            <span class="mdc-list-item__text">
+              <span class="mdc-list-item__primary-text">${cred.name}</span>
+              <span class="mdc-list-item__secondary-text">Secondary text</span>
             </span>
+            <span class="mdc-list-item--with-trailing-icon">delete</span>
           </li>`)}
         </ul>` : html`<p>No credentials found.</p>`}`;
         render(creds, list);
