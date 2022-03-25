@@ -557,16 +557,22 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
 
-  // Query the user
-  const user = db.get('users').find({ username: req.session.username }).value();
-
-  let credential = user.credentials.find((cred) => cred.credId === req.body.id);
-  
-  credential.credentialPublicKey = base64url.toBuffer(credential.publicKey);
-  credential.credentialID = base64url.toBuffer(credential.credId);
-  credential.counter = credential.prevCounter;
-
   try {
+    const user_id = body.response.userHandle;
+
+    // Query the user
+    const user = db.get('users').find({ id: user_id }).value();
+
+    if (!user) {
+      throw 'User not found.';
+    }
+
+    let credential = user.credentials.find((cred) => cred.credId === body.id);
+
+    credential.credentialPublicKey = base64url.toBuffer(credential.publicKey);
+    credential.credentialID = base64url.toBuffer(credential.credId);
+    credential.counter = credential.prevCounter;
+
     if (!credential) {
       throw 'Authenticating credential not found.';
     }
@@ -587,9 +593,10 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
 
     credential.prevCounter = authenticationInfo.newCounter;
 
-    db.get('users').find({ username: req.session.username }).assign(user).write();
+    db.get('users').find({ username: user.username }).assign(user).write();
 
     delete req.session.challenge;
+    req.session.username = user.username;
     req.session['signed-in'] = 'yes';
     res.json(user);
   } catch (e) {

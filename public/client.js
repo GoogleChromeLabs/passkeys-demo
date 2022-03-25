@@ -88,7 +88,7 @@ export const registerCredential = async () => {
 export const authenticate = async () => {
   const opts = {};
 
-  let url = '/auth/signinRequest';
+  let url = '/auth/discoveryRequest';
   const credId = localStorage.getItem(`credId`);
   if (credId) {
     url += `?credId=${encodeURIComponent(credId)}`;
@@ -128,7 +128,7 @@ export const authenticate = async () => {
     };
   }
 
-  return await _fetch(`/auth/signinResponse`, credential);
+  return await _fetch(`/auth/discoveryResponse`, credential);
 };
 
 export const unregisterCredential = async (credId) => {
