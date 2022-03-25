@@ -86,13 +86,8 @@
         <mwc-list>
           ${res.credentials.map(cred => html`
           <mwc-list-item>
-            <span class="mdc-list-item--with-leading-icon">
-              <i class="material-icons mdc-icon-button__icon mdc-icon-button__icon--on">cable</i>
-            </span>
-            <span>${cred.name}</span>
-            <span class="mdc-list-item--with-trailing-icon">
-              <i class="material-icons mdc-icon-button__icon mdc-icon-button__icon--on">delete</i>
-            </span>
+            <span class="credential_item">${cred.name || 'Unnamed' }</span>
+            <mwc-icon-button id="${cred.credId}" @click="${removeCredential}" icon="delete"></mwc-icon-button>
           </mwc-list-item>`)}
         </mwc-list>` : html`<p>No credentials found.</p>`}`;
         render(creds, list);

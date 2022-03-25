@@ -54,6 +54,10 @@ body {
   }
 }
 
+.credential_item {
+  line-height: var(--mdc-icon-button-size, 48px);
+}
+
 mwc-button, .mdc-button {
   margin: 8px 0;
   a {

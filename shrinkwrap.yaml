@@ -2,6 +2,7 @@ dependencies:
   '@babel/core': 7.17.8
   '@material/mwc-button': 0.25.3
   '@material/mwc-fab': 0.25.3
+  '@material/mwc-icon-button': 0.25.3
   '@material/mwc-list': 0.25.3
   '@material/mwc-textfield': 0.25.3
   '@material/mwc-top-app-bar-fixed': 0.25.3
@@ -390,6 +391,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-3uFMi8Y680P0nzP5zih4YuOZJLl/C6Ux9G810Unwo44zblG/ckgJlFiM+T+oR+OH5KM8LbfNlV0ypo7FT5zYJA==
+  /@material/mwc-icon-button/0.25.3:
+    dependencies:
+      '@material/mwc-ripple': 0.25.3
+      lit: 2.2.1
+      tslib: 2.3.1
+    dev: false
+    resolution:
+      integrity: sha512-FexkMpK3ZSHh7NF+PIqvVhvAbBOgFDYPck/lqnxIDC3VGJ0rjD/1MqevDy2fY6IcHGlc8Ai7VuYbdQ6Cvw8WcQ==
   /@material/mwc-icon/0.25.3:
     dependencies:
       lit: 2.0.2
@@ -5190,6 +5199,7 @@ specifiers:
   '@babel/core': ^7.17.2
   '@material/mwc-button': ^0.25.2
   '@material/mwc-fab': ^0.25.2
+  '@material/mwc-icon-button': ^0.25.2
   '@material/mwc-list': ^0.25.2
   '@material/mwc-textfield': ^0.25.2
   '@material/mwc-top-app-bar-fixed': ^0.25.2

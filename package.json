@@ -29,7 +29,8 @@
     "file-loader": "^6.2.0",
     "express-session": "^1.17.2",
     "express-useragent": "^1.0.15",
-    "@material/mwc-list": "^0.25.2"
+    "@material/mwc-list": "^0.25.2",
+    "@material/mwc-icon-button": "^0.25.2"
   },
   "engines": {
     "node": "10.x"
