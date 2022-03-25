@@ -498,4 +498,104 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   }
 });
 
+/**
+ * Respond with required information to call navigator.credential.get()
+ * Input is passed via `req.body` with similar format as output
+ * Output format:
+ * ```{
+     challenge: String,
+     userVerification: ('required'|'preferred'|'discouraged'),
+     allowCredentials: [{
+       id: String,
+       type: 'public-key',
+       transports: [('ble'|'nfc'|'usb'|'internal'), ...]
+     }, ...]
+ * }```
+ **/
+router.post('/discoveryRequest', csrfCheck, async (req, res) => {
+  try {
+    const userVerification = req.body.userVerification || 'required';
+
+    const allowCredentials = [];
+
+    const options = fido2.generateAuthenticationOptions({
+      timeout: TIMEOUT,
+      rpID: process.env.HOSTNAME,
+      allowCredentials,
+      /**
+       * This optional value controls whether or not the authenticator needs be able to uniquely
+       * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
+       */
+      userVerification,
+    });
+    req.session.challenge = options.challenge;
+
+    res.json(options);
+  } catch (e) {
+    res.status(400).json({ error: e });
+  }
+});
+
+/**
+ * Authenticate the user.
+ * Input format:
+ * ```{
+     id: String,
+     type: 'public-key',
+     rawId: String,
+     response: {
+       clientDataJSON: String,
+       authenticatorData: String,
+       signature: String,
+       userHandle: String
+     }
+ * }```
+ **/
+router.post('/discoveryResponse', csrfCheck, async (req, res) => {
+  const { body } = req;
+  const expectedChallenge = req.session.challenge;
+  const expectedOrigin = getOrigin(req.get('User-Agent'));
+  const expectedRPID = process.env.HOSTNAME;
+
+  // Query the user
+  const user = db.get('users').find({ username: req.session.username }).value();
+
+  let credential = user.credentials.find((cred) => cred.credId === req.body.id);
+  
+  credential.credentialPublicKey = base64url.toBuffer(credential.publicKey);
+  credential.credentialID = base64url.toBuffer(credential.credId);
+  credential.counter = credential.prevCounter;
+
+  try {
+    if (!credential) {
+      throw 'Authenticating credential not found.';
+    }
+
+    const verification = fido2.verifyAuthenticationResponse({
+      credential: body,
+      expectedChallenge,
+      expectedOrigin,
+      expectedRPID,
+      authenticator: credential,
+    });
+
+    const { verified, authenticationInfo } = verification;
+
+    if (!verified) {
+      throw 'User verification failed.';
+    }
+
+    credential.prevCounter = authenticationInfo.newCounter;
+
+    db.get('users').find({ username: req.session.username }).assign(user).write();
+
+    delete req.session.challenge;
+    req.session['signed-in'] = 'yes';
+    res.json(user);
+  } catch (e) {
+    delete req.session.challenge;
+    res.status(400).json({ error: e });
+  }
+});
+
 module.exports = router;

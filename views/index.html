@@ -90,10 +90,8 @@
               throw 'User not found.';
             }
           }).catch(e => {
-            console.error(e.message || e);
-            alert('Authentication failed. Use password to sign-in.');
-            form.classList.remove('hidden');
-            $('#uvpa_available').classList.add('hidden');
+            console.error(e);
+            alert(e.message);
           });        
         });
       </script>

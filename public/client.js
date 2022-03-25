@@ -45,8 +45,8 @@ export const registerCredential = async () => {
     attestation: 'none',
     authenticatorSelection: {
       authenticatorAttachment: 'platform',
-      userVerification: 'required',
-      requireResidentKey: false
+      userVerification: 'preferred',
+      residentKey: 'required'
     }
   };
   const options = await _fetch('/auth/registerRequest', opts);
@@ -96,16 +96,11 @@ export const authenticate = async () => {
 
   const options = await _fetch(url, opts);
 
-  if (options.allowCredentials.length === 0) {
-    console.info('No registered credentials found.');
-    return Promise.resolve(null);
+  if (options.allowCredentials.length > 0) {
+    options.allowCredentials = [];
   }
 
   options.challenge = base64url.decode(options.challenge);
-
-  for (let cred of options.allowCredentials) {
-    cred.id = base64url.decode(cred.id);
-  }
 
   const cred = await navigator.credentials.get({
     publicKey: options,
