@@ -85,11 +85,11 @@
         const creds = html`${res.credentials.length > 0 ? html`
         <mwc-list>
           ${res.credentials.map(cred => html`
-          <mwc-list-item>
-            <mwc-icon-button icon="cable"></mwc-icon-button>
-            <span class="credential_item">${cred.name || 'Unnamed' }</span>
-            <mwc-icon-button id="${cred.credId}" @click="${removeCredential}" icon="delete"></mwc-icon-button>
-          </mwc-list-item>`)}
+            <mwc-list-item>
+              <mwc-icon-button icon="${cred.transports.includes('cable') ? 'cable' : 'fingerprint'}"></mwc-icon-button>
+              <span class="credential_item">${cred.name || 'Unnamed' }</span>
+              <mwc-icon-button id="${cred.credId}" @click="${removeCredential}" icon="delete"></mwc-icon-button>
+            </mwc-list-item>`)}
         </mwc-list>` : html`<p>No credentials found.</p>`}`;
         render(creds, list);
       };
