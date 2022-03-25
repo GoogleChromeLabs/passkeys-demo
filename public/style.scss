@@ -54,8 +54,15 @@ body {
   }
 }
 
-.credential_item {
-  line-height: var(--mdc-icon-button-size, 48px);
+mwc-list {
+  width: 300px;
+  mwc-list-item {
+    .credential_item {
+      display: inline-block;
+      width: 172px;
+      line-height: var(--mdc-icon-button-size, 48px);
+    }
+  }  
 }
 
 mwc-button, .mdc-button {
