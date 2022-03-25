@@ -37,6 +37,12 @@ body {
   color: gray;
 }
 
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .credential {
   margin: 10px 0 20px 0;
   padding: 10px;
@@ -48,9 +54,12 @@ body {
   }
 }
 
-mwc-button > a {
-  text-decoration: none;
-  color: inherit;
+mwc-button {
+  margin: 8px 0;
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
 }
 
 .public-key {
