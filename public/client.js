@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
+export const $ = document.querySelector.bind(document);
+
 export const _fetch = async (path, payload = '') => {
   const headers = {
     'X-Requested-With': 'XMLHttpRequest',

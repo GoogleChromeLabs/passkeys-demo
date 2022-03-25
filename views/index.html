@@ -43,15 +43,21 @@
           <span class="mdc-line-ripple"></span>
         </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
+        <div id="uvpa_available" class="hidden">
+          <p class="center">
+            or
+          </p>
+          <input type="button" id="passkey" class="mdc-button mdc-button--raised" value="Sign-in with passkey" />
+        </div>
         <p class="instructions">
           You can build this very experience in <a href="https://codelabs.developers.google.com/codelabs/webauthn-reauth/">a codelab</a>.
         </p>
       </form>
       <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
       <script type="module">
-        new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
-        import { _fetch } from '/client.js';
-        const form = document.querySelector('#form');
+        import { $, _fetch, authenticate } from '/client.js';
+        new mdc.textField.MDCTextField($('.mdc-text-field'));
+        const form = $('#form');
         form.addEventListener('submit', e => {
           e.preventDefault();
           const form = new FormData(e.target);
@@ -63,6 +69,32 @@
           }).catch(e => {
             alert(e);
           });
+        });
+
+        if (window.PublicKeyCredential) {
+          PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+          .then(uvpaa => {
+            // TODO: Add `navigator.credentials.conditionalMediationSupported` check
+            if (uvpaa) {
+              $('#uvpa_available').classList.remove('hidden');
+            }
+          });
+        }
+
+        const button = $('#passkey');
+        button.addEventListener('click', e => {
+          authenticate().then(user => {
+            if (user) {
+              location.href = '/home';
+            } else {
+              throw 'User not found.';
+            }
+          }).catch(e => {
+            console.error(e.message || e);
+            alert('Authentication failed. Use password to sign-in.');
+            form.classList.remove('hidden');
+            $('#uvpa_available').classList.add('hidden');
+          });        
         });
       </script>
     </main>
