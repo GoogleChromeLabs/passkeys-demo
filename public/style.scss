@@ -25,10 +25,6 @@ body {
   padding: 0;
 }
 
-.hidden {
-  display: none;
-}
-
 .content {
   margin: 0 16px 20px 16px;
 }
@@ -41,6 +37,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+  .hidden {
+  display: none !important;
 }
 
 .credential {
