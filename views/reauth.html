@@ -78,13 +78,13 @@
       if (window.PublicKeyCredential) {
         PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
         .then(uvpaa => {
-          if (uvpaa && localStorage.getItem(`credId`)) {
-            document
-              .querySelector('#uvpa_available')
-              .classList.remove('hidden');
-          } else {
+          // if (uvpaa && localStorage.getItem(`credId`)) {
+          //   document
+          //     .querySelector('#uvpa_available')
+          //     .classList.remove('hidden');
+          // } else {
             form.classList.remove('hidden');
-          }
+          // }
         });        
       } else {
         form.classList.remove('hidden');
