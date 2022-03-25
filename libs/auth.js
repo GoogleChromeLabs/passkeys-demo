@@ -159,7 +159,8 @@ router.get('/signout', (req, res) => {
    credId: String,
    publicKey: String,
    aaguid: ??,
-   prevCounter: Int
+   prevCounter: Int,
+   name: String
  };
  ```
  **/
@@ -360,6 +361,8 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
         publicKey: base64PublicKey,
         credId: base64CredentialID,
         prevCounter: counter,
+        name: req.useragent.platform || 'Unknown platform',
+        transports: ['internal']
       });
     }
 

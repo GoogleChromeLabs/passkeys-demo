@@ -21,11 +21,13 @@ const session = require('express-session');
 const hbs = require('hbs');
 const auth = require('./libs/auth');
 const app = express();
+const useragent = require('express-useragent');
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 app.set('views', './views');
 app.use(express.json());
+app.use(useragent.express());
 app.use(express.static('public'));
 app.use(express.static('dist'));
 app.use(session({
