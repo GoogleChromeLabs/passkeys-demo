@@ -250,7 +250,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     }
     const as = {}; // authenticatorSelection
     const aa = req.body.authenticatorSelection.authenticatorAttachment;
-    const rr = req.body.authenticatorSelection.requireResidentKey;
+    const rr = req.body.authenticatorSelection.residentKey;
     const uv = req.body.authenticatorSelection.userVerification;
     const cp = req.body.attestation; // attestationConveyancePreference
     let asFlag = false;
@@ -261,9 +261,9 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       asFlag = true;
       as.authenticatorAttachment = aa;
     }
-    if (rr && typeof rr == 'boolean') {
+    if (rr && (rr == 'required' || rr === 'preferred' || rr === 'discouraged')) {
       asFlag = true;
-      as.requireResidentKey = rr;
+      as.residentKey = rr;
     }
     if (uv && (uv == 'required' || uv == 'preferred' || uv == 'discouraged')) {
       asFlag = true;
