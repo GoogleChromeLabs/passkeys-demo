@@ -32,6 +32,7 @@
     <mwc-top-app-bar-fixed>
       <span slot="title">Passkeys codelab</span>
     </mwc-top-app-bar-fixed>
+    <mwc-linear-progress id="progress"></mwc-linear-progress>
     <main class="content center">
       <h2>
         Login with a random username
@@ -56,7 +57,7 @@
       </form>
       <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
       <script type="module">
-        import { $, _fetch, authenticate } from '/client.js';
+        import { $, _fetch, loading, authenticate } from '/client.js';
         new mdc.textField.MDCTextField($('.mdc-text-field'));
         const form = $('#form');
         form.addEventListener('submit', e => {
@@ -84,6 +85,7 @@
 
         const button = $('#passkey');
         button.addEventListener('click', e => {
+          loading.start();
           authenticate().then(user => {
             if (user) {
               location.href = '/home';
@@ -91,6 +93,7 @@
               throw 'User not found.';
             }
           }).catch(e => {
+            loading.stop();
             console.error(e);
             alert(e.message);
           });        

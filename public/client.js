@@ -40,6 +40,20 @@ export const _fetch = async (path, payload = '') => {
   }
 };
 
+class Loading {
+  constructor() {
+    this.progress = $('#progress');
+  }
+  start() {
+    this.progress.indeterminate = true;    
+  }
+  stop() {
+    this.progress.indeterminate = false;    
+  }
+}
+
+export const loading = new Loading();
+
 export const registerCredential = async () => {
   const opts = {
     attestation: 'none',

@@ -34,7 +34,7 @@
     <mwc-top-app-bar-fixed>
       <span slot="title">Passkeys codelab</span>
     </mwc-top-app-bar-fixed>
-
+    <mwc-linear-progress id="progress"></mwc-linear-progress>
     <main class="content center">
       <h2>
         Welcome, {{username}}!
@@ -56,7 +56,7 @@
     </main>
     <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
     <script type="module">
-      import { $, _fetch, registerCredential, unregisterCredential } from '/client.js';
+      import { $, _fetch, loading, registerCredential, unregisterCredential } from '/client.js';
       import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
       // new mdc.list.MDCList($('.mdc-list'));
 
@@ -98,17 +98,26 @@
 
       const removeCredential = async e => {
         try {
+          loading.start();
           await unregisterCredential(e.target.id);
+          loading.stop();
           getCredentials();
         } catch (e) {
+          loading.stop();
           alert(e);
         }
       };
 
-      register.addEventListener('click', e => {
-        registerCredential().then(user => {
+      register.addEventListener('click', async e => {
+        try {
+          loading.start();
+          await registerCredential();
+          loading.stop();
           getCredentials();
-        }).catch(e => alert(e));
+        } catch (e) {
+          loading.stop();
+          alert(e);
+        }
       });
     </script>
   </body>
