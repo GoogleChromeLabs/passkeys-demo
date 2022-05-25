@@ -533,7 +533,6 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 router.post('/discoveryRequest', csrfCheck, async (req, res) => {
   try {
     const userVerification = req.body.userVerification || 'required';
-
     const allowCredentials = [];
 
     const options = fido2.generateAuthenticationOptions({

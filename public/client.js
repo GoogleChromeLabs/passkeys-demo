@@ -107,17 +107,9 @@ export const authenticate = async () => {
   const opts = {};
 
   let url = '/auth/discoveryRequest';
-  const credId = localStorage.getItem(`credId`);
-  if (credId) {
-    url += `?credId=${encodeURIComponent(credId)}`;
-  }
-
   const options = await _fetch(url, opts);
 
-  // if (options.allowCredentials.length > 0) {
-    options.allowCredentials = [];
-  // }
-
+  options.allowCredentials = [];
   options.challenge = base64url.decode(options.challenge);
 
   const cred = await navigator.credentials.get({
