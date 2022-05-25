@@ -86,12 +86,21 @@
       const getCredentials = async () => {
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
+        const transportIconMap = {
+          internal: "fingerprint",
+          usb: "usb",
+          nfc: "nfc",
+          ble: "bluetooth",
+          cable: "cable",
+        };
         const creds = html`${res.credentials.length > 0 ? html`
         <mwc-list>
           ${res.credentials.map(cred => html`
             <mwc-list-item>
-              <mwc-icon-button icon="${cred.transports.includes('cable') ? 'cable' : 'fingerprint'}"></mwc-icon-button>
               <span class="credential_item">${cred.name || 'Unnamed' }</span>
+              ${cred.transports.map(transport => html`
+              <mwc-icon class="mini" icon="${transportIconMap[transport]}"></mwc-icon>
+              `)}
               <mwc-icon-button data-cred-id="${cred.credId}" data-name="${cred.name || 'Unnamed' }" @click="${renameCredential}" icon="edit"></mwc-icon-button>
               <mwc-icon-button data-cred-id="${cred.credId}" @click="${removeCredential}" icon="delete"></mwc-icon-button>
             </mwc-list-item>`)}

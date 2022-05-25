@@ -61,7 +61,10 @@ mwc-list {
       display: inline-block;
       line-height: var(--mdc-icon-button-size, 48px);
     }
-  }  
+    mwc-icon.mini {
+      --mdc-icon-size: 24px;
+    }
+  }
 }
 
 mwc-button, .mdc-button {
