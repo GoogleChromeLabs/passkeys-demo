@@ -173,6 +173,14 @@ router.post('/renameKey', csrfCheck, sessionCheck, (req, res) => {
   const { credId, newName } = req.body;
   const username = req.session.username;
   const user = db.get('users').find({ username: username }).value();
+  const newCreds = user.credentials.map(cred => {
+    if (cred.credId === credId) {
+console.log('credential renamed to:', newName);
+      cred.name = newName;
+    }
+    return cred;
+  });
+  db.get('users').find({ username }).assign({ credentials: newCreds }).write();
 });
 
 /**
@@ -245,7 +253,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
         excludeCredentials.push({
           id: base64url.toBuffer(cred.credId),
           type: 'public-key',
-          transports: ['internal'],
+          transports: cred.transports,
         });
       }
     }
@@ -422,7 +430,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
         allowCredentials.push({
           id: base64url.toBuffer(cred.credId),
           type: 'public-key',
-          transports: ['internal']
+          transports: cred.transports
         });
       }
     }
