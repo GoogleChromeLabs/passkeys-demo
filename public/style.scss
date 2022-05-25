@@ -55,14 +55,29 @@ body {
 }
 
 mwc-list {
-  width: 300px;
+  width: 500px;
   mwc-list-item {
-    .credential_item {
+    * {
       display: inline-block;
+    }
+    .credential_item, {
       line-height: var(--mdc-icon-button-size, 48px);
     }
     mwc-icon.mini {
-      --mdc-icon-size: 24px;
+      margin: 4px;
+      --mdc-icon-size: 16px;
+      vertical-align: middle;
+    }
+  }
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  * {
+    flex: 1 1 auto;
+    &.buttons {
+      flex-grow: 0;
     }
   }
 }
