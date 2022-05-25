@@ -55,29 +55,27 @@ body {
 }
 
 mwc-list {
-  width: 500px;
+  width: 400px;
   mwc-list-item {
-    * {
-      display: inline-block;
-    }
-    .credential_item, {
-      line-height: var(--mdc-icon-button-size, 48px);
-    }
-    mwc-icon.mini {
-      margin: 4px;
-      --mdc-icon-size: 16px;
-      vertical-align: middle;
-    }
-  }
-}
-
-.list-item {
-  display: flex;
-  justify-content: space-between;
-  * {
-    flex: 1 1 auto;
-    &.buttons {
-      flex-grow: 0;
+    .list-item {
+      width: 368px;
+      display: flex;
+      justify-content: space-between;
+      * {
+        display: inline-block;
+      }
+      .credential-name {
+        line-height: var(--mdc-icon-button-size, 48px);
+        flex: 1 1 auto;
+        mwc-icon.mini {
+          margin: 4px;
+          --mdc-icon-size: 16px;
+          vertical-align: middle;
+        }
+      }
+      .buttons {
+        flex: 0 1 auto;
+      }
     }
   }
 }

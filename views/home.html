@@ -98,10 +98,12 @@
           ${res.credentials.map(cred => html`
             <mwc-list-item>
               <div class="list-item">
-                <span class="credential_item">${cred.name || 'Unnamed' }</span>
-                ${cred.transports.map(transport => html`
-                <mwc-icon class="mini">${transportIconMap[transport]}</mwc-icon>
-                `)}
+                <div class="credential-name">
+                  <span>${cred.name || 'Unnamed' }</span>
+                  ${cred.transports.map(transport => html`
+                  <mwc-icon class="mini">${transportIconMap[transport]}</mwc-icon>
+                  `)}
+                </div>
                 <div class="buttons">
                   <mwc-icon-button data-cred-id="${cred.credId}" data-name="${cred.name || 'Unnamed' }" @click="${renameCredential}" icon="edit"></mwc-icon-button>
                   <mwc-icon-button data-cred-id="${cred.credId}" @click="${removeCredential}" icon="delete"></mwc-icon-button>
