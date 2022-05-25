@@ -57,7 +57,7 @@
     </main>
     <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
     <script type="module">
-      import { $, _fetch, loading, registerCredential, unregisterCredential } from '/client.js';
+      import { $, _fetch, loading, registerCredential, updateCredential, unregisterCredential } from '/client.js';
       import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
 
       $('#code').addEventListener('click', e => {
@@ -107,7 +107,7 @@
         if (newName.length === 0) return;
         try {
           loading.start();
-          await renameCredential(credId, newName);
+          await updateCredential(credId, newName);
           loading.stop();
           getCredentials();
         } catch (e) {

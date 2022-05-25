@@ -181,6 +181,7 @@ console.log('credential renamed to:', newName);
     return cred;
   });
   db.get('users').find({ username }).assign({ credentials: newCreds }).write();
+  res.json({});
 });
 
 /**

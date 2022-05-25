@@ -150,8 +150,8 @@ export const authenticate = async () => {
   return await _fetch(`/auth/discoveryResponse`, credential);
 };
 
-export const renameCredential = async (credId, newName) => {
-  return _fetch(`/auth/renameKey`);
+export const updateCredential = async (credId, newName) => {
+  return _fetch(`/auth/renameKey`, { credId, newName });
 }
 
 export const unregisterCredential = async (credId) => {
