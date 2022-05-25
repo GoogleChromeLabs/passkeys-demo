@@ -47,7 +47,7 @@
           <span class="mdc-line-ripple"></span>
         </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
-        <div id="uvpa_available" class="hidden">
+        <div id="uvpa_available">
           <p class="center">
             or
           </p>
@@ -76,16 +76,6 @@
             alert(e);
           });
         });
-
-        if (window.PublicKeyCredential) {
-          PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-          .then(uvpaa => {
-            // TODO: Add `navigator.credentials.conditionalMediationSupported` check
-            if (uvpaa) {
-              $('#uvpa_available').classList.remove('hidden');
-            }
-          });
-        }
 
         const button = $('#passkey');
         button.addEventListener('click', e => {

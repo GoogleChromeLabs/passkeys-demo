@@ -114,9 +114,9 @@ export const authenticate = async () => {
 
   const options = await _fetch(url, opts);
 
-  if (options.allowCredentials.length > 0) {
+  // if (options.allowCredentials.length > 0) {
     options.allowCredentials = [];
-  }
+  // }
 
   options.challenge = base64url.decode(options.challenge);
 
