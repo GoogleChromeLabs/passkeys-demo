@@ -92,7 +92,7 @@
             <mwc-list-item>
               <mwc-icon-button icon="${cred.transports.includes('cable') ? 'cable' : 'fingerprint'}"></mwc-icon-button>
               <span class="credential_item">${cred.name || 'Unnamed' }</span>
-              <mwc-icon-button data-cred-id="${cred.credId}" @click="${renameCredential}" icon="edit"></mwc-icon-button>
+              <mwc-icon-button data-cred-id="${cred.credId}" data-name="${cred.name || 'Unnamed' }" @click="${renameCredential}" icon="edit"></mwc-icon-button>
               <mwc-icon-button data-cred-id="${cred.credId}" @click="${removeCredential}" icon="delete"></mwc-icon-button>
             </mwc-list-item>`)}
         </mwc-list>` : html`<p>No credentials found.</p>`}`;
@@ -102,11 +102,12 @@
       getCredentials();
       
       const renameCredential = async e => {
-        const newName = prompt('Enter a new credential name.');
+        const { credId, name } = e.target.dataset;
+        const newName = prompt('Enter a new credential name.', name);
         if (newName.length === 0) return;
         try {
           loading.start();
-          await renameCredential(e.target.dataset.credId, newName);
+          await renameCredential(credId, newName);
           loading.stop();
           getCredentials();
         } catch (e) {
