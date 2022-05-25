@@ -345,8 +345,6 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   try {
     const { body: credential } = req;
 
-console.log(credential);
-
     const verification = await fido2.verifyRegistrationResponse({
       credential,
       expectedChallenge,
@@ -378,8 +376,8 @@ console.log(credential);
         publicKey: base64PublicKey,
         credId: base64CredentialID,
         prevCounter: counter,
-        name: req.useragent.platform || 'Unknown platform',
-        transports: credential.transports || ['internal']
+        name: credential.name || req.useragent.platform || 'Unknown platform',
+        transports: credential.response.transports || ['internal']
       });
     }
 
