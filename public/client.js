@@ -58,9 +58,8 @@ export const registerCredential = async () => {
   const opts = {
     attestation: 'none',
     authenticatorSelection: {
-      authenticatorAttachment: 'platform',
       userVerification: 'preferred',
-      residentKey: 'required'
+      residentKey: 'preferred'
     }
   };
   const options = await _fetch('/auth/registerRequest', opts);
@@ -88,7 +87,7 @@ export const registerCredential = async () => {
       base64url.encode(cred.response.clientDataJSON);
     const attestationObject =
       base64url.encode(cred.response.attestationObject);
-    let transports;
+    let transports = [];
     if (cred.response.getTransports) {
       transports = cred.response.getTransports();      
     }
