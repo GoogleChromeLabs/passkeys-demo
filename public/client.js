@@ -88,7 +88,10 @@ export const registerCredential = async () => {
       base64url.encode(cred.response.clientDataJSON);
     const attestationObject =
       base64url.encode(cred.response.attestationObject);
-    const transports = cred.response.getTransports();
+    let transports;
+    if (cred.response.getTransports) {
+      transports = cred.response.getTransports();      
+    }
     credential.response = {
       clientDataJSON,
       attestationObject,
@@ -146,6 +149,10 @@ export const authenticate = async () => {
 
   return await _fetch(`/auth/discoveryResponse`, credential);
 };
+
+export const renameCredential = async (credId, newName) => {
+  return _fetch(`/auth/renameKey`);
+}
 
 export const unregisterCredential = async (credId) => {
   localStorage.removeItem('credId');

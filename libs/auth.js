@@ -169,6 +169,12 @@ router.post('/getKeys', csrfCheck, sessionCheck, (req, res) => {
   res.json(user || {});
 });
 
+router.post('/renameKey', csrfCheck, sessionCheck, (req, res) => {
+  const { credId, newName } = req.body;
+  const username = req.session.username;
+  const user = db.get('users').find({ username: username }).value();
+});
+
 /**
  * Removes a credential id attached to the user
  * Responds with empty JSON `{}`

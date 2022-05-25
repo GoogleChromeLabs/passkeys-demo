@@ -43,7 +43,7 @@
         <div class="mdc-text-field mdc-text-field--filled">
           <span class="mdc-text-field__ripple"></span>
           <label class="mdc-floating-label" id="username-label">username</label>
-          <input type="text" class="mdc-text-field__input" aria-labelledby="username-label" name="username" />
+          <input type="text" class="mdc-text-field__input" aria-labelledby="username-label" name="username" autofocus />
           <span class="mdc-line-ripple"></span>
         </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
@@ -53,9 +53,6 @@
           </p>
           <input type="button" id="passkey" class="mdc-button mdc-button--raised" value="Sign-in with passkey" />
         </div>
-        <p class="instructions">
-          You can build this very experience in <a href="https://codelabs.developers.google.com/codelabs/webauthn-reauth/">a codelab</a>.
-        </p>
       </form>
       <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
       <script type="module">
