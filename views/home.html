@@ -42,7 +42,7 @@
         Click on "Add a credential" to register this device. Then "Sign out" and try "Sign-in with passkey"!
       </p>
       <p id="uvpa_unavailable" class="hidden">
-        This device does not support User Verifying Platform Authenticator. You can't register a credential.
+        This device does not support User Verifying Platform Authenticator.
       </p>
       <h3 class="mdc-typography mdc-typography--headline6">
         Your registered credentials:
@@ -70,11 +70,9 @@
           if (uvpaa) {
             register.classList.remove('hidden');
           } else {
-            document
-              .querySelector('#uvpa_unavailable')
-              .classList.remove('hidden');
+            document.querySelector('#uvpa_unavailable').classList.remove('hidden');
           }
-        });        
+        });
       } else {
         document
           .querySelector('#uvpa_unavailable')
