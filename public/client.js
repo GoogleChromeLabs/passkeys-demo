@@ -36,7 +36,7 @@ export const _fetch = async (path, payload = '') => {
   } else {
     // Server authentication failed
     const result = await res.json();
-    throw result.error;
+    throw new Error(result.error);
   }
 };
 

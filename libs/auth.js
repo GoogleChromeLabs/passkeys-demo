@@ -583,6 +583,8 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
     if (!user) {
       throw 'User not found.';
     }
+    
+    console.log(user);
 
     let credential = user.credentials.find((cred) => cred.credId === body.id);
 
@@ -617,6 +619,7 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
     req.session['signed-in'] = 'yes';
     res.json(user);
   } catch (e) {
+    console.error(e);
     delete req.session.challenge;
     res.status(400).json({ error: e });
   }
