@@ -54,7 +54,7 @@ class Loading {
 
 export const loading = new Loading();
 
-export const registerCredential = async () => {
+export const registerCredential = async (name) => {
   const opts = {
     attestation: 'none',
     authenticatorSelection: {
@@ -81,6 +81,7 @@ export const registerCredential = async () => {
   credential.id = cred.id;
   credential.rawId = base64url.encode(cred.rawId);
   credential.type = cred.type;
+  credential.name = name;
 
   if (cred.response) {
     const clientDataJSON =
@@ -94,7 +95,7 @@ export const registerCredential = async () => {
     credential.response = {
       clientDataJSON,
       attestationObject,
-      transports,
+      transports
     };
   }
 

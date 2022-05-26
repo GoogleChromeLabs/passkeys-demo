@@ -141,8 +141,13 @@
 
       register.addEventListener('click', async e => {
         try {
+          const name = prompt('Enter a credential name.');
+          
+          // Terminate if the name is an empty string.
+          if (name.length === 0) return;
+
           loading.start();
-          await registerCredential();
+          await registerCredential(name);
           loading.stop();
           getCredentials();
         } catch (e) {
