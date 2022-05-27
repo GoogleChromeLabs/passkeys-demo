@@ -36,7 +36,7 @@
     <mwc-linear-progress id="progress"></mwc-linear-progress>
     <main class="content center">
       <h2>
-        Welcome, {{username}}!
+        Welcome, {{displayName}}!
       </h2>
       <section>
         <div id="display-name"></div>
@@ -77,16 +77,18 @@
       const renderDisplayName = async () => {
         const res = await _fetch('/auth/userinfo');
         render(html`
+        <mwc-list>
           <mwc-list-item>
             <div class="list-item">
               <div class="entity-name">
-                <span>${res.displayName}</span>
+                <span>${res.displayName || res.username}</span>
               </div>
               <div class="buttons">
                 <mwc-icon-button data-display-name="${res.displayName || res.username }" @click="${changeDisplayName}" icon="edit"></mwc-icon-button>
               </div>
             </div>
-          </mwc-list-item>`, $('#display-name'));
+          </mwc-list-item>
+        <mwc-list>`, $('#display-name'));
       };
 
       const addUVPA = $('#addUVPA');

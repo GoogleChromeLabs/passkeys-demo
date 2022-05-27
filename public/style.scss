@@ -39,7 +39,7 @@ body {
   align-items: center;
 }
 
-  .hidden {
+.hidden {
   display: none !important;
 }
 
@@ -93,7 +93,11 @@ mwc-button, .mdc-button {
   text-overflow: ellipsis;
 }
 
-#register {
+#addUVPA {
+  --mdc-theme-primary: red;
+}
+
+#addUVRA {
   --mdc-theme-primary: red;
 }
 

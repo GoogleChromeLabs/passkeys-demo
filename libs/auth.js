@@ -310,6 +310,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       rpID: process.env.HOSTNAME,
       userID: user.id,
       userName: user.username,
+      userDisplayName: user.displayName || user.username,
       timeout: TIMEOUT,
       // Prompt users for additional information about the authenticator.
       attestationType: attestation,

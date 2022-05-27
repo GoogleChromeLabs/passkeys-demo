@@ -79,7 +79,7 @@ app.get('/home', (req, res) => {
     return;
   }
   // `home.html` shows sign-out link
-  res.render('home.html', { username: req.session.username });
+  res.render('home.html', { displayName: req.session.username });
 });
 
 app.get('/reauth', (req, res) => {
