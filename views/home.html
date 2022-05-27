@@ -50,6 +50,10 @@
       <p class="instructions">
         Click on "Add this device" to register this device. Then "Sign out" and try "Sign-in with passkey"!
       </p>
+      
+      <p id="uvpa_available" class="hidden">
+        This device supports a platform authenticator.
+      </p>
       <p id="uvpa_unavailable" class="hidden">
         This device does not support user verifying platform authenticators.
       </p>
@@ -68,7 +72,7 @@
       $('#code').addEventListener('click', e => {
         location.href = 'https://glitch.com/edit/#!/passkeys-codelab';
       });
-      
+
       const changeDisplayName = async e => {
         const newName = prompt('Enter a new display name', e.target.dataset.displayName);
         if (newName) {
@@ -113,9 +117,7 @@
           }
         });
       } else {
-        document
-          .querySelector('#uvpa_unavailable')
-          .classList.remove('hidden');
+        document.querySelector('#uvpa_unavailable').classList.remove('hidden');
       }
 
       const getCredentials = async () => {
