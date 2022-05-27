@@ -54,14 +54,7 @@ class Loading {
 
 export const loading = new Loading();
 
-export const registerCredential = async (name) => {
-  const opts = {
-    attestation: 'none',
-    authenticatorSelection: {
-      userVerification: 'required',
-      residentKey: 'preferred'
-    }
-  };
+export const registerCredential = async (name, opts) => {
   const options = await _fetch('/auth/registerRequest', opts);
 
   options.user.id = base64url.decode(options.user.id);

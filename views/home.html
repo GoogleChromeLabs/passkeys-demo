@@ -103,8 +103,8 @@
                   `)}
                 </div>
                 <div class="buttons">
-                  <mwc-icon-button data-cred-id="${cred.credId}" data-name="${cred.name || 'Unnamed' }" @click="${renameCredential}" icon="edit"></mwc-icon-button>
-                  <mwc-icon-button data-cred-id="${cred.credId}" @click="${removeCredential}" icon="delete"></mwc-icon-button>
+                  <mwc-icon-button data-cred-id="${cred.credId}" data-name="${cred.name || 'Unnamed' }" @click="${rename}" icon="edit"></mwc-icon-button>
+                  <mwc-icon-button data-cred-id="${cred.credId}" @click="${remove}" icon="delete"></mwc-icon-button>
                 </div>
               </div>
             </mwc-list-item>`)}
@@ -114,7 +114,7 @@
 
       getCredentials();
       
-      const renameCredential = async e => {
+      const rename = async e => {
         const { credId, name } = e.target.dataset;
         const newName = prompt('Enter a new credential name.', name);
         if (newName.length === 0) return;
@@ -129,7 +129,7 @@
         }
       };
 
-      const removeCredential = async e => {
+      const remove = async e => {
         try {
           loading.start();
           await unregisterCredential(e.target.dataset.credId);
@@ -141,9 +141,7 @@
         }
       };
       
-      const onRegisterCredential = async (e) => {};
-
-      addUVPA.addEventListener('click', async e => {
+      const register = authenticatorAttachment => async e => {
         try {
           const name = prompt('Enter a credential name.');
           
@@ -151,14 +149,25 @@
           if (name.length === 0) return;
 
           loading.start();
-          await registerCredential(name);
+console.log(authenticatorAttachment);
+          await registerCredential(name, {
+            attestation: 'none',
+            authenticatorSelection: {
+              authenticatorAttachment,
+              userVerification: 'required',
+              residentKey: 'preferred'
+            }
+          });
           loading.stop();
           getCredentials();
         } catch (e) {
           loading.stop();
           alert(e);
-        }
-      });
+        }        
+      };
+
+      addUVPA.addEventListener('click', register('platform'));
+      addUVRA.addEventListener('click', register('cross-platform'));
     </script>
   </body>
 </html>
