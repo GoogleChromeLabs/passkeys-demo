@@ -83,7 +83,11 @@ export const registerCredential = async (name, opts) => {
       base64url.encode(cred.response.attestationObject);
     let transports = [];
     if (cred.response.getTransports) {
-      transports = cred.response.getTransports();      
+      transports = cred.response.getTransports();
+    }
+    // If `getTransports` is not available, consider it's a platform authenticator
+    if (transports.length === 0) {
+      transports = ['internal'];
     }
     credential.response = {
       clientDataJSON,

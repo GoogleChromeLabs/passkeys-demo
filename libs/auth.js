@@ -601,14 +601,14 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
     console.log(user);
 
     let credential = user.credentials.find((cred) => cred.credId === body.id);
+    
+    if (!credential) {
+      throw 'Credential not found.';
+    }
 
     credential.credentialPublicKey = base64url.toBuffer(credential.publicKey);
     credential.credentialID = base64url.toBuffer(credential.credId);
     credential.counter = credential.prevCounter;
-
-    if (!credential) {
-      throw 'Authenticating credential not found.';
-    }
 
     const verification = fido2.verifyAuthenticationResponse({
       credential: body,
