@@ -47,19 +47,10 @@
       <h3 class="mdc-typography mdc-typography--headline6">
         Your registered credentials:
       </h3>
-      <p class="instructions">
-        Click on "Add this device" to register this device. Then "Sign out" and try "Sign-in with passkey"!
-      </p>
-      
-      <p id="uvpa_available" class="hidden">
-        This device supports a platform authenticator.
-      </p>
-      <p id="uvpa_unavailable" class="hidden">
-        This device does not support user verifying platform authenticators.
-      </p>
       <section>
         <div id="list"></div>
       </section>
+      <p id="message" class="instructions"></p>
       <mwc-button id="addUVPA" class="hidden" icon="fingerprint" raised>Add this device</mwc-button>
       <mwc-button id="addUVRA" icon="smartphone" raised>Add your phone</mwc-button>
       <mwc-button><a href="/auth/signout">Sign out</a></mwc-button>
@@ -112,12 +103,11 @@
         .then(uvpaa => {
           if (uvpaa) {
             addUVPA.classList.remove('hidden');
-          } else {
-            document.querySelector('#uvpa_unavailable').classList.remove('hidden');
+            $('#message').innerText = 'This device supports a platform authenticator.';
           }
         });
       } else {
-        document.querySelector('#uvpa_unavailable').classList.remove('hidden');
+        $('#message').innerText = 'This device does not support WebAuthn.';
       }
 
       const getCredentials = async () => {
@@ -170,6 +160,8 @@
       };
 
       const remove = async e => {
+        if (!confirm('Do you really want to remove this credential?')) return;
+
         try {
           loading.start();
           await unregisterCredential(e.target.dataset.credId);
@@ -185,8 +177,8 @@
         try {
           const name = prompt('Enter a credential name.');
           
-          // Terminate if the name is an empty string.
-          if (name.length === 0) return;
+          // Terminate if the name is nullish.
+          if (!name) return;
 
           loading.start();
           await registerCredential(name, {
