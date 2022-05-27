@@ -39,7 +39,7 @@
         Welcome, {{username}}!
       </h2>
       <p class="instructions">
-        Click on "Add a credential" to register this device. Then "Sign out" and try "Sign-in with passkey"!
+        Click on "Add this device" to register this device. Then "Sign out" and try "Sign-in with passkey"!
       </p>
       <p id="uvpa_unavailable" class="hidden">
         This device does not support user verifying platform authenticators.
@@ -50,7 +50,8 @@
       <section>
         <div id="list"></div>
       </section>
-      <mwc-button id="register" class="hidden" icon="fingerprint" raised>Add a credential</mwc-button>
+      <mwc-button id="addUVPA" class="hidden" icon="fingerprint" raised>Add this device</mwc-button>
+      <mwc-button id="addUVRA" icon="smartphone" raised>Add your phone</mwc-button>
       <mwc-button><a href="/auth/signout">Sign out</a></mwc-button>
     </main>
     <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
@@ -62,13 +63,14 @@
         location.href = 'https://glitch.com/edit/#!/passkeys-codelab';
       });
 
-      const register = $('#register');
+      const addUVPA = $('#addUVPA');
+      const addUVRA = $('#addUVRA');
 
       if (window.PublicKeyCredential) {
         PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
         .then(uvpaa => {
           if (uvpaa) {
-            register.classList.remove('hidden');
+            addUVPA.classList.remove('hidden');
           } else {
             document.querySelector('#uvpa_unavailable').classList.remove('hidden');
           }
@@ -139,7 +141,7 @@
         }
       };
 
-      register.addEventListener('click', async e => {
+      addUVPA.addEventListener('click', async e => {
         try {
           const name = prompt('Enter a credential name.');
           

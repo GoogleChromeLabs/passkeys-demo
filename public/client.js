@@ -58,7 +58,7 @@ export const registerCredential = async (name) => {
   const opts = {
     attestation: 'none',
     authenticatorSelection: {
-      userVerification: 'preferred',
+      userVerification: 'required',
       residentKey: 'preferred'
     }
   };
