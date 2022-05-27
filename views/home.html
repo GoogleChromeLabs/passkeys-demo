@@ -39,17 +39,20 @@
         Welcome, {{displayName}}!
       </h2>
       <section>
+        <h3>
+          Your name:
+        </h3>
         <div id="display-name"></div>
       </section>
+      <h3 class="mdc-typography mdc-typography--headline6">
+        Your registered credentials:
+      </h3>
       <p class="instructions">
         Click on "Add this device" to register this device. Then "Sign out" and try "Sign-in with passkey"!
       </p>
       <p id="uvpa_unavailable" class="hidden">
         This device does not support user verifying platform authenticators.
       </p>
-      <h3 class="mdc-typography mdc-typography--headline6">
-        Your registered credentials:
-      </h3>
       <section>
         <div id="list"></div>
       </section>
@@ -68,10 +71,12 @@
       
       const changeDisplayName = async e => {
         const newName = prompt('Enter a new display name', e.target.dataset.displayName);
-        loading.start();
-        await _fetch('/auth/updateDisplayName', { newName });
-        loading.stop();
-        renderDisplayName();
+        if (newName) {
+          loading.start();
+          await _fetch('/auth/updateDisplayName', { newName });
+          loading.stop();
+          renderDisplayName();          
+        }
       }
 
       const renderDisplayName = async () => {
@@ -84,7 +89,11 @@
                 <span>${res.displayName || res.username}</span>
               </div>
               <div class="buttons">
-                <mwc-icon-button data-display-name="${res.displayName || res.username }" @click="${changeDisplayName}" icon="edit"></mwc-icon-button>
+                <mwc-icon-button
+                  data-display-name="${res.displayName || res.username }"
+                  @click="${changeDisplayName}"
+                  title="Edit your display name"
+                  icon="edit"></mwc-icon-button>
               </div>
             </div>
           </mwc-list-item>
