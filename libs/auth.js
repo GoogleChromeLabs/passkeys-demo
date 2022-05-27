@@ -41,8 +41,7 @@ db.defaults({
 
 const csrfCheck = (req, res, next) => {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
-    res.status(400).json({ error: 'invalid access.' });
-    return;
+    return res.status(400).json({ error: 'invalid access.' });
   }
   next();
 };
@@ -53,8 +52,7 @@ const csrfCheck = (req, res, next) => {
  **/
 const sessionCheck = (req, res, next) => {
   if (!req.session['signed-in']) {
-    res.status(401).json({ error: 'not signed in.' });
-    return;
+    return res.status(401).json({ error: 'not signed in.' });
   }
   next();
 };
@@ -95,8 +93,7 @@ router.post('/username', (req, res) => {
   const username = req.body.username;
   // Only check username, no need to check password as this is a mock
   if (!username || !/[a-zA-Z0-9-_]+/.test(username)) {
-    res.status(400).send({ error: 'Bad request' });
-    return;
+    return res.status(400).send({ error: 'Bad request' });
   } else {
     // See if account already exists
     let user = db.get('users').find({ username: username }).value();
@@ -112,7 +109,7 @@ router.post('/username', (req, res) => {
     // Set username in the session
     req.session.username = username;
     // If sign-in succeeded, redirect to `/home`.
-    res.json(user);
+    return res.json(user);
   }
 });
 
@@ -123,25 +120,28 @@ router.post('/username', (req, res) => {
  **/
 router.post('/password', (req, res) => {
   if (!req.body.password) {
-    res.status(401).json({ error: 'Enter at least one random letter.' });
-    return;
+    return res.status(401).json({ error: 'Enter at least one random letter.' });
   }
   const user = db.get('users').find({ username: req.session.username }).value();
 
   if (!user) {
-    res.status(401).json({ error: 'Enter username first.' });
-    return;
+    return res.status(401).json({ error: 'Enter username first.' });
   }
 
   req.session['signed-in'] = 'yes';
-  res.json(user);
+  return res.json(user);
+});
+
+router.get('/userinfo', csrfCheck, sessionCheck, (req, res) => {
+  const user = db.get('users').find({ username: req.session.username }).value();
+  return res.json(user);
 });
 
 router.get('/signout', (req, res) => {
   // Remove the session
   req.session.destroy()
   // Redirect to `/`
-  res.redirect(307, '/');
+  return res.redirect(307, '/');
 });
 
 /**
@@ -166,7 +166,7 @@ router.get('/signout', (req, res) => {
  **/
 router.post('/getKeys', csrfCheck, sessionCheck, (req, res) => {
   const user = db.get('users').find({ username: req.session.username }).value();
-  res.json(user || {});
+  return res.json(user || {});
 });
 
 router.post('/renameKey', csrfCheck, sessionCheck, (req, res) => {
@@ -181,7 +181,7 @@ console.log('credential renamed to:', newName);
     return cred;
   });
   db.get('users').find({ username }).assign({ credentials: newCreds }).write();
-  res.json({});
+  return res.json({});
 });
 
 /**
@@ -203,13 +203,13 @@ router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
     .assign({ credentials: newCreds })
     .write();
 
-  res.json({});
+  return res.json({});
 });
 
 router.get('/resetDB', (req, res) => {
   db.set('users', []).write();
   const users = db.get('users').value();
-  res.json(users);
+  return res.json(users);
 });
 
 /**
@@ -313,9 +313,9 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       options.pubKeyCredParams.push({ type: 'public-key', alg: param });
     }
 
-    res.json(options);
+    return res.json(options);
   } catch (e) {
-    res.status(400).send({ error: e });
+    return res.status(400).send({ error: e });
   }
 });
 
@@ -386,10 +386,10 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     delete req.session.challenge;
 
     // Respond with user info
-    res.json(user);
+    return res.json(user);
   } catch (e) {
     delete req.session.challenge;
-    res.status(400).send({ error: e.message });
+    return res.status(400).send({ error: e.message });
   }
 });
 
@@ -448,9 +448,9 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     });
     req.session.challenge = options.challenge;
 
-    res.json(options);
+    return res.json(options);
   } catch (e) {
-    res.status(400).json({ error: e });
+    return res.status(400).json({ error: e });
   }
 });
 
@@ -509,10 +509,10 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
     delete req.session.challenge;
     req.session['signed-in'] = 'yes';
-    res.json(user);
+    return res.json(user);
   } catch (e) {
     delete req.session.challenge;
-    res.status(400).json({ error: e });
+    return res.status(400).json({ error: e });
   }
 });
 
@@ -547,9 +547,9 @@ router.post('/discoveryRequest', csrfCheck, async (req, res) => {
     });
     req.session.challenge = options.challenge;
 
-    res.json(options);
+    return res.json(options);
   } catch (e) {
-    res.status(400).json({ error: e });
+    return res.status(400).json({ error: e });
   }
 });
 
@@ -617,11 +617,11 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
     delete req.session.challenge;
     req.session.username = user.username;
     req.session['signed-in'] = 'yes';
-    res.json(user);
+    return res.json(user);
   } catch (e) {
     console.error(e);
     delete req.session.challenge;
-    res.status(400).json({ error: e });
+    return res.status(400).json({ error: e });
   }
 });
 

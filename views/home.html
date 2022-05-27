@@ -38,6 +38,9 @@
       <h2>
         Welcome, {{username}}!
       </h2>
+      <section>
+        <div id="display-name"></div>
+      </section>
       <p class="instructions">
         Click on "Add this device" to register this device. Then "Sign out" and try "Sign-in with passkey"!
       </p>
@@ -62,6 +65,21 @@
       $('#code').addEventListener('click', e => {
         location.href = 'https://glitch.com/edit/#!/passkeys-codelab';
       });
+      
+      const renderDisplayName = () => {
+        const res = await _fetch('/auth/userinfo');
+        render(html`
+          <mwc-list-item>
+            <div class="list-item">
+              <div class="credential-name">
+                <span>${res.displayName}</span>
+              </div>
+              <div class="buttons">
+                <mwc-icon-button data-name="${res.displayName || res.name }" @click="${changeDisplayName}" icon="edit"></mwc-icon-button>
+              </div>
+            </div>
+          </mwc-list-item>`, $('#display-name'));
+      };
 
       const addUVPA = $('#addUVPA');
       const addUVRA = $('#addUVRA');
