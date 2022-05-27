@@ -101,6 +101,7 @@ router.post('/username', (req, res) => {
     if (!user) {
       user = {
         username: username,
+        displayName: username,
         id: base64url.encode(crypto.randomBytes(32)),
         credentials: [],
       };
@@ -132,9 +133,21 @@ router.post('/password', (req, res) => {
   return res.json(user);
 });
 
-router.get('/userinfo', csrfCheck, sessionCheck, (req, res) => {
+router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
   const user = db.get('users').find({ username: req.session.username }).value();
   return res.json(user);
+});
+
+router.post('/updateDisplayName', csrfCheck, sessionCheck, (req, res) => {
+  const { newName } = req.body;
+  if (newName) {
+    const user = db.get('users').find({ username: req.session.username }).value();
+    user.displayName = newName;
+    db.get('users').find({ username: user.username }).assign(user).write();
+    return res.json(user);
+  } else {
+    return res.status(400);
+  }
 });
 
 router.get('/signout', (req, res) => {
