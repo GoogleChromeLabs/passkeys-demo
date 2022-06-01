@@ -35,18 +35,7 @@
     </mwc-top-app-bar-fixed>
     <mwc-linear-progress id="progress"></mwc-linear-progress>
     <main class="content">
-      <div id="uvpa_available" class="hidden center">
-        <h2>
-          Verify your identity
-        </h2>
-        <div>
-          <mwc-button id="reauth" raised>Authenticate</mwc-button>
-        </div>
-        <div>
-          <mwc-button id="cancel">Sign-in with password</mwc-button>
-        </div>
-      </div>
-      <form id="form" method="POST" action="/auth/password" class="center hidden">
+      <form id="form" method="POST" action="/auth/password" class="center">
         <h2>
           Enter a password
         </h2>
@@ -63,7 +52,7 @@
     </main>
     <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
     <script type="module">
-      import { $, _fetch, authenticate } from '/client.js';
+      import { $, _fetch } from '/client.js';
       new mdc.textField.MDCTextField($('.mdc-text-field'));
       
       $('#code').addEventListener('click', e => {
@@ -81,45 +70,6 @@
           location.href = '/home';
         })
         .catch(e => alert(e));
-      });
-
-      if (window.PublicKeyCredential) {
-        PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-        .then(uvpaa => {
-          // if (uvpaa && localStorage.getItem(`credId`)) {
-          //   document
-          //     .querySelector('#uvpa_available')
-          //     .classList.remove('hidden');
-          // } else {
-            form.classList.remove('hidden');
-          // }
-        });        
-      } else {
-        form.classList.remove('hidden');
-      }
-
-      const cancel = $('#cancel');
-      cancel.addEventListener('click', e => {
-        form.classList.remove('hidden');
-        document
-          .querySelector('#uvpa_available')
-          .classList.add('hidden');        
-      });
-
-      const button = $('#reauth');
-      button.addEventListener('click', e => {
-        authenticate().then(user => {
-          if (user) {
-            location.href = '/home';
-          } else {
-            throw new Error('User not found.');
-          }
-        }).catch(e => {
-          console.error(e.message || e);
-          alert('Authentication failed. Use password to sign-in.');
-          form.classList.remove('hidden');
-          $('#uvpa_available').classList.add('hidden');
-        });        
       });
     </script>
   </body>

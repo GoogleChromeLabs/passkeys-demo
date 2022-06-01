@@ -62,16 +62,6 @@
           location.href = 'https://glitch.com/edit/#!/passkeys-codelab';
         });
 
-        if (window.PublicKeyCredential) {
-          PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-          .then(uvpaa => {
-            // TODO: Add `navigator.credentials.conditionalMediationSupported` check
-            if (uvpaa) {
-              $('#uvpa_available').classList.remove('hidden');
-            }
-          });
-        }
-
         const form = $('#form');
         form.addEventListener('submit', e => {
           e.preventDefault();
@@ -85,6 +75,16 @@
             alert(e);
           });
         });
+
+        if (window.PublicKeyCredential) {
+          PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+          .then(uvpaa => {
+            // TODO: Add `navigator.credentials.conditionalMediationSupported` check
+            if (uvpaa) {
+              $('#uvpa_available').classList.remove('hidden');
+            }
+          });
+        }
 
         const button = $('#passkey');
         button.addEventListener('click', e => {
