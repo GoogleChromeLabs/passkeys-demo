@@ -95,6 +95,8 @@
         <mwc-list>`, $('#display-name'));
       };
 
+      renderDisplayName();
+
       const addUVPA = $('#addUVPA');
       const addUVRA = $('#addUVRA');
 
@@ -141,7 +143,6 @@
         render(creds, list);
       };
 
-      renderDisplayName();
       getCredentials();
       
       const rename = async e => {
