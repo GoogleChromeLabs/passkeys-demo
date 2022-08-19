@@ -52,12 +52,6 @@
           <span class="mdc-line-ripple"></span>
         </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
-        <div id="uvpa_available" class="hidden">
-          <p class="center">
-            or
-          </p>
-          <input type="button" id="passkey" class="mdc-button mdc-button--raised" value="Sign-in with passkey" />
-        </div>
       </form>
       <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
       <script type="module">
@@ -82,28 +76,29 @@
           });
         });
 
-        if (window.PublicKeyCredential) {
-          PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+        if (window.PublicKeyCredential && PublicKeyCredential.isConditionalMediationAvailable) {
+          PublicKeyCredential.isConditionalMediationAvailable()
           .then(uvpaa => {
-            // TODO: Add `navigator.credentials.conditionalMediationSupported` check
             if (uvpaa) {
-              $('#uvpa_available').classList.remove('hidden');
+              console.log('condition ui is available');
+              authenticate().then(user => {
+                loading.start();
+                if (user) {
+                  location.href = '/home';
+                } else {
+                  throw new Error('User not found.');
+                }
+              }).catch(e => {
+                loading.stop();
+                console.error(e);
+                alert('Authentication failed.');
+              });
+            } else {
+              console.log('condition ui is NOT available');
             }
           });
         }
 
-        authenticate().then(user => {
-          loading.start();
-          if (user) {
-            location.href = '/home';
-          } else {
-            throw new Error('User not found.');
-          }
-        }).catch(e => {
-          loading.stop();
-          console.error(e);
-          alert('Authentication failed.');
-        });
       </script>
     </main>
   </body>
