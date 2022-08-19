@@ -76,7 +76,8 @@
           });
         });
 
-        if (window.PublicKeyCredential && PublicKeyCredential.isConditionalMediationAvailable) {
+        if (window.PublicKeyCredential &&
+            PublicKeyCredential.isConditionalMediationAvailable) {
           PublicKeyCredential.isConditionalMediationAvailable()
           .then(uvpaa => {
             if (uvpaa) {

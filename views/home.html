@@ -120,7 +120,8 @@
           usb: "usb",
           nfc: "nfc",
           ble: "bluetooth",
-          cable: "smartphone",
+          cable: "cable",
+          hybrid: "cable",
         };
         const creds = html`${res.credentials.length > 0 ? html`
         <mwc-list>
@@ -187,7 +188,7 @@
             authenticatorSelection: {
               authenticatorAttachment,
               userVerification: 'required',
-              residentKey: 'preferred'
+              residentKey: 'required'
             }
           });
           loading.stop();
