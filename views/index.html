@@ -42,7 +42,13 @@
         <div class="mdc-text-field mdc-text-field--filled">
           <span class="mdc-text-field__ripple"></span>
           <label class="mdc-floating-label" id="username-label">username</label>
-          <input type="text" class="mdc-text-field__input" aria-labelledby="username-label" name="username" autofocus />
+          <input
+           type="text"
+           class="mdc-text-field__input"
+           aria-labelledby="username-label"
+           name="username"
+           autocomplete="username webauthn"
+           autofocus />
           <span class="mdc-line-ripple"></span>
         </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
@@ -86,20 +92,17 @@
           });
         }
 
-        const button = $('#passkey');
-        button.addEventListener('click', e => {
+        authenticate().then(user => {
           loading.start();
-          authenticate().then(user => {
-            if (user) {
-              location.href = '/home';
-            } else {
-              throw new Error('User not found.');
-            }
-          }).catch(e => {
-            loading.stop();
-            console.error(e);
-            alert('Authentication failed.');
-          });        
+          if (user) {
+            location.href = '/home';
+          } else {
+            throw new Error('User not found.');
+          }
+        }).catch(e => {
+          loading.stop();
+          console.error(e);
+          alert('Authentication failed.');
         });
       </script>
     </main>

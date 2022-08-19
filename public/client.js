@@ -110,6 +110,7 @@ export const authenticate = async () => {
 
   const cred = await navigator.credentials.get({
     publicKey: options,
+    mediation: 'conditional'
   });
 
   const credential = {};
