@@ -69,7 +69,9 @@ app.get('/', (req, res) => {
     return;
   }
   // If user is not signed in, show `index.html` with id/password form.
-  res.render('index.html');
+  res.render('index.html', {
+    project_name: process.env.PROJECT_NAME
+  });
 });
 
 app.get('/home', (req, res) => {
@@ -79,7 +81,10 @@ app.get('/home', (req, res) => {
     return;
   }
   // `home.html` shows sign-out link
-  res.render('home.html', { displayName: req.session.username });
+  res.render('home.html', {
+    displayName: req.session.username,
+    project_name: process.env.PROJECT_NAME
+  });
 });
 
 app.get('/reauth', (req, res) => {
@@ -91,7 +96,10 @@ app.get('/reauth', (req, res) => {
   // Show `reauth.html`.
   // User is supposed to enter a password (which will be ignored)
   // Make XHR POST to `/signin`
-  res.render('reauth.html', { username: username });
+  res.render('reauth.html', {
+    username: username,
+    project_name: process.env.PROJECT_NAME
+  });
 });
 
 app.get('/.well-known/assetlinks.json', (req, res) => {
