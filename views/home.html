@@ -52,7 +52,7 @@
       </section>
       <p id="message" class="instructions"></p>
       <mwc-button id="addUVPA" class="hidden" icon="fingerprint" raised>Add this device</mwc-button>
-      <mwc-button id="addUVRA" icon="smartphone" raised>Add your phone</mwc-button>
+<!--       <mwc-button id="addUVRA" icon="smartphone" raised>Add your phone</mwc-button> -->
       <mwc-button><a href="/auth/signout">Sign out</a></mwc-button>
     </main>
     <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
@@ -199,7 +199,7 @@
       };
 
       addUVPA.addEventListener('click', register('platform'));
-      addUVRA.addEventListener('click', register('cross-platform'));
+      // addUVRA.addEventListener('click', register('cross-platform'));
     </script>
   </body>
 </html>
