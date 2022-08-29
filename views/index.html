@@ -47,8 +47,12 @@
            class="mdc-text-field__input"
            aria-labelledby="username-label"
            name="username"
-           autocomplete="username webauthn"
+           autocomplete="webauthn"
            autofocus />
+          <input
+           type="hidden"
+           name="password"
+           autocomplete="current-password" />
           <span class="mdc-line-ripple"></span>
         </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
