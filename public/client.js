@@ -105,12 +105,14 @@ export const authenticate = async () => {
   let url = '/auth/discoveryRequest';
   const options = await _fetch(url, opts);
 
+  const abortController = new AbortController();
   options.allowCredentials = [];
   options.challenge = base64url.decode(options.challenge);
 
   const cred = await navigator.credentials.get({
     publicKey: options,
-    mediation: 'conditional'
+    mediation: 'conditional',
+    signal: abortController.signal
   });
 
   const credential = {};
