@@ -132,6 +132,10 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
   res.json(assetlinks);
 });
 
+app.get('/test', (req, res) => {
+  res.render('test.html');
+})
+
 app.use('/auth', auth);
 
 // listen for req :)

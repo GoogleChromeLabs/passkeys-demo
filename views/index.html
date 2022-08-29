@@ -47,12 +47,20 @@
            class="mdc-text-field__input"
            aria-labelledby="username-label"
            name="username"
-           autocomplete="username"
+           autocomplete="username webauthn"
            autofocus />
+          <span class="mdc-line-ripple"></span>
+        </div>
+        <div class="mdc-text-field mdc-text-field--filled">
+          <span class="mdc-text-field__ripple"></span>
+          <label class="mdc-floating-label" id="password-label">password</label>
           <input
-           type="hidden"
+           type="password"
+           class="mdc-text-field__input"
+           aria-labelledby="password-label"
            name="password"
-           autocomplete="current-password" />
+           autocomplete="current-password"
+           autofocus />
           <span class="mdc-line-ripple"></span>
         </div>
         <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
