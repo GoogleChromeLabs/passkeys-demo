@@ -93,7 +93,6 @@
           PublicKeyCredential.isConditionalMediationAvailable()
           .then(uvpaa => {
             if (uvpaa) {
-              console.log('conditional ui is available');
               authenticate().then(user => {
                 loading.start();
                 if (user) {
@@ -106,8 +105,6 @@
                 console.error(e);
                 alert('Authentication failed.');
               });
-            } else {
-              console.log('conditional ui is NOT available');
             }
           });
         }
