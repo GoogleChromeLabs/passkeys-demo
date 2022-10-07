@@ -101,22 +101,18 @@ export const registerCredential = async (name, opts) => {
 
 let abortController;
 
-export const authenticate = async (username) => {
+export const authenticate = async (params) => {
+  const { ac, username } = params;
   const opts = { username };
   const options = await _fetch('/auth/discoveryRequest', opts);
   
-  if (abortController) {
-    abortController.abort();
-  }
-
-  abortController = new AbortController();
   options.allowCredentials = [];
   options.challenge = base64url.decode(options.challenge);
 
   const cred = await navigator.credentials.get({
     publicKey: options,
     mediation: 'conditional',
-    signal: abortController.signal
+    signal: ac ? ac.signal : undefined,
   });
 
   const credential = {};

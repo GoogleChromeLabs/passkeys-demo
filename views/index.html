@@ -74,6 +74,7 @@
           location.href = 'https://glitch.com/edit/#!/{{project_name}}';
         });
 
+        const ac = new AbortController();
         const form = $('#form');
         form.addEventListener('submit', e => {
           e.preventDefault();
@@ -83,6 +84,10 @@
 
           if (window.PublicKeyCredential &&
               PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+            // Abort the ongoing request
+            if (!ac.aborted) {
+              ac.abort('canceled');
+            }
             PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
             .then(uvpaa => authenticate(form.get('username')))
             .then(user => {
@@ -111,7 +116,7 @@
           PublicKeyCredential.isConditionalMediationAvailable()
           .then(cma => {
             if (cma) {
-              authenticate().then(user => {
+              authenticate({ ac }).then(user => {
                 loading.start();
                 if (user) {
                   location.href = '/home';
@@ -121,7 +126,6 @@
               }).catch(e => {
                 loading.stop();
                 console.error(e);
-                alert('Authentication failed.');
               });
             }
           });
