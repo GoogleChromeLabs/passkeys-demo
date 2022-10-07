@@ -1,5 +1,5 @@
 {
-  "name": "webauthn-codelab",
+  "name": "passkeys-codelab",
   "version": "0.0.3",
   "description": "Your First WebAuthn App",
   "main": "server.js",
@@ -11,30 +11,30 @@
     "express": "^4.18.1",
     "hbs": "^4.2.0",
     "lowdb": "^1.0.0",
-    "@material/mwc-button": "^0.25.2",
-    "@material/mwc-fab": "^0.25.2",
-    "@material/mwc-top-app-bar-fixed": "^0.25.2",
+    "@material/mwc-button": "^0.27.0",
+    "@material/mwc-fab": "^0.27.0",
+    "@material/mwc-top-app-bar-fixed": "^0.27.0",
     "@material/mwc-textfield": "^0.25.2",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
-    "@babel/core": "^7.17.12",
+    "@babel/core": "^7.19.3",
     "babel-loader": "^8.2.5",
     "babel-preset-env": "^1.7.0",
-    "@simplewebauthn/server": "^4.4.0",
+    "@simplewebauthn/server": "^6.2.0",
     "base64url": "^3.0.1",
     "css-loader": "^4.3.0",
     "sass-loader": "^10.0.4",
-    "sass": "^1.49.9",
+    "sass": "^1.54.9",
     "extract-loader": "^5.1.0",
     "file-loader": "^6.2.0",
     "express-session": "^1.17.3",
     "express-useragent": "^1.0.15",
     "@material/mwc-list": "^0.25.2",
-    "@material/mwc-icon-button": "^0.25.2",
-    "@material/mwc-linear-progress": "^0.25.2"
+    "@material/mwc-icon-button": "^0.27.0",
+    "@material/mwc-linear-progress": "^0.27.0"
   },
   "engines": {
-    "node": "10.x"
+    "node": "16.x"
   },
   "repository": {
     "url": "https://github.com/googlecodelabs/fido2-codelab"
