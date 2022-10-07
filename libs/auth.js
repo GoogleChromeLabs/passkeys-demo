@@ -391,7 +391,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
         credId: base64CredentialID,
         prevCounter: counter,
         name: credential.name || req.useragent.platform || 'Unknown platform',
-        transports: credential.response.transports || ['internal']
+        transports: credential.response.transports || []
       });
     }
 
