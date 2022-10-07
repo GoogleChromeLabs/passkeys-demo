@@ -101,9 +101,7 @@ export const registerCredential = async (name, opts) => {
 
 export const authenticate = async () => {
   const opts = {};
-
-  let url = '/auth/discoveryRequest';
-  const options = await _fetch(url, opts);
+  const options = await _fetch('/auth/discoveryRequest', opts);
 
   const abortController = new AbortController();
   options.allowCredentials = [];

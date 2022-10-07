@@ -546,6 +546,15 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
  **/
 router.post('/discoveryRequest', csrfCheck, async (req, res) => {
   try {
+    if (req.body.username) {
+      const user = db.get('users').find({ username }).value();
+
+      if (!user) {
+        // Send empty response if user is not registered yet.
+        res.json({ error: 'User not found.' });
+        return;
+      }      
+    }
     const userVerification = req.body.userVerification || 'required';
     const allowCredentials = [];
 
