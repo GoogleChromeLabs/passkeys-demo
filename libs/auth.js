@@ -547,6 +547,8 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 router.post('/discoveryRequest', csrfCheck, async (req, res) => {
   try {
     const username = req.body.username;
+
+console.log('username', username);
     let user;
     if (username) {
       user = db.get('users').find({ username }).value();

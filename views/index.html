@@ -89,7 +89,9 @@
               ac.abort('canceled');
             }
             PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-            .then(uvpaa => authenticate(form.get('username')))
+            .then(uvpaa => {
+              return authenticate({ username: form.get('username') })
+            })
             .then(user => {
               loading.start();
               if (user) {
