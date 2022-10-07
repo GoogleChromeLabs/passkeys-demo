@@ -77,6 +77,13 @@
         const form = $('#form');
         form.addEventListener('submit', e => {
           e.preventDefault();
+          if (window.PublicKeyCredential &&
+              PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+            PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+            .then(uvpaa => {
+              authenticate()
+            });
+          }
           const form = new FormData(e.target);
           const cred = {};
           form.forEach((v, k) => cred[k] = v);
@@ -91,8 +98,8 @@
         if (window.PublicKeyCredential &&
             PublicKeyCredential.isConditionalMediationAvailable) {
           PublicKeyCredential.isConditionalMediationAvailable()
-          .then(uvpaa => {
-            if (uvpaa) {
+          .then(cma => {
+            if (cma) {
               authenticate().then(user => {
                 loading.start();
                 if (user) {

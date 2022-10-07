@@ -546,18 +546,29 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
  **/
 router.post('/discoveryRequest', csrfCheck, async (req, res) => {
   try {
-    if (req.body.username) {
-      const user = db.get('users').find({ username }).value();
+    const username = req.body.username;
+    let user;
+    if (username) {
+      user = db.get('users').find({ username }).value();
 
       if (!user) {
         // Send empty response if user is not registered yet.
         res.json({ error: 'User not found.' });
         return;
-      }      
+      }
     }
-    const userVerification = req.body.userVerification || 'required';
-    const allowCredentials = [];
-
+    const userVerification = req.body.userVerification || 'preferred';
+    let allowCredentials = [];
+    if (user) {
+      allowCredentials = user.credentials.map(cred => {
+        return {
+          id: cred.credId,
+          type: 'public-key',
+          transports: cred.transports,
+        }
+      });
+    }
+console.log('allowCredentials', allowCredentials);
     const options = await fido2.generateAuthenticationOptions({
       timeout: TIMEOUT,
       rpID: process.env.HOSTNAME,
@@ -607,7 +618,7 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
       throw 'User not found.';
     }
     
-    console.log(user);
+console.log(user);
 
     let credential = user.credentials.find((cred) => cred.credId === body.id);
     

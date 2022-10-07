@@ -99,8 +99,8 @@ export const registerCredential = async (name, opts) => {
   return await _fetch('/auth/registerResponse', credential);
 };
 
-export const authenticate = async () => {
-  const opts = {};
+export const authenticate = async (username) => {
+  const opts = { username };
   const options = await _fetch('/auth/discoveryRequest', opts);
 
   const abortController = new AbortController();
