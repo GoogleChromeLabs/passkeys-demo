@@ -99,20 +99,23 @@ export const registerCredential = async (name, opts) => {
   return await _fetch('/auth/registerResponse', credential);
 };
 
-let abortController;
+let ac;
 
-export const authenticate = async (params) => {
-  const { ac, username } = params;
+export const authenticate = async (username) => {
   const opts = { username };
   const options = await _fetch('/auth/discoveryRequest', opts);
-  
-  options.allowCredentials = [];
+
+  if (ac && ac.aborted === false) {
+    ac.abort('canceled');
+  }
+  ac = new AbortController();
+
   options.challenge = base64url.decode(options.challenge);
 
   const cred = await navigator.credentials.get({
     publicKey: options,
     mediation: 'conditional',
-    signal: ac && !ac.aborted ? ac.signal : undefined,
+    signal: ac.signal
   });
 
   const credential = {};
