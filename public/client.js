@@ -99,11 +99,17 @@ export const registerCredential = async (name, opts) => {
   return await _fetch('/auth/registerResponse', credential);
 };
 
+let abortController;
+
 export const authenticate = async (username) => {
   const opts = { username };
   const options = await _fetch('/auth/discoveryRequest', opts);
+  
+  if (abortController) {
+    abortController.abort();
+  }
 
-  const abortController = new AbortController();
+  abortController = new AbortController();
   options.allowCredentials = [];
   options.challenge = base64url.decode(options.challenge);
 
