@@ -450,7 +450,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
       }
     }
 
-    const options = fido2.generateAuthenticationOptions({
+    const options = await fido2.generateAuthenticationOptions({
       timeout: TIMEOUT,
       rpID: process.env.HOSTNAME,
       allowCredentials,
@@ -503,7 +503,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
       throw 'Authenticating credential not found.';
     }
 
-    const verification = fido2.verifyAuthenticationResponse({
+    const verification = await fido2.verifyAuthenticationResponse({
       credential: body,
       expectedChallenge,
       expectedOrigin,
@@ -549,7 +549,7 @@ router.post('/discoveryRequest', csrfCheck, async (req, res) => {
     const userVerification = req.body.userVerification || 'required';
     const allowCredentials = [];
 
-    const options = fido2.generateAuthenticationOptions({
+    const options = await fido2.generateAuthenticationOptions({
       timeout: TIMEOUT,
       rpID: process.env.HOSTNAME,
       allowCredentials,
@@ -610,7 +610,7 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
     credential.credentialID = base64url.toBuffer(credential.credId);
     credential.counter = credential.prevCounter;
 
-    const verification = fido2.verifyAuthenticationResponse({
+    const verification = await fido2.verifyAuthenticationResponse({
       credential: body,
       expectedChallenge,
       expectedOrigin,
