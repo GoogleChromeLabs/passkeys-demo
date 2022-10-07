@@ -548,14 +548,15 @@ router.post('/discoveryRequest', csrfCheck, async (req, res) => {
   try {
     const username = req.body.username;
 
-console.log('username', username);
     let user;
     if (username) {
       user = db.get('users').find({ username }).value();
+      
+console.log('user', user);
 
       if (!user) {
         // Send empty response if user is not registered yet.
-        res.json({ error: 'User not found.' });
+        res.status(400).json({ error: 'User not found.' });
         return;
       }
     }

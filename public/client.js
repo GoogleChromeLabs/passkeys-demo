@@ -110,6 +110,9 @@ export const authenticate = async (username) => {
   }
   ac = new AbortController();
 
+  options.allowCredentials = options.allowCredentials.map(cred => {
+    cred.id = base64url.decode(cred.id);
+  });
   options.challenge = base64url.decode(options.challenge);
 
   const cred = await navigator.credentials.get({
