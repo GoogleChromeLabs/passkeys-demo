@@ -20,24 +20,25 @@ const crypto = require('crypto');
 const fido2 = require('@simplewebauthn/server');
 const base64url = require('base64url');
 const fs = require('fs');
-const low = require('lowdb');
+import { Low, JSONFile } from 'lowdb';
 
 if (!fs.existsSync('./.data')) {
   fs.mkdirSync('./.data');
 }
 
-const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync('.data/db.json');
-const db = low(adapter);
+const adapter = new JSONFile('.data/db.json');
+const db = Low(adapter);
 
 router.use(express.json());
 
 const RP_NAME = 'WebAuthn Codelab';
 const TIMEOUT = 30 * 1000 * 60;
 
-db.defaults({
-  users: [],
-}).write();
+db.data ||= { users: [] } ;
+
+async function findUserByUsername(username) {
+  const user = db.data.users.find(user => user.username === username);
+}
 
 const csrfCheck = (req, res, next) => {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
@@ -96,7 +97,7 @@ router.post('/username', (req, res) => {
     return res.status(400).send({ error: 'Bad request' });
   } else {
     // See if account already exists
-    let user = db.get('users').find({ username: username }).value();
+    let user = db.data.users.find({ username: username }).value();
     // If user entry is not created yet, create one
     if (!user) {
       user = {
@@ -617,11 +618,11 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
     // Query the user
     const user = db.get('users').find({ id: user_id }).value();
 
+console.log(user);
+
     if (!user) {
       throw 'User not found.';
     }
-    
-console.log(user);
 
     let credential = user.credentials.find((cred) => cred.credId === body.id);
     
