@@ -17,11 +17,11 @@
 
 // init project
 import express from 'express';
-import { session } from 'express-session';
-import { hbs } from 'hbs';
+import session from 'express-session';
+import hbs from 'hbs';
 import { auth } from './libs/auth.mjs';
 const app = express();
-import { useragent } from 'express-useragent';
+import useragent from 'express-useragent';
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);

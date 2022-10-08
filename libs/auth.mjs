@@ -22,7 +22,7 @@ import base64url from 'base64url';
 import { Low, JSONFile } from 'lowdb';
 
 const adapter = new JSONFile('.data/db.json');
-const db = Low(adapter);
+const db = new Low(adapter);
 await db.read();
 
 router.use(express.json());
@@ -440,7 +440,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     if (!user) {
       // Send empty response if user is not registered yet.
-      res.json({ error: 'User not found.' });
+      res.status(400).json({ error: 'User not found.' });
       return;
     }
 
@@ -558,10 +558,11 @@ router.post('/discoveryRequest', csrfCheck, async (req, res) => {
   try {
     const username = req.body.username;
 
+console.log('username', username);
     let user;
     if (username) {
       user = findUserByUsername(username);
-      
+
 console.log('user', user);
 
       if (!user) {
@@ -672,4 +673,4 @@ console.log(user);
   }
 });
 
-module.exports = router;
+export { router as auth };
