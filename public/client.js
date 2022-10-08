@@ -105,13 +105,14 @@ export const authenticate = async (opts = {}) => {
   const { username } = opts;
   const options = await _fetch('/auth/discoveryRequest', opts);
 
-  if (ac && ac.aborted === false) {
+  if (ac && ac.signal.aborted === false) {
     ac.abort('canceled');
   }
   ac = new AbortController();
 
   options.allowCredentials = options.allowCredentials.map(cred => {
     cred.id = base64url.decode(cred.id);
+    return cred;
   });
   options.challenge = base64url.decode(options.challenge);
 
