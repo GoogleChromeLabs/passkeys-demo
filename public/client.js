@@ -101,8 +101,8 @@ export const registerCredential = async (name, opts) => {
 
 let ac;
 
-export const authenticate = async (username) => {
-  const opts = { username };
+export const authenticate = async (opts = {}) => {
+  const { username } = opts;
   const options = await _fetch('/auth/discoveryRequest', opts);
 
   if (ac && ac.aborted === false) {
@@ -115,9 +115,10 @@ export const authenticate = async (username) => {
   });
   options.challenge = base64url.decode(options.challenge);
 
+  const mediation = username ? undefined : 'conditional';
   const cred = await navigator.credentials.get({
     publicKey: options,
-    mediation: 'conditional',
+    mediation,
     signal: ac.signal
   });
 
