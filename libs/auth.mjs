@@ -103,7 +103,7 @@ const getOrigin = (userAgent) => {
  * Check username, create a new account if it doesn't exist.
  * Set a `username` in the session.
  **/
-router.post('/username', (req, res) => {
+router.post('/username', async (req, res) => {
   const username = req.body.username;
   // Only check username, no need to check password as this is a mock
   if (!username || !/[a-zA-Z0-9-_]+/.test(username)) {
@@ -152,7 +152,7 @@ router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
   return res.json(user);
 });
 
-router.post('/updateDisplayName', csrfCheck, sessionCheck, (req, res) => {
+router.post('/updateDisplayName', csrfCheck, sessionCheck, async (req, res) => {
   const { newName } = req.body;
   if (newName) {
     const user = findUserByUsername(req.session.username);
@@ -216,7 +216,7 @@ console.log('credential renamed to:', newName);
  * Removes a credential id attached to the user
  * Responds with empty JSON `{}`
  **/
-router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
+router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
   const credId = req.query.credId;
   const username = req.session.username;
   const user = findUserByUsername(username);
@@ -366,13 +366,10 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
+  const credential = req.body;
+  const { id: credId, type } = credential;
 
   try {
-    const credential = req.body;
-    console.log(credential);
-    const credId = credential.id;
-    const type = credential.type;
-    // const { id: credId, type } = credential;
 
     const verification = await fido2.verifyRegistrationResponse({
       credential,
