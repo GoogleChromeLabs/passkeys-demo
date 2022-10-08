@@ -3,9 +3,10 @@
   "version": "0.0.3",
   "description": "Your First WebAuthn App",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "build": "webpack -p",
-    "start": "node server.js"
+    "start": "node server.mjs"
   },
   "dependencies": {
     "express": "^4.18.1",

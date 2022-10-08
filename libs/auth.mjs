@@ -14,21 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const crypto = require('crypto');
-const fido2 = require('@simplewebauthn/server');
-const base64url = require('base64url');
-const fs = require('fs');
+import crypto from 'crypto';
+import fido2 from '@simplewebauthn/server';
+import base64url from 'base64url';
 import { Low, JSONFile } from 'lowdb';
-
-if (!fs.existsSync('./.data')) {
-  fs.mkdirSync('./.data');
-}
 
 const adapter = new JSONFile('.data/db.json');
 const db = Low(adapter);
-
 await db.read();
 
 router.use(express.json());
@@ -213,7 +207,8 @@ console.log('credential renamed to:', newName);
     }
     return cred;
   });
-  db.get('users').find({ username }).assign({ credentials: newCreds }).write();
+  user.credentials = newCreds;
+  updateUser(user);
   return res.json({});
 });
 
@@ -230,11 +225,9 @@ router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
     // Leave credential ids that do not match
     return cred.credId !== credId;
   });
+  user.credentials = newCreds;
 
-  db.get('users')
-    .find({ username: username })
-    .assign({ credentials: newCreds })
-    .write();
+  updateUser(user);
 
   return res.json({});
 });
@@ -509,7 +502,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   // Query the user
   const user = findUserByUsername(req.session.username);
 
-  let credential = user.credentials.find((cred) => cred.credId === req.body.id);
+  let credential = user.credentials.find(cred => cred.credId === req.body.id);
   
   credential.credentialPublicKey = base64url.toBuffer(credential.publicKey);
   credential.credentialID = base64url.toBuffer(credential.credId);
@@ -536,7 +529,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
     credential.prevCounter = authenticationInfo.newCounter;
 
-    findUserByUsername(req.session.username }).assign(user).write();
+    updateUser(user);
 
     delete req.session.challenge;
     req.session['signed-in'] = 'yes';

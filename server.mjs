@@ -16,12 +16,12 @@
  */
 
 // init project
-const express = require('express');
-const session = require('express-session');
-const hbs = require('hbs');
-const auth = require('./libs/auth');
+import express from 'express';
+import { session } from 'express-session';
+import { hbs } from 'hbs';
+import { auth } from './libs/auth.mjs';
 const app = express();
-const useragent = require('express-useragent');
+import { useragent } from 'express-useragent';
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
