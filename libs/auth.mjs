@@ -366,13 +366,14 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
-  const credential = req.body;
-  const credId = credential.id;
-  const type = credential.type;
-  // const { id: credId, type } = credential;
-console.log(credential);
 
   try {
+    const credential = req.body;
+    console.log(credential);
+    const credId = credential.id;
+    const type = credential.type;
+    // const { id: credId, type } = credential;
+
     const verification = await fido2.verifyRegistrationResponse({
       credential,
       expectedChallenge,
