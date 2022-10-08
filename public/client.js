@@ -104,6 +104,10 @@ let ac;
 export const authenticate = async (opts = {}) => {
   const { username } = opts;
   const options = await _fetch('/auth/discoveryRequest', opts);
+  
+  if (username && options.allowCredentials.length === 0) {
+    throw new Error('User is not using passkeys.');
+  }
 
   if (ac && ac.signal.aborted === false) {
     ac.abort('canceled');

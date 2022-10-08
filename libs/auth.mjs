@@ -43,7 +43,7 @@ function findUserByUserId(user_id) {
 }
 
 async function updateUser(user) {
-  const _user = findUserByUserId(user.id);
+  let _user = findUserByUserId(user.id);
   if (!_user) {
     db.data.users.push(user);
   } else {
@@ -366,12 +366,9 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
-  const credId = req.body.id;
-  const type = req.body.type;
+  const { id: credId, type, credential } = req.body;
 
   try {
-    const { body: credential } = req;
-
     const verification = await fido2.verifyRegistrationResponse({
       credential,
       expectedChallenge,
@@ -382,7 +379,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const { verified, registrationInfo } = verification;
 
     if (!verified) {
-      throw 'User verification failed.';
+      throw new Error('User verification failed.');
     }
 
     const { credentialPublicKey, credentialID, counter } = registrationInfo;
@@ -416,6 +413,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     return res.json(user);
   } catch (e) {
     delete req.session.challenge;
+    console.error(e);
     return res.status(400).send({ error: e.message });
   }
 });
