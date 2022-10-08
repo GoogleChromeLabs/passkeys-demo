@@ -94,14 +94,17 @@
               } else {
                 throw new Error('User not found.');
               }
-            }).catch(e => {
+            })
+            .catch(e => {
               loading.stop();
               console.error(e.message);
               return _fetch(e.target.action, cred);
               // alert('Authentication failed.');
-            }).then(user => {
+            })
+            .then(user => {
               location.href = '/reauth';
-            }).catch(e => {
+            })
+            .catch(e => {
               alert(e);
             });
           }
