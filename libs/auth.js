@@ -29,6 +29,8 @@ if (!fs.existsSync('./.data')) {
 const adapter = new JSONFile('.data/db.json');
 const db = Low(adapter);
 
+await db.read();
+
 router.use(express.json());
 
 const RP_NAME = 'WebAuthn Codelab';
@@ -36,8 +38,25 @@ const TIMEOUT = 30 * 1000 * 60;
 
 db.data ||= { users: [] } ;
 
-async function findUserByUsername(username) {
+function findUserByUsername(username) {
   const user = db.data.users.find(user => user.username === username);
+  return user;
+}
+
+function findUserByUserId(user_id) {
+  const user = db.data.users.find(user => user.id === user_id);
+  return user;
+}
+
+async function updateUser(user) {
+  const _user = findUserByUserId(user.id);
+  if (!_user) {
+    db.data.users.push(user);
+  } else {
+    _user = user;
+    await db.write();
+  }
+  return;
 }
 
 const csrfCheck = (req, res, next) => {
@@ -97,7 +116,7 @@ router.post('/username', (req, res) => {
     return res.status(400).send({ error: 'Bad request' });
   } else {
     // See if account already exists
-    let user = db.data.users.find({ username: username }).value();
+    let user = findUserByUsername(username);
     // If user entry is not created yet, create one
     if (!user) {
       user = {
@@ -106,7 +125,7 @@ router.post('/username', (req, res) => {
         id: base64url.encode(crypto.randomBytes(32)),
         credentials: [],
       };
-      db.get('users').push(user).write();
+      updateUser(user);
     }
     // Set username in the session
     req.session.username = username;
@@ -124,7 +143,7 @@ router.post('/password', (req, res) => {
   if (!req.body.password) {
     return res.status(401).json({ error: 'Enter at least one random letter.' });
   }
-  const user = db.get('users').find({ username: req.session.username }).value();
+  const user = findUserByUsername(req.session.username);
 
   if (!user) {
     return res.status(401).json({ error: 'Enter username first.' });
@@ -135,16 +154,16 @@ router.post('/password', (req, res) => {
 });
 
 router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
-  const user = db.get('users').find({ username: req.session.username }).value();
+  const user = findUserByUsername(req.session.username);
   return res.json(user);
 });
 
 router.post('/updateDisplayName', csrfCheck, sessionCheck, (req, res) => {
   const { newName } = req.body;
   if (newName) {
-    const user = db.get('users').find({ username: req.session.username }).value();
+    const user = findUserByUsername(req.session.username);
     user.displayName = newName;
-    db.get('users').find({ username: user.username }).assign(user).write();
+    updateUser(user);
     return res.json(user);
   } else {
     return res.status(400);
@@ -179,14 +198,14 @@ router.get('/signout', (req, res) => {
  ```
  **/
 router.post('/getKeys', csrfCheck, sessionCheck, (req, res) => {
-  const user = db.get('users').find({ username: req.session.username }).value();
+  const user = findUserByUsername(req.session.username);
   return res.json(user || {});
 });
 
 router.post('/renameKey', csrfCheck, sessionCheck, (req, res) => {
   const { credId, newName } = req.body;
   const username = req.session.username;
-  const user = db.get('users').find({ username: username }).value();
+  const user = findUserByUsername(username);
   const newCreds = user.credentials.map(cred => {
     if (cred.credId === credId) {
 console.log('credential renamed to:', newName);
@@ -205,7 +224,7 @@ console.log('credential renamed to:', newName);
 router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
   const credId = req.query.credId;
   const username = req.session.username;
-  const user = db.get('users').find({ username: username }).value();
+  const user = findUserByUsername(username);
 
   const newCreds = user.credentials.filter((cred) => {
     // Leave credential ids that do not match
@@ -220,10 +239,10 @@ router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
   return res.json({});
 });
 
-router.get('/resetDB', (req, res) => {
-  db.set('users', []).write();
-  const users = db.get('users').value();
-  return res.json(users);
+router.get('/resetDB', async (req, res) => {
+  db.data = { users: [] };
+  await db.write();
+  return res.json(db.data.users);
 });
 
 /**
@@ -260,7 +279,7 @@ router.get('/resetDB', (req, res) => {
  **/
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   const username = req.session.username;
-  const user = db.get('users').find({ username: username }).value();
+  const user = findUserByUsername(username);
   try {
     const excludeCredentials = [];
     if (user.credentials.length > 0) {
@@ -377,7 +396,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const base64PublicKey = base64url.encode(credentialPublicKey);
     const base64CredentialID = base64url.encode(credentialID);
 
-    const user = db.get('users').find({ username: username }).value();
+    const user = findUserByUsername(username);
 
     const existingCred = user.credentials.find(
       (cred) => cred.credID === base64CredentialID,
@@ -396,7 +415,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       });
     }
 
-    db.get('users').find({ username: username }).assign(user).write();
+    updateUser(user);
 
     delete req.session.challenge;
 
@@ -424,10 +443,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
  **/
 router.post('/signinRequest', csrfCheck, async (req, res) => {
   try {
-    const user = db
-      .get('users')
-      .find({ username: req.session.username })
-      .value();
+    const user = findUserByUsername(req.session.username);
 
     if (!user) {
       // Send empty response if user is not registered yet.
@@ -491,7 +507,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   const expectedRPID = process.env.HOSTNAME;
 
   // Query the user
-  const user = db.get('users').find({ username: req.session.username }).value();
+  const user = findUserByUsername(req.session.username);
 
   let credential = user.credentials.find((cred) => cred.credId === req.body.id);
   
@@ -520,7 +536,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
     credential.prevCounter = authenticationInfo.newCounter;
 
-    db.get('users').find({ username: req.session.username }).assign(user).write();
+    findUserByUsername(req.session.username }).assign(user).write();
 
     delete req.session.challenge;
     req.session['signed-in'] = 'yes';
@@ -551,7 +567,7 @@ router.post('/discoveryRequest', csrfCheck, async (req, res) => {
 
     let user;
     if (username) {
-      user = db.get('users').find({ username }).value();
+      user = findUserByUsername(username);
       
 console.log('user', user);
 
@@ -616,7 +632,7 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
     const user_id = body.response.userHandle;
 
     // Query the user
-    const user = db.get('users').find({ id: user_id }).value();
+    const user = findUserByUserId(user_id);
 
 console.log(user);
 
@@ -650,7 +666,7 @@ console.log(user);
 
     credential.prevCounter = authenticationInfo.newCounter;
 
-    db.get('users').find({ username: user.username }).assign(user).write();
+    updateUser(user);
 
     delete req.session.challenge;
     req.session.username = user.username;
