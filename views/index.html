@@ -75,9 +75,9 @@
         });
 
         const form = $('#form');
-        form.addEventListener('submit', e => {
-          e.preventDefault();
-          const form = new FormData(e.target);
+        form.addEventListener('submit', s => {
+          s.preventDefault();
+          const form = new FormData(s.target);
           const cred = {};
           form.forEach((v, k) => cred[k] = v);
 
@@ -98,13 +98,14 @@
             .catch(e => {
               loading.stop();
               console.error(e.message);
-              return _fetch(e.target.action, cred);
+              return _fetch(s.target.action, cred);
               // alert('Authentication failed.');
             })
             .then(user => {
               location.href = '/reauth';
             })
             .catch(e => {
+              console.error(e.message);
               alert(e);
             });
           }
