@@ -119,7 +119,7 @@ router.post('/username', (req, res) => {
         id: base64url.encode(crypto.randomBytes(32)),
         credentials: [],
       };
-      updateUser(user);
+      await updateUser(user);
     }
     // Set username in the session
     req.session.username = username;
@@ -157,7 +157,7 @@ router.post('/updateDisplayName', csrfCheck, sessionCheck, (req, res) => {
   if (newName) {
     const user = findUserByUsername(req.session.username);
     user.displayName = newName;
-    updateUser(user);
+    await updateUser(user);
     return res.json(user);
   } else {
     return res.status(400);
@@ -227,7 +227,7 @@ router.post('/removeKey', csrfCheck, sessionCheck, (req, res) => {
   });
   user.credentials = newCreds;
 
-  updateUser(user);
+  await updateUser(user);
 
   return res.json({});
 });
@@ -366,7 +366,11 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
-  const { id: credId, type, credential } = req.body;
+  const credential = req.body;
+console.log(credential);
+  const credId = credential.id;
+  const type = credential.type;
+  // const { id: credId, type } = credential;
 
   try {
     const verification = await fido2.verifyRegistrationResponse({
@@ -405,7 +409,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       });
     }
 
-    updateUser(user);
+    await updateUser(user);
 
     delete req.session.challenge;
 
@@ -527,7 +531,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
     credential.prevCounter = authenticationInfo.newCounter;
 
-    updateUser(user);
+    await updateUser(user);
 
     delete req.session.challenge;
     req.session['signed-in'] = 'yes';
@@ -658,7 +662,7 @@ console.log(user);
 
     credential.prevCounter = authenticationInfo.newCounter;
 
-    updateUser(user);
+    await updateUser(user);
 
     delete req.session.challenge;
     req.session.username = user.username;
