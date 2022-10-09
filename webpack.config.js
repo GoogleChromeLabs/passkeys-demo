@@ -1,6 +1,4 @@
-import sass from 'sass';
-
-export default {
+module.exports = {
   entry: {
     'components-bundle': './public/components.js',
     'styles-bundle': './public/style.scss',
@@ -25,7 +23,7 @@ export default {
           {
             loader: 'sass-loader',
             options: {
-              implementation: sass,
+              implementation: require('sass'),
               webpackImporter: false,
               sassOptions: {
                 includePaths: ['./node_modules'],

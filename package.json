@@ -35,7 +35,7 @@
     "@material/mwc-linear-progress": "^0.27.0"
   },
   "engines": {
-    "node": "16.x"
+    "node": ">=16.x"
   },
   "repository": {
     "url": "https://github.com/googlecodelabs/fido2-codelab"
@@ -45,6 +45,7 @@
     "node",
     "express",
     "webauthn",
-    "fido2"
+    "fido2",
+    "passkey"
   ]
 }
