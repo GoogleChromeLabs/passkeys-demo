@@ -43,12 +43,19 @@ function findUserByUserId(user_id) {
 }
 
 async function updateUser(user) {
-  let _user = findUserByUserId(user.id);
-  if (!_user) {
+  let found = false;
+  db.data.users = db.data.users.map(_user => {
+    if (_user.id === user.id) {
+      found = true;
+      return user;
+    } else {
+      return _user;
+    }
+  });
+  if (!found) {
     db.data.users.push(user);
-  } else {
-    _user = user;
   }
+  console.log('[updateUser] user was found:', found);
   return db.write();
 }
 
@@ -207,7 +214,7 @@ router.post('/renameKey', csrfCheck, sessionCheck, (req, res) => {
   const user = findUserByUsername(username);
   const newCreds = user.credentials.map(cred => {
     if (cred.credId === credId) {
-console.log('credential renamed to:', newName);
+console.log('[renameKey] credential renamed to:', newName);
       cred.name = newName;
     }
     return cred;
@@ -562,12 +569,12 @@ router.post('/discoveryRequest', csrfCheck, async (req, res) => {
   try {
     const username = req.body.username;
 
-console.log('username', username);
+console.log('[discoveryRequest] username', username);
     let user;
     if (username) {
       user = findUserByUsername(username);
 
-console.log('user', user);
+console.log('[discoveryRequest] user', user);
 
       if (!user) {
         // Send empty response if user is not registered yet.
@@ -586,7 +593,7 @@ console.log('user', user);
         }
       });
     }
-console.log('allowCredentials', allowCredentials);
+console.log('[discoveryRequest] allowCredentials', allowCredentials);
     const options = await fido2.generateAuthenticationOptions({
       timeout: TIMEOUT,
       rpID: process.env.HOSTNAME,
@@ -630,7 +637,7 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
     const user_id = credential.response.userHandle;
     const user = findUserByUserId(user_id);
 
-console.log(user);
+console.log('[discoveryResponse] user', user);
 
     if (!user) {
       throw 'User not found.';
