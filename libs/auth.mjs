@@ -616,15 +616,13 @@ console.log('allowCredentials', allowCredentials);
  * }```
  **/
 router.post('/discoveryResponse', csrfCheck, async (req, res) => {
-  const { body } = req;
+  const { body: credential } = req;
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
 
   try {
-    const user_id = body.response.userHandle;
-
-    // Query the user
+    const user_id = credential.response.userHandle;
     const user = findUserByUserId(user_id);
 
 console.log(user);
@@ -633,22 +631,21 @@ console.log(user);
       throw 'User not found.';
     }
 
-    let credential = user.credentials.find((cred) => cred.credId === body.id);
-    
-    if (!credential) {
+    let authenticator = user.credentials.find((cred) => cred.credId === credential.id);
+
+    if (!authenticator) {
       throw 'Credential not found.';
     }
 
-    credential.credentialPublicKey = base64url.toBuffer(credential.publicKey);
-    credential.credentialID = base64url.toBuffer(credential.credId);
-    credential.counter = credential.prevCounter;
+    authenticator.credentialPublicKey = base64url.toBuffer(authenticator.publicKey);
+    authenticator.credentialID = base64url.toBuffer(authenticator.credId);
 
     const verification = await fido2.verifyAuthenticationResponse({
-      credential: body,
+      credential,
       expectedChallenge,
       expectedOrigin,
       expectedRPID,
-      authenticator: credential,
+      authenticator,
     });
 
     const { verified, authenticationInfo } = verification;
