@@ -110,6 +110,7 @@ const getOrigin = (userAgent) => {
  * Set a `username` in the session.
  **/
 router.post('/username', async (req, res) => {
+  console.log('[username] entry')
   const username = req.body.username;
   
   try {
