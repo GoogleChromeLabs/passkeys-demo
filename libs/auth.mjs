@@ -631,14 +631,18 @@ console.log(user);
       throw 'User not found.';
     }
 
-    let authenticator = user.credentials.find((cred) => cred.credId === credential.id);
+    const auth = user.credentials.find((cred) => cred.credId === credential.id);
 
     if (!authenticator) {
       throw 'Credential not found.';
     }
 
-    authenticator.credentialPublicKey = base64url.toBuffer(authenticator.publicKey);
-    authenticator.credentialID = base64url.toBuffer(authenticator.credId);
+    const authenticator = {
+      credentialPublicKey: base64url.toBuffer(auth.publicKey),
+      credentialID: base64url.toBuffer(auth.credId),
+      counter: auth.counter++,
+      transports: auth.transports,
+    };
 
     const verification = await fido2.verifyAuthenticationResponse({
       credential,
