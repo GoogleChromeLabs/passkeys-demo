@@ -48,9 +48,8 @@ async function updateUser(user) {
     db.data.users.push(user);
   } else {
     _user = user;
-    await db.write();
   }
-  return;
+  return db.write();
 }
 
 const csrfCheck = (req, res, next) => {
@@ -105,26 +104,32 @@ const getOrigin = (userAgent) => {
  **/
 router.post('/username', async (req, res) => {
   const username = req.body.username;
-  // Only check username, no need to check password as this is a mock
-  if (!username || !/[a-zA-Z0-9-_]+/.test(username)) {
-    return res.status(400).send({ error: 'Bad request' });
-  } else {
-    // See if account already exists
-    let user = findUserByUsername(username);
-    // If user entry is not created yet, create one
-    if (!user) {
-      user = {
-        username: username,
-        displayName: username,
-        id: base64url.encode(crypto.randomBytes(32)),
-        credentials: [],
-      };
-      await updateUser(user);
+  
+  try {
+     // Only check username, no need to check password as this is a mock
+    if (username && !/[a-zA-Z0-9-_]+/.test(username)) {
+      // See if account already exists
+      let user = findUserByUsername(username);
+      // If user entry is not created yet, create one
+      if (!user) {
+        user = {
+          username: username,
+          displayName: username,
+          id: base64url.encode(crypto.randomBytes(32)),
+          credentials: [],
+        };
+        await updateUser(user);
+      }
+      // Set username in the session
+      req.session.username = username;
+      // If sign-in succeeded, redirect to `/home`.
+      return res.json(user);
+    } else {
+      throw new Error('Invalid user name');
     }
-    // Set username in the session
-    req.session.username = username;
-    // If sign-in succeeded, redirect to `/home`.
-    return res.json(user);
+  } catch (e) {
+    console.error(e);
+    return res.status(400).send({ error: 'Bad request' });
   }
 });
 
@@ -191,7 +196,7 @@ router.get('/signout', (req, res) => {
  };
  ```
  **/
-router.post('/getKeys', csrfCheck, sessionCheck, (req, res) => {
+router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
   const user = findUserByUsername(req.session.username);
   return res.json(user || {});
 });
@@ -208,7 +213,7 @@ console.log('credential renamed to:', newName);
     return cred;
   });
   user.credentials = newCreds;
-  updateUser(user);
+  await updateUser(user);
   return res.json({});
 });
 
@@ -271,7 +276,7 @@ router.get('/resetDB', async (req, res) => {
  * }```
  **/
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
-  const username = req.session.username;
+  const { username } = req.session;
   const user = findUserByUsername(username);
   try {
     const excludeCredentials = [];
