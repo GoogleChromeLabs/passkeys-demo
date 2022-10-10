@@ -131,7 +131,9 @@
           .catch(e => {
             loading.stop();
             console.error(e);
-            // alert(e.message);
+            if (e !== 'canceled') {
+              alert(e.message);
+            }
           });
         }
 
