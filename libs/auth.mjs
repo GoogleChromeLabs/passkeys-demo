@@ -55,7 +55,6 @@ async function updateUser(user) {
   if (!found) {
     db.data.users.push(user);
   }
-  console.log('[updateUser] user was found:', found);
   return db.write();
 }
 
@@ -486,7 +485,8 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     return res.json(options);
   } catch (e) {
-    return res.status(400).json({ error: e });
+    console.error(e);
+    return res.status(400).json({ error: e.message });
   }
 });
 
@@ -522,7 +522,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
   try {
     if (!credential) {
-      throw 'Authenticating credential not found.';
+      throw new Error('Authenticating credential not found.');
     }
 
     const verification = await fido2.verifyAuthenticationResponse({
@@ -536,7 +536,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     const { verified, authenticationInfo } = verification;
 
     if (!verified) {
-      throw 'User verification failed.';
+      throw new Error('User verification failed.');
     }
 
     credential.prevCounter = authenticationInfo.newCounter;
@@ -548,7 +548,8 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     return res.json(user);
   } catch (e) {
     delete req.session.challenge;
-    return res.status(400).json({ error: e });
+    console.error(e);
+    return res.status(400).json({ error: e.message });
   }
 });
 
@@ -609,7 +610,8 @@ console.log('[discoveryRequest] allowCredentials', allowCredentials);
 
     return res.json(options);
   } catch (e) {
-    return res.status(400).json({ error: e });
+    console.error(e);
+    return res.status(400).json({ error: e.message });
   }
 });
 
@@ -641,13 +643,13 @@ router.post('/discoveryResponse', csrfCheck, async (req, res) => {
 console.log('[discoveryResponse] user', user);
 
     if (!user) {
-      throw 'User not found.';
+      throw new Error('User not found.');
     }
 
     const auth = user.credentials.find((cred) => cred.credId === credential.id);
 
-    if (!authenticator) {
-      throw 'Credential not found.';
+    if (!auth) {
+      throw new Error('Credential not found.');
     }
 
     const authenticator = {
@@ -668,7 +670,7 @@ console.log('[discoveryResponse] user', user);
     const { verified, authenticationInfo } = verification;
 
     if (!verified) {
-      throw 'User verification failed.';
+      throw new Error('User verification failed.');
     }
 
     await updateUser(user);
@@ -680,7 +682,7 @@ console.log('[discoveryResponse] user', user);
   } catch (e) {
     console.error(e);
     delete req.session.challenge;
-    return res.status(400).json({ error: e });
+    return res.status(400).json({ error: e.message });
   }
 });
 
