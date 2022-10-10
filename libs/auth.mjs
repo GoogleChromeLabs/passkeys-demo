@@ -606,6 +606,7 @@ console.log('[discoveryRequest] allowCredentials', allowCredentials);
       userVerification,
     });
     req.session.challenge = options.challenge;
+console.log('[discoveryRequest] options', options);
 
     return res.json(options);
   } catch (e) {
