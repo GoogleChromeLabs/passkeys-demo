@@ -673,7 +673,7 @@ console.log('[discoveryResponse] user', user);
       throw new Error('User verification failed.');
     }
 
-    auth.prevCounter = authenticatorInfo.newCounter;
+    auth.prevCounter = authenticationInfo.newCounter;
 
     await updateUser(user);
 
