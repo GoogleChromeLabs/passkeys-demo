@@ -588,7 +588,7 @@ console.log('[discoveryRequest] username', username);
     if (user) {
       allowCredentials = user.credentials.map(cred => {
         return {
-          id: cred.credId,
+          id: base64url.toBuffer(cred.credId),
           type: 'public-key',
           transports: cred.transports,
         }
@@ -655,7 +655,7 @@ console.log('[discoveryResponse] user', user);
     const authenticator = {
       credentialPublicKey: base64url.toBuffer(auth.publicKey),
       credentialID: base64url.toBuffer(auth.credId),
-      counter: auth.counter++,
+      counter: auth.counter,
       transports: auth.transports,
     };
 
@@ -672,6 +672,8 @@ console.log('[discoveryResponse] user', user);
     if (!verified) {
       throw new Error('User verification failed.');
     }
+    
+    auth.counter++;
 
     await updateUser(user);
 
