@@ -136,7 +136,7 @@ console.log('[username] username', username);
     }
   } catch (e) {
     console.error(e);
-    return res.status(400).send({ error: 'Bad request' });
+    return res.status(400).send({ error: e.message });
   }
 });
 
@@ -354,7 +354,8 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 
     return res.json(options);
   } catch (e) {
-    return res.status(400).send({ error: e });
+    console.error(e);
+    return res.status(400).send({ error: e.message });
   }
 });
 
@@ -575,9 +576,6 @@ console.log('[discoveryRequest] username', username);
     let user;
     if (username) {
       user = findUserByUsername(username);
-
-console.log('[discoveryRequest] user', user);
-
       if (!user) {
         // Send empty response if user is not registered yet.
         res.status(400).json({ error: 'User not found.' });

@@ -2,7 +2,7 @@
   "name": "passkeys-codelab",
   "version": "0.0.3",
   "description": "Your First WebAuthn App",
-  "main": "server.js",
+  "main": "server.mjs",
   "type": "module",
   "scripts": {
     "build": "webpack",
