@@ -655,7 +655,7 @@ console.log('[discoveryResponse] user', user);
     const authenticator = {
       credentialPublicKey: base64url.toBuffer(auth.publicKey),
       credentialID: base64url.toBuffer(auth.credId),
-      counter: auth.counter,
+      counter: auth.prevCounter,
       transports: auth.transports,
     };
 
@@ -672,8 +672,8 @@ console.log('[discoveryResponse] user', user);
     if (!verified) {
       throw new Error('User verification failed.');
     }
-    
-    auth.counter++;
+
+    auth.prevCounter = authenticatorInfo.newCounter;
 
     await updateUser(user);
 
