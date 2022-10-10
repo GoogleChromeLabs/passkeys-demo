@@ -54,7 +54,7 @@ class Loading {
 
 export const loading = new Loading();
 
-export const registerCredential = async (name, opts) => {
+export const registerCredential = async (opts) => {
   const options = await _fetch('/auth/registerRequest', opts);
 
   options.user.id = base64url.decode(options.user.id);
@@ -74,7 +74,6 @@ export const registerCredential = async (name, opts) => {
   credential.id = cred.id;
   credential.rawId = base64url.encode(cred.rawId);
   credential.type = cred.type;
-  credential.name = name;
 
   if (cred.response) {
     const clientDataJSON =

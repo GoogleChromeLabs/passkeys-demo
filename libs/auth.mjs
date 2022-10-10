@@ -214,8 +214,7 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const user = findUserByUsername(username);
   const newCreds = user.credentials.map(cred => {
     if (cred.credId === credId) {
-console.log('[renameKey] credential renamed to:', newName);
-      cred.name = newName;
+      cred.name = req.useragent.platform;
     }
     return cred;
   });
@@ -414,7 +413,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       user.credentials.push({
         publicKey: base64PublicKey,
         credId: base64CredentialID,
-        name: credential.name || req.useragent.platform || 'Unknown platform',
+        name: req.useragent.platform,
         transports: credential.response.transports || []
       });
     }

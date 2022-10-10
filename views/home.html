@@ -148,11 +148,11 @@
       
       const rename = async e => {
         const { credId, name } = e.target.dataset;
-        const newName = prompt('Enter a new credential name.', name);
-        if (newName.length === 0) return;
+        // const newName = prompt('Enter a new credential name.', name);
+        // if (newName.length === 0) return;
         try {
           loading.start();
-          await updateCredential(credId, newName);
+          await updateCredential(credId);
           loading.stop();
           getCredentials();
         } catch (e) {
@@ -177,13 +177,13 @@
       
       const register = authenticatorAttachment => async e => {
         try {
-          const name = prompt('Enter a credential name.');
+//           const name = prompt('Enter a credential name.');
           
-          // Terminate if the name is nullish.
-          if (!name) return;
+//           // Terminate if the name is nullish.
+//           if (!name) return;
 
           loading.start();
-          await registerCredential(name, {
+          await registerCredential({
             attestation: 'none',
             authenticatorSelection: {
               authenticatorAttachment,

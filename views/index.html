@@ -131,7 +131,8 @@
           .catch(e => {
             loading.stop();
             console.error(e);
-            if (e !== 'canceled') {
+            debugger;
+            if (e !== 'canceled' && e.name !== 'NotAllowedError') {
               alert(e.message);
             }
           });
