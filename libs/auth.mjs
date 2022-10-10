@@ -110,12 +110,12 @@ const getOrigin = (userAgent) => {
  * Set a `username` in the session.
  **/
 router.post('/username', async (req, res) => {
-  console.log('[username] entry')
   const username = req.body.username;
-  
+console.log('[username] username', username);
+
   try {
      // Only check username, no need to check password as this is a mock
-    if (username && !/^[a-zA-Z0-9@\.\-_]+$/.test(username)) {
+    if (username && /^[a-zA-Z0-9@\.\-_]+$/.test(username)) {
       // See if account already exists
       let user = findUserByUsername(username);
       // If user entry is not created yet, create one
