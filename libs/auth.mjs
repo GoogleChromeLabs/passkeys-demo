@@ -572,7 +572,6 @@ router.post('/discoveryRequest', csrfCheck, async (req, res) => {
   try {
     const username = req.body.username;
 
-console.log('[discoveryRequest] username', username);
     let user;
     if (username) {
       user = findUserByUsername(username);
@@ -593,7 +592,7 @@ console.log('[discoveryRequest] username', username);
         }
       });
     }
-console.log('[discoveryRequest] allowCredentials', allowCredentials);
+
     const options = await fido2.generateAuthenticationOptions({
       timeout: TIMEOUT,
       rpID: process.env.HOSTNAME,
@@ -605,6 +604,7 @@ console.log('[discoveryRequest] allowCredentials', allowCredentials);
       userVerification,
     });
     req.session.challenge = options.challenge;
+
 console.log('[discoveryRequest] options', options);
 
     return res.json(options);
