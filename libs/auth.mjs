@@ -482,6 +482,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
        */
       userVerification,
     });
+console.log('[discoveryRequest] options', options);
     req.session.challenge = options.challenge;
 
     return res.json(options);
