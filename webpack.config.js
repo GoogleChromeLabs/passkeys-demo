@@ -36,8 +36,6 @@ export default {
       },
       {
         test: /components\.js$/,
-        loader: 'babel-loader',
-        options: { presets: ['env'] },
       },
     ],
   },

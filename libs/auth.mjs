@@ -115,7 +115,7 @@ router.post('/username', async (req, res) => {
   
   try {
      // Only check username, no need to check password as this is a mock
-    if (username && !/[a-zA-Z0-9-_]+/.test(username)) {
+    if (username && !/^[a-zA-Z0-9@\.\-_]+$/.test(username)) {
       // See if account already exists
       let user = findUserByUsername(username);
       // If user entry is not created yet, create one
@@ -209,7 +209,7 @@ router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
   return res.json(user || {});
 });
 
-router.post('/renameKey', csrfCheck, sessionCheck, (req, res) => {
+router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
   const username = req.session.username;
   const user = findUserByUsername(username);
