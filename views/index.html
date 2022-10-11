@@ -85,10 +85,10 @@
               PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
             PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
             .then(uvpaa => {
-              loading.start();
               return authenticate({ username: form.get('username') })
             })
             .then(user => {
+              loading.start();
               if (user) {
                 location.href = '/home';
               } else {

@@ -48,14 +48,14 @@ class Loading {
     this.progress.indeterminate = true;
     const inputs = document.querySelectorAll('input');
     if (inputs) {
-      inputs.map(input => input.disabled = true);
+      inputs.forEach(input => input.disabled = true);
     }
   }
   stop() {
     this.progress.indeterminate = false;
     const inputs = document.querySelectorAll('input');
     if (inputs) {
-      inputs.map(input => input.disabled = false);
+      inputs.forEach(input => input.disabled = false);
     }
   }
 }
