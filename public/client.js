@@ -113,10 +113,12 @@ export const authenticate = async (opts = {}) => {
   const options = await _fetch('/auth/discoveryRequest', opts);
   let mediation;
   
-  if (username && options.allowCredentials.length === 0) {
-    throw new Error('User is not using passkeys.');
-  } else {
-    mediation = 'conditional';
+  if (options.allowCredentials.length === 0) {
+    if (username) {
+      throw new Error('User is not using passkeys.');
+    } else {
+      mediation = 'conditional';
+    }
   }
 
   if (ac && ac.signal.aborted === false) {
