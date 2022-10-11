@@ -1,7 +1,7 @@
 {
-  "name": "passkeys-codelab",
+  "name": "passkey-form-demo",
   "version": "0.0.3",
-  "description": "Your First WebAuthn App",
+  "description": "Passkey Form Demo",
   "main": "server.mjs",
   "type": "module",
   "scripts": {

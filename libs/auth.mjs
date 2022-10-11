@@ -214,7 +214,7 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const user = findUserByUsername(username);
   const newCreds = user.credentials.map(cred => {
     if (cred.credId === credId) {
-      cred.name = newName || req.useragent.platform;
+      cred.name = newName;
     }
     return cred;
   });
