@@ -98,11 +98,14 @@
             .catch(e => {
               loading.stop();
               console.error(e.message);
-              return _fetch(s.target.action, cred);
-              // alert('Authentication failed.');
-            })
-            .then(user => {
-              location.href = '/reauth';
+              return _fetch(s.target.action, cred)
+              .then(user => {
+                if (user) {
+                  location.href = '/reauth';
+                } else {
+                  throw new Error('User not found.');
+                }
+              });
             })
             .catch(e => {
               console.error(e.message);
