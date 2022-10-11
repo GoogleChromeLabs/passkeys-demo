@@ -111,9 +111,12 @@ let ac;
 export const authenticate = async (opts = {}) => {
   const { username } = opts;
   const options = await _fetch('/auth/discoveryRequest', opts);
+  let mediation;
   
   if (username && options.allowCredentials.length === 0) {
     throw new Error('User is not using passkeys.');
+  } else {
+    mediation = 'conditional';
   }
 
   if (ac && ac.signal.aborted === false) {
@@ -127,7 +130,6 @@ export const authenticate = async (opts = {}) => {
   });
   options.challenge = base64url.decode(options.challenge);
 
-  const mediation = username ? undefined : 'conditional';
   const cred = await navigator.credentials.get({
     publicKey: options,
     mediation,
