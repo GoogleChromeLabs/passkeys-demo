@@ -588,7 +588,7 @@ router.post('/discoveryRequest', csrfCheck, async (req, res) => {
         return {
           id: base64url.toBuffer(cred.credId),
           type: 'public-key',
-          transports: cred.transports,
+          // transports: cred.transports,
         }
       });
     }
