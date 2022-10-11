@@ -113,23 +113,24 @@ export const authenticate = async (opts = {}) => {
   const options = await _fetch('/auth/discoveryRequest', opts);
   let mediation;
   
+  if (ac && ac.signal.aborted === false) {
+    ac.abort('canceled');
+  }
+  ac = new AbortController();
+
   if (options.allowCredentials.length === 0) {
     if (username) {
       throw new Error('User is not using passkeys.');
     } else {
       mediation = 'conditional';
     }
+  } else {
+    options.allowCredentials = options.allowCredentials.map(cred => {
+      cred.id = base64url.decode(cred.id);
+      return cred;
+    });
   }
 
-  if (ac && ac.signal.aborted === false) {
-    ac.abort('canceled');
-  }
-  ac = new AbortController();
-
-  options.allowCredentials = options.allowCredentials.map(cred => {
-    cred.id = base64url.decode(cred.id);
-    return cred;
-  });
   options.challenge = base64url.decode(options.challenge);
 
   const cred = await navigator.credentials.get({
