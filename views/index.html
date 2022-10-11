@@ -85,10 +85,10 @@
               PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
             PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
             .then(uvpaa => {
+              loading.start();
               return authenticate({ username: form.get('username') })
             })
             .then(user => {
-              loading.start();
               if (user) {
                 location.href = '/home';
               } else {
@@ -96,7 +96,6 @@
               }
             })
             .catch(e => {
-              loading.stop();
               console.error(e.message);
               return _fetch(s.target.action, cred)
               .then(user => {
@@ -108,11 +107,22 @@
               });
             })
             .catch(e => {
+              loading.stop();
+              console.error(e.message);
+              alert(e);
+            });
+          } else {
+            loading.start();
+            _fetch(s.target.action, cred)
+            .then(user => {
+              location.href = '/reauth';
+            })
+            .catch(e => {
+              loading.stop();
               console.error(e.message);
               alert(e);
             });
           }
-          // TODO: implement Else case
         });
 
         if (window.PublicKeyCredential &&

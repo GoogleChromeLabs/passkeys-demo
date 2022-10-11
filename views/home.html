@@ -148,11 +148,11 @@
       
       const rename = async e => {
         const { credId, name } = e.target.dataset;
-        // const newName = prompt('Enter a new credential name.', name);
-        // if (newName.length === 0) return;
+        const newName = prompt('Enter a new credential name.', name);
+        if (newName.length === 0) return;
         try {
           loading.start();
-          await updateCredential(credId);
+          await updateCredential(credId, newName);
           loading.stop();
           getCredentials();
         } catch (e) {
