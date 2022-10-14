@@ -80,49 +80,57 @@
           const form = new FormData(s.target);
           const cred = {};
           form.forEach((v, k) => cred[k] = v);
+          _fetch(s.target.action, cred)
+          .then(user => {
+            location.href = '/reauth';
+          }).catch(e => {
+            loading.stop();
+            console.error(e.message);
+            alert(e);
+          });
 
-          if (window.PublicKeyCredential &&
-              PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
-            PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-            .then(uvpaa => {
-              return authenticate({ username: form.get('username') })
-            })
-            .then(user => {
-              loading.start();
-              if (user) {
-                location.href = '/home';
-              } else {
-                throw new Error('User not found.');
-              }
-            })
-            .catch(e => {
-              console.error(e.message);
-              return _fetch(s.target.action, cred)
-              .then(user => {
-                if (user) {
-                  location.href = '/reauth';
-                } else {
-                  throw new Error('User not found.');
-                }
-              });
-            })
-            .catch(e => {
-              loading.stop();
-              console.error(e.message);
-              alert(e);
-            });
-          } else {
-            loading.start();
-            _fetch(s.target.action, cred)
-            .then(user => {
-              location.href = '/reauth';
-            })
-            .catch(e => {
-              loading.stop();
-              console.error(e.message);
-              alert(e);
-            });
-          }
+          // if (window.PublicKeyCredential &&
+          //     PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+          //   PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+          //   .then(uvpaa => {
+          //     return authenticate({ username: form.get('username') })
+          //   })
+          //   .then(user => {
+          //     loading.start();
+          //     if (user) {
+          //       location.href = '/home';
+          //     } else {
+          //       throw new Error('User not found.');
+          //     }
+          //   })
+          //   .catch(e => {
+          //     console.error(e.message);
+          //     return _fetch(s.target.action, cred)
+          //     .then(user => {
+          //       if (user) {
+          //         location.href = '/reauth';
+          //       } else {
+          //         throw new Error('User not found.');
+          //       }
+          //     });
+          //   })
+          //   .catch(e => {
+          //     loading.stop();
+          //     console.error(e.message);
+          //     alert(e);
+          //   });
+          // } else {
+          //   loading.start();
+          //   _fetch(s.target.action, cred)
+          //   .then(user => {
+          //     location.href = '/reauth';
+          //   })
+          //   .catch(e => {
+          //     loading.stop();
+          //     console.error(e.message);
+          //     alert(e);
+          //   });
+          // }
         });
 
         if (window.PublicKeyCredential &&
