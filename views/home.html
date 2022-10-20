@@ -46,7 +46,7 @@
       </section>
       <section>
         <h3 class="mdc-typography mdc-typography--headline6">
-          Your registered credentials:
+          Your registered passkeys:
         </h3>
         <div id="list"></div>
       </section>
@@ -101,15 +101,15 @@
       const addUVRA = $('#addUVRA');
 
       if (window.PublicKeyCredential) {
-        PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-        .then(uvpaa => {
-          if (uvpaa) {
+        PublicKeyCredential.isConditionalMediationAvailable()
+        .then(cma => {
+          if (cma) {
             addUVPA.classList.remove('hidden');
-            $('#message').innerText = 'This device supports a platform authenticator.';
+            $('#message').innerText = 'This device supports passkeys.';
           }
         });
       } else {
-        $('#message').innerText = 'This device does not support WebAuthn.';
+        $('#message').innerText = 'This device does not support passkeys.';
       }
 
       const getCredentials = async () => {
