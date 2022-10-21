@@ -94,23 +94,7 @@
         <mwc-list>`, $('#display-name'));
       };
 
-      renderDisplayName();
-
-      const addUVPA = $('#addUVPA');
-
-      if (window.PublicKeyCredential) {
-        PublicKeyCredential.isConditionalMediationAvailable()
-        .then(cma => {
-          if (cma) {
-            addUVPA.classList.remove('hidden');
-            $('#message').innerText = 'This device supports passkeys.';
-          }
-        });
-      } else {
-        $('#message').innerText = 'This device does not support passkeys.';
-      }
-
-      const getCredentials = async () => {
+      const renderCredentials = async () => {
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
         const transportIconMap = {
@@ -138,11 +122,29 @@
                 </div>
               </div>
             </mwc-list-item>`)}
-        </mwc-list>` : html`<p>No credentials found.</p>`}`;
+        </mwc-list>` : html`<mwc-list><mwc-list-item>No credentials found.</mwc-list-item></mwc-list>`}`;
         render(creds, list);
       };
+      
+      renderDisplayName();
 
-      getCredentials();
+      const addUVPA = $('#addUVPA');
+
+      if (window.PublicKeyCredential && PublicKeyCredential.isConditionalMediationAvailable) {
+        PublicKeyCredential.isConditionalMediationAvailable()
+        .then(cma => {
+          if (cma) {
+            addUVPA.classList.remove('hidden');
+            $('#message').innerText = 'This device supports passkeys.';
+          } else {
+            $('#message').innerText = 'This device does not support passkeys.';
+          }
+        });
+      } else {
+        $('#message').innerText = 'This device does not support passkeys.';
+      }
+
+      renderCredentials();
       
       const rename = async e => {
         const { credId, name } = e.target.dataset;
@@ -152,7 +154,7 @@
           loading.start();
           await updateCredential(credId, newName);
           loading.stop();
-          getCredentials();
+          renderCredentials();
         } catch (e) {
           loading.stop();
           alert(e);
@@ -166,7 +168,7 @@
           loading.start();
           await unregisterCredential(e.target.dataset.credId);
           loading.stop();
-          getCredentials();
+          renderCredentials();
         } catch (e) {
           loading.stop();
           alert(e);
@@ -185,7 +187,7 @@
             }
           });
           loading.stop();
-          getCredentials();
+          renderCredentials();
         } catch (e) {
           loading.stop();
           alert(e);
