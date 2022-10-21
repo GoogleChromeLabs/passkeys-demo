@@ -18,7 +18,7 @@
     "@material/mwc-textfield": "^0.27.0",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0",
-    "@babel/core": "^7.19.3",
+    "@babel/core": "^7.19.6",
     "babel-loader": "^8.2.5",
     "babel-preset-env": "^1.7.0",
     "@simplewebauthn/server": "^6.2.1",
