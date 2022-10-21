@@ -27,7 +27,7 @@ await db.read();
 
 router.use(express.json());
 
-const RP_NAME = 'WebAuthn Codelab';
+const RP_NAME = 'Passkey Form Demo';
 const TIMEOUT = 30 * 1000 * 60;
 
 db.data ||= { users: [] } ;
