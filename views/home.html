@@ -63,7 +63,7 @@
         location.href = 'https://glitch.com/edit/#!/{{project_name}}';
       });
 
-      const changeDisplayName = async e => {
+      async function changeDisplayName(e) {
         const newName = prompt('Enter a new display name', e.target.dataset.displayName);
         if (newName) {
           loading.start();
@@ -73,7 +73,7 @@
         }
       }
 
-      const renderDisplayName = async () => {
+      async function renderDisplayName() {
         const res = await _fetch('/auth/userinfo');
         render(html`
         <mwc-list>
@@ -94,7 +94,7 @@
         <mwc-list>`, $('#display-name'));
       };
 
-      const renderCredentials = async () => {
+      async function renderCredentials() {
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
         const transportIconMap = {
@@ -149,7 +149,7 @@
 
       renderCredentials();
       
-      const rename = async e => {
+      async function rename(e) {
         const { credId, name } = e.target.dataset;
         const newName = prompt('Enter a new credential name.', name);
         if (newName.length === 0) return;
@@ -165,7 +165,7 @@
         }
       };
 
-      const remove = async e => {
+      async function remove(e) {
         if (!confirm('Do you really want to remove this credential?')) return;
 
         try {
@@ -180,24 +180,26 @@
         }
       };
       
-      const register = authenticatorAttachment => async e => {
-        try {
-          loading.start();
-          await registerCredential({
-            attestation: 'none',
-            authenticatorSelection: {
-              authenticatorAttachment,
-              userVerification: 'required',
-              residentKey: 'required'
-            }
-          });
-          loading.stop();
-          renderCredentials();
-        } catch (e) {
-          loading.stop();
-          console.error(e);
-          alert(e.message);
-        }        
+      function register {
+        return async fucntion authenticatorAttachment(e) {
+          try {
+            loading.start();
+            await registerCredential({
+              attestation: 'none',
+              authenticatorSelection: {
+                authenticatorAttachment,
+                userVerification: 'required',
+                residentKey: 'required'
+              }
+            });
+            loading.stop();
+            renderCredentials();
+          } catch (e) {
+            loading.stop();
+            console.error(e);
+            alert(e.message);
+          }        
+        };
       };
 
       addUVPA.addEventListener('click', register('platform'));
