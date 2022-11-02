@@ -180,8 +180,8 @@
         }
       };
       
-      function register {
-        return async fucntion authenticatorAttachment(e) {
+      function register() {
+        return async function authenticatorAttachment(e) {
           try {
             loading.start();
             await registerCredential({
