@@ -77,7 +77,7 @@
         });
 
         const form = $('#form');
-        form.addEventListener('submit', s => {
+        form.addEventListener('submit', async s => {
           s.preventDefault();
           const form = new FormData(s.target);
           const cred = {};
@@ -93,45 +93,36 @@
 
           if (window.PublicKeyCredential &&
               PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
-            PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-            .then(uvpaa => {
-              return authenticate({ username: form.get('username') })
-            })
-            .then(user => {
+            try {
+              const uvpaa = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+              const user = await authenticate({ username: form.get('username') });
               loading.start();
               if (user) {
                 location.href = '/home';
               } else {
                 throw new Error('User not found.');
               }
-            })
-            .catch(e => {
+            } catch (e) {
               console.error(e.message);
-              return _fetch(s.target.action, cred)
-              .then(user => {
-                if (user) {
-                  location.href = '/reauth';
-                } else {
-                  throw new Error('User not found.');
-                }
-              });
-            })
-            .catch(e => {
-              loading.stop();
-              console.error(e.message);
-              alert(e);
-            });
+              try {
+                const user = await _fetch(s.target.action, cred);
+                location.href = '/reauth';
+              } catch (e) {
+                loading.stop();
+                console.error(e.message);
+                alert(e);
+              }
+            }
           } else {
             loading.start();
-            _fetch(s.target.action, cred)
-            .then(user => {
+            try {
+              const user = await _fetch(s.target.action, cred)
               location.href = '/reauth';
-            })
-            .catch(e => {
+            } catch (e) {
               loading.stop();
               console.error(e.message);
               alert(e);
-            });
+            }
           }
         });
 
