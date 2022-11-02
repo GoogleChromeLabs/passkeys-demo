@@ -130,16 +130,19 @@
 
       const addUVPA = $('#addUVPA');
 
-      if (window.PublicKeyCredential && PublicKeyCredential.isConditionalMediationAvailable) {
-        PublicKeyCredential.isConditionalMediationAvailable()
-        .then(cma => {
+      if (window.PublicKeyCredential &&
+          PublicKeyCredential.isConditionalMediationAvailable) {
+        try {
+          const cma = await PublicKeyCredential.isConditionalMediationAvailable();
           if (cma) {
             addUVPA.classList.remove('hidden');
             $('#message').innerText = 'This device supports passkeys.';
           } else {
             $('#message').innerText = 'This device does not support passkeys.';
           }
-        });
+        } catch (e) {
+          console.error(e);
+        }
       } else {
         $('#message').innerText = 'This device does not support passkeys.';
       }
@@ -157,7 +160,8 @@
           renderCredentials();
         } catch (e) {
           loading.stop();
-          alert(e);
+          console.error(e);
+          alert(e.message);
         }
       };
 
@@ -171,7 +175,8 @@
           renderCredentials();
         } catch (e) {
           loading.stop();
-          alert(e);
+          console.error(e);
+          alert(e.message);
         }
       };
       
@@ -190,7 +195,8 @@
           renderCredentials();
         } catch (e) {
           loading.stop();
-          alert(e);
+          console.error(e);
+          alert(e.message);
         }        
       };
 

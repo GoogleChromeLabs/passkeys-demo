@@ -95,34 +95,32 @@
               PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
             try {
               const uvpaa = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-              const user = await authenticate({ username: form.get('username') });
-              loading.start();
-              if (user) {
-                location.href = '/home';
-              } else {
-                throw new Error('User not found.');
+              if (uvpaa) {
+                const user = await authenticate({ username: form.get('username') });
+                if (user) {
+                  loading.start();
+                  location.href = '/home';
+                  return;
+                } else {
+                  throw new Error('User not found.');
+                }
               }
             } catch (e) {
               console.error(e.message);
-              try {
-                const user = await _fetch(s.target.action, cred);
-                location.href = '/reauth';
-              } catch (e) {
-                loading.stop();
-                console.error(e.message);
-                alert(e);
+              if (e !== 'canceled' && e.name !== 'NotAllowedError') {
+                alert(e.message);
               }
             }
-          } else {
-            loading.start();
-            try {
-              const user = await _fetch(s.target.action, cred)
-              location.href = '/reauth';
-            } catch (e) {
-              loading.stop();
-              console.error(e.message);
-              alert(e);
-            }
+          }
+
+          loading.start();
+          try {
+            const user = await _fetch(s.target.action, cred)
+            location.href = '/reauth';
+          } catch (e) {
+            loading.stop();
+            console.error(e.message);
+            alert(e);
           }
         });
 
@@ -132,10 +130,9 @@
             const cma= await PublicKeyCredential.isConditionalMediationAvailable();
             if (cma) {
               const user = await authenticate();
-
-              loading.start();
               if (user) {
                 $('#username').value = user.username;
+                loading.start();
                 location.href = '/home';
               } else {
                 throw new Error('User not found.');
