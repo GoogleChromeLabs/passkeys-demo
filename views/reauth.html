@@ -57,10 +57,10 @@
         <p class="instructions">password will be ignored in this demo.</p>
       </form>
     </main>
-    <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
     <script type="module">
       import { $, _fetch } from '/client.js';
-      // new mdc.textField.MDCTextField($('.mdc-text-field'));
+      new mdc.textField.MDCTextField($('.mdc-text-field'));
       
       $('#code').addEventListener('click', e => {
         location.href = 'https://glitch.com/edit/#!/{{project_name}}';
