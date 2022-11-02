@@ -141,6 +141,7 @@
             const cma= await PublicKeyCredential.isConditionalMediationAvailable();
             if (cma) {
               const user = await authenticate();
+
               loading.start();
               if (user) {
                 $('#username').value = user.username;
@@ -148,7 +149,7 @@
               } else {
                 throw new Error('User not found.');
               }
-            }            
+            }
           } catch (e) {
             loading.stop();
             console.error(e);
