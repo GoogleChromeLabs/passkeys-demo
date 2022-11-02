@@ -6,5 +6,4 @@ import '@material/mwc-list';
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import '@material/mwc-linear-progress';
-
-new mdc.textField.MDCTextField($('.mdc-text-field'));
+import 'material-components-web';
