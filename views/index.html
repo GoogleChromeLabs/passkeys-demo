@@ -137,28 +137,25 @@
 
         if (window.PublicKeyCredential &&
             PublicKeyCredential.isConditionalMediationAvailable) {
-          PublicKeyCredential.isConditionalMediationAvailable()
-          .then(cma => {
+          try {
+            const cma= await PublicKeyCredential.isConditionalMediationAvailable();
             if (cma) {
-              return authenticate();
-            }
-          })
-          .then(user => {
-            loading.start();
-            if (user) {
-              $('#username').value = user.username;
-              location.href = '/home';
-            } else {
-              throw new Error('User not found.');
-            }
-          })
-          .catch(e => {
+              const user = await authenticate();
+              loading.start();
+              if (user) {
+                $('#username').value = user.username;
+                location.href = '/home';
+              } else {
+                throw new Error('User not found.');
+              }
+            }            
+          } catch (e) {
             loading.stop();
             console.error(e);
             if (e !== 'canceled' && e.name !== 'NotAllowedError') {
               alert(e.message);
             }
-          });
+          }
         }
 
       </script>
