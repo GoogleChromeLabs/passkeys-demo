@@ -69,7 +69,7 @@
           loading.start();
           await _fetch('/auth/updateDisplayName', { newName });
           loading.stop();
-          renderDisplayName();          
+          renderDisplayName();
         }
       }
 
@@ -125,7 +125,7 @@
         </mwc-list>` : html`<mwc-list><mwc-list-item>No credentials found.</mwc-list-item></mwc-list>`}`;
         render(creds, list);
       };
-      
+
       renderDisplayName();
 
       const addUVPA = $('#addUVPA');
