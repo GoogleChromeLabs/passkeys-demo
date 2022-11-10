@@ -6,4 +6,3 @@ import '@material/mwc-list';
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import '@material/mwc-linear-progress';
-import 'material-components-web';
