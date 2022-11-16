@@ -82,46 +82,46 @@
           const form = new FormData(s.target);
           const cred = {};
           form.forEach((v, k) => cred[k] = v);
-          // _fetch(s.target.action, cred)
-          // .then(user => {
-          //   location.href = '/reauth';
-          // }).catch(e => {
-          //   loading.stop();
-          //   console.error(e.message);
-          //   alert(e);
-          // });
-
-          if (window.PublicKeyCredential &&
-              PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
-            try {
-              const uvpaa = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-              if (uvpaa) {
-                const user = await authenticate({ username: form.get('username') });
-                if (user) {
-                  loading.start();
-                  location.href = '/home';
-                  return;
-                } else {
-                  throw new Error('User not found.');
-                }
-              }
-            } catch (e) {
-              console.error(e.message);
-              if (e !== 'canceled' && e.name !== 'NotAllowedError') {
-                alert(e.message);
-              }
-            }
-          }
-
-          loading.start();
-          try {
-            const user = await _fetch(s.target.action, cred)
+          _fetch(s.target.action, cred)
+          .then(user => {
             location.href = '/reauth';
-          } catch (e) {
+          }).catch(e => {
             loading.stop();
             console.error(e.message);
             alert(e);
-          }
+          });
+
+//           if (window.PublicKeyCredential &&
+//               PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+//             try {
+//               const uvpaa = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+//               if (uvpaa) {
+//                 const user = await authenticate({ username: form.get('username') });
+//                 if (user) {
+//                   loading.start();
+//                   location.href = '/home';
+//                   return;
+//                 } else {
+//                   throw new Error('User not found.');
+//                 }
+//               }
+//             } catch (e) {
+//               console.error(e.message);
+//               if (e !== 'canceled' && e.name !== 'NotAllowedError') {
+//                 alert(e.message);
+//               }
+//             }
+//           }
+
+//           loading.start();
+//           try {
+//             const user = await _fetch(s.target.action, cred)
+//             location.href = '/reauth';
+//           } catch (e) {
+//             loading.stop();
+//             console.error(e.message);
+//             alert(e);
+//           }
         });
 
         if (window.PublicKeyCredential &&
