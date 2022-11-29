@@ -58,7 +58,7 @@ async function updateUser(user) {
   return db.write();
 }
 
-const csrfCheck = (req, res, next) => {
+function csrfCheck(req, res, next) {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
     return res.status(400).json({ error: 'invalid access.' });
   }
@@ -69,14 +69,14 @@ const csrfCheck = (req, res, next) => {
  * Checks CSRF protection using custom header `X-Requested-With`
  * If the session doesn't contain `signed-in`, consider the user is not authenticated.
  **/
-const sessionCheck = (req, res, next) => {
+function sessionCheck(req, res, next) {
   if (!req.session['signed-in']) {
     return res.status(401).json({ error: 'not signed in.' });
   }
   next();
 };
 
-const getOrigin = (userAgent) => {
+function getOrigin(userAgent) {
   let origin = process.env.ORIGIN;
   
   const appRe = /^[a-zA-z0-9_.]+/;

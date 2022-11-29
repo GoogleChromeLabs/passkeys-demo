@@ -16,7 +16,7 @@
  */
 export const $ = document.querySelector.bind(document);
 
-export const _fetch = async (path, payload = '') => {
+export async function _fetch(path, payload = '') {
   const headers = {
     'X-Requested-With': 'XMLHttpRequest',
   };
@@ -62,7 +62,7 @@ class Loading {
 
 export const loading = new Loading();
 
-export const registerCredential = async (opts) => {
+export async function registerCredential(opts) {
   const options = await _fetch('/auth/registerRequest', opts);
 
   options.user.id = base64url.decode(options.user.id);
@@ -108,7 +108,7 @@ export const registerCredential = async (opts) => {
 
 let ac;
 
-export const authenticate = async (opts = {}) => {
+export async function authenticate(opts = {}) {
   const { username } = opts;
   const options = await _fetch('/auth/discoveryRequest', opts);
   let mediation;
@@ -164,10 +164,10 @@ export const authenticate = async (opts = {}) => {
   return await _fetch(`/auth/discoveryResponse`, credential);
 };
 
-export const updateCredential = async (credId, newName) => {
+export async function updateCredential(credId, newName) {
   return _fetch(`/auth/renameKey`, { credId, newName });
 }
 
-export const unregisterCredential = async (credId) => {
+export async function unregisterCredential(credId) {
   return _fetch(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
 };
