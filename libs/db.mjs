@@ -82,8 +82,13 @@ export const Credentials = {
     return db.write();
   },
   
-  remove: (credential_id, user_id) {
-    db.data.credentials.splice()
+  remove: async (credential_id, user_id) {
+    db.data.credentials = db.data.credentials.filter(_cred => {
+      return _cred.id === credential_id && _cred.user_id === user_id;
+    }
+  }
+  return db.write();
+})
 
   }
 }
