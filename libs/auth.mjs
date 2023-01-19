@@ -239,14 +239,7 @@ router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
   const credId = req.query.credId;
   const { user } = res.locals;
 
-  const credentials = Credentials.findByUserId(user.id);
-  const newCreds = user.credentials.filter((cred) => {
-    // Leave credential ids that do not match
-    return cred.id !== credId;
-  });
-  user.credentials = newCreds;
-
-  await Users.update(user);
+  await Credentials.remove(credId, user.id);
 
   return res.json({});
 });
@@ -255,8 +248,9 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   const { user } = res.locals;
   try {
     const excludeCredentials = [];
-    if (user.credentials.length > 0) {
-      for (let cred of user.credentials) {
+    const credentials = Credentials.findByUserId(user.id);
+    if (credentials.length > 0) {
+      for (const cred of credentials) {
         excludeCredentials.push({
           id: base64url.toBuffer(cred.id),
           type: 'public-key',
