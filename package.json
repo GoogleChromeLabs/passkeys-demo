@@ -1,7 +1,7 @@
 {
-  "name": "passkey-form-demo",
+  "name": "passkey-form-codelab",
   "version": "0.0.3",
-  "description": "Passkey Form Demo",
+  "description": "Passkey Form Codelab",
   "main": "server.mjs",
   "type": "module",
   "scripts": {
@@ -13,8 +13,9 @@
     "express-session": "^1.17.3",
     "express-useragent": "^1.0.15",
     "extract-loader": "^5.1.0",
+    "file-loader": "^6.2.0",
     "hbs": "^4.2.0",
-    "lowdb": "^3.0.0",
+    "lowdb": "^5.0.5",
     "@material/mwc-button": "^0.27.0",
     "@material/mwc-fab": "^0.27.0",
     "@material/mwc-top-app-bar-fixed": "^0.27.0",
@@ -22,17 +23,16 @@
     "@material/mwc-list": "^0.27.0",
     "@material/mwc-icon-button": "^0.27.0",
     "@material/mwc-linear-progress": "^0.27.0",
-    "webpack": "^5.75.0",
-    "webpack-cli": "^4.10.0",
+    "@simplewebauthn/server": "^6.2.1",
     "@babel/core": "^7.20.7",
     "babel-loader": "^8.3.0",
     "babel-preset-env": "^1.7.0",
-    "@simplewebauthn/server": "^6.2.1",
     "base64url": "^3.0.1",
     "css-loader": "^6.7.3",
     "sass-loader": "^13.1.0",
     "sass": "^1.57.1",
-    "file-loader": "^6.2.0"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   },
   "engines": {
     "node": ">=16.x"
