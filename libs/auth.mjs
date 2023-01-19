@@ -19,7 +19,8 @@ const router = express.Router();
 import crypto from 'crypto';
 import fido2 from '@simplewebauthn/server';
 import base64url from 'base64url';
-import { Low, JSONFile } from 'lowdb';
+import { Low } from 'lowdb';
+import { JSONFile } from 'lowdb/node'
 
 const adapter = new JSONFile('.data/db.json');
 const db = new Low(adapter);
@@ -70,9 +71,14 @@ function csrfCheck(req, res, next) {
  * If the session doesn't contain `signed-in`, consider the user is not authenticated.
  **/
 function sessionCheck(req, res, next) {
-  if (!req.session['signed-in']) {
+  if (!req.session['signed-in'] || !req.session.username) {
     return res.status(401).json({ error: 'not signed in.' });
   }
+  const user = findUserByUsername(req.session.username);
+  if (!user) {
+    return res.status(401).json({ error: 'user not found.' });    
+  }
+  req.locals.user = user;
   next();
 };
 
@@ -159,14 +165,16 @@ router.post('/password', (req, res) => {
 });
 
 router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
-  const user = findUserByUsername(req.session.username);
+  // const user = findUserByUsername(req.session.username);
+  const user = req.locals.user;
   return res.json(user);
 });
 
 router.post('/updateDisplayName', csrfCheck, sessionCheck, async (req, res) => {
   const { newName } = req.body;
   if (newName) {
-    const user = findUserByUsername(req.session.username);
+    // const user = findUserByUsername(req.session.username);
+    const user = req.locals.user;
     user.displayName = newName;
     await updateUser(user);
     return res.json(user);
@@ -203,14 +211,16 @@ router.get('/signout', (req, res) => {
  ```
  **/
 router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
-  const user = findUserByUsername(req.session.username);
+  // const user = findUserByUsername(req.session.username);
+  const user = req.locals.user;
   return res.json(user || {});
 });
 
 router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
-  const username = req.session.username;
-  const user = findUserByUsername(username);
+  // const username = req.session.username;
+  // const user = findUserByUsername(username);
+  const user = req.locals.user;
   const newCreds = user.credentials.map(cred => {
     if (cred.credId === credId) {
       cred.name = newName;
@@ -228,8 +238,9 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
  **/
 router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
   const credId = req.query.credId;
-  const username = req.session.username;
-  const user = findUserByUsername(username);
+  // const username = req.session.username;
+  // const user = findUserByUsername(username);
+  const user = req.locals.user;
 
   const newCreds = user.credentials.filter((cred) => {
     // Leave credential ids that do not match
@@ -249,8 +260,9 @@ router.get('/resetDB', async (req, res) => {
 });
 
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
-  const { username } = req.session;
-  const user = findUserByUsername(username);
+  // const { username } = req.session;
+  // const user = findUserByUsername(username);
+  const user = req.locals.user;
   try {
     const excludeCredentials = [];
     if (user.credentials.length > 0) {
@@ -326,7 +338,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 });
 
 router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
-  const username = req.session.username;
+  // const username = req.session.username;
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
@@ -352,7 +364,8 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const base64PublicKey = base64url.encode(credentialPublicKey);
     const base64CredentialID = base64url.encode(credentialID);
 
-    const user = findUserByUsername(username);
+    // const user = findUserByUsername(username);
+    const user = req.locals.user;
 
     const existingCred = user.credentials.find(
       (cred) => cred.credID === base64CredentialID,
