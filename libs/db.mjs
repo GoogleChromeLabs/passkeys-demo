@@ -84,7 +84,12 @@ export const Credentials = {
   
   remove: async (credential_id, user_id) => {
     db.data.credentials = db.data.credentials.filter(_cred => {
-      return _cred.id === credential_id && _cred.user_id === user_id;
+      if (_cred.id !== credential_id) {
+        return true;
+      } else {
+        // Only when the user ID matches, remove it (return `false`).
+        return _cred.user_id !== user_id;
+      }
     });
     return db.write();
   }

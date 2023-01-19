@@ -410,11 +410,14 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   const expectedRPID = process.env.HOSTNAME;
 
   try {
-    const cred = Credentials.findById(credential.id);    
-    const user = Users.findById(cred.user_id);
-
-    if (!cred || !user) {
+    const cred = Credentials.findById(credential.id);
+    if (!cred) {
       throw new Error('Credential not found.');
+    }
+
+    const user = Users.findById(cred.user_id);
+    if (!user) {
+      throw new Error('User not found.');
     }
 
     const authenticator = {
