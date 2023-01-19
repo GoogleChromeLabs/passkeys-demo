@@ -24,7 +24,7 @@ import {
   verifyAuthenticationResponse
 } from '@simplewebauthn/server';
 import base64url from 'base64url';
-import { Users, Credentials } from './db';
+import { Users, Credentials } from './db.mjs';
 // import { Low } from 'lowdb';
 // import { JSONFile } from 'lowdb/node'
 
@@ -373,12 +373,9 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
   try {
     const { username } = req.body;
 
-    const user = Users.findByUsername(username);
-    if (!user) {
-      // Send empty response if user is not registered yet.
-      return res.status(400).json({ error: 'User not found.' });
-    }
     let allowCredentials = [];
+
+    const user = Users.findByUsername(username);
     if (user) {
       const credentials = Credentials.findByUserId(user.id);
       allowCredentials = credentials.map(cred => {

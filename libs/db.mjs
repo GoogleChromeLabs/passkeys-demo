@@ -59,12 +59,12 @@ export const Credentials = {
   findById: (credential_id) => {
     const credential = db.data.credentials.find(credential => credential.id === credential_id);
     return credential;
-  }
+  },
 
   findByUserId: (user_id) => {
     const credentials = db.data.credentials.filter(credential => credential.user_id === user_id);
     return credentials;
-  }
+  },
 
   update: async (credential) => {
     let found = false;

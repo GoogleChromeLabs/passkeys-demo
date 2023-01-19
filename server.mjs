@@ -66,11 +66,11 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   // Check session
   if (req.session.username) {
-    // If user is signed in, redirect to `/reauth`.
+    // If username is known, redirect to `/reauth`.
     res.redirect(307, '/reauth');
     return;
   }
-  // If user is not signed in, show `index.html` with id/password form.
+  // If the user is not signed in, show `index.html` with id/password form.
   res.render('index.html', {
     project_name: process.env.PROJECT_NAME,
     title: PROJECT_TITLE,
