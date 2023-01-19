@@ -222,7 +222,7 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
   const { user } = req.locals;
   const newCreds = user.credentials.map(cred => {
-    if (cred.credId === credId) {
+    if (cred.id === credId) {
       cred.name = newName;
     }
     return cred;
@@ -242,7 +242,7 @@ router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
 
   const newCreds = user.credentials.filter((cred) => {
     // Leave credential ids that do not match
-    return cred.credId !== credId;
+    return cred.id !== credId;
   });
   user.credentials = newCreds;
 
@@ -258,7 +258,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     if (user.credentials.length > 0) {
       for (let cred of user.credentials) {
         excludeCredentials.push({
-          id: base64url.toBuffer(cred.credId),
+          id: base64url.toBuffer(cred.id),
           type: 'public-key',
           transports: cred.transports,
         });
@@ -309,7 +309,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
   const credential = req.body;
-  const { id: credId, type } = credential;
+  const { id, type } = credential;
 
   try {
 
@@ -333,10 +333,11 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const { user } = req.locals;
     
     await Credentials.update({
+      id: base64CredentialID,
       publicKey: base64PublicKey,
-      credId: base64CredentialID,
       name: req.useragent.platform,
-      transports: credential.response.transports || []
+      transports: credential.response.transports || [],
+      user_id: user.id,
     });
 
     // const existingCred = user.credentials.find(
@@ -382,7 +383,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
       const credentials = Credentials.findByUserId(user.id);
       allowCredentials = credentials.map(cred => {
         return {
-          id: base64url.toBuffer(cred.credId),
+          id: base64url.toBuffer(cred.id),
           type: 'public-key',
           transports: cred.transports,
         }
@@ -417,26 +418,18 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   const expectedRPID = process.env.HOSTNAME;
 
   try {
-    const user_id = credential.response.userHandle;
-    const user = Users.findById(user_id);
+    const cred = Credentials.findById(credential.id);    
+    const user = Users.findById(cred.user_id);
 
-console.log('[discoveryResponse] user', user);
-
-    if (!user) {
-      throw new Error('User not found.');
-    }
-
-    const auth = user.credentials.find((cred) => cred.credId === credential.id);
-
-    if (!auth) {
+    if (!cred || !user) {
       throw new Error('Credential not found.');
     }
 
     const authenticator = {
-      credentialPublicKey: base64url.toBuffer(auth.publicKey),
-      credentialID: base64url.toBuffer(auth.credId),
-      counter: auth.prevCounter,
-      transports: auth.transports,
+      credentialPublicKey: base64url.toBuffer(cred.publicKey),
+      credentialID: base64url.toBuffer(cred.id),
+      counter: cred.prevCounter,
+      transports: cred.transports,
     };
 
     const verification = await verifyAuthenticationResponse({
@@ -452,10 +445,6 @@ console.log('[discoveryResponse] user', user);
     if (!verified) {
       throw new Error('User verification failed.');
     }
-
-    auth.prevCounter = authenticationInfo.newCounter;
-
-    await Users.update(user);
 
     delete req.session.challenge;
     req.session.username = user.username;

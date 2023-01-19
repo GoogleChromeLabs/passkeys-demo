@@ -10,9 +10,9 @@ db.data ||= { users: [] } ;
 /**
  * User data schema
  * {
- *   id: Base64URL encoded user ID,
- *   username: string,
- *   displayName: string,
+ *   id: string Base64URL encoded user ID,
+ *   username: string username,
+ *   displayName: string display name,
  * }
  **/
 
@@ -47,10 +47,11 @@ export const Users = {
 /**
  * User data schema
  * {
- *   publicKey: base64PublicKey,
- *   credId: base64CredentialID,
- *   name: req.useragent.platform,
- *   transports: credential.response.transports || []
+ *   id: string Base64URL encoded CredentialID,
+ *   publicKey: string Base64URL encoded PublicKey,
+ *   name: string name of the credential,
+ *   transports: an array of transports,
+ *   user_id: string Base64URL encoded user ID of the owner,
  * }
  **/
 
