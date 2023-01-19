@@ -17,7 +17,12 @@
 import express from 'express';
 const router = express.Router();
 import crypto from 'crypto';
-import fido2 from '@simplewebauthn/server';
+import {
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
+  generateAuthenticationOptions,
+  verifyAuthenticationResponse
+} from '@simplewebauthn/server';
 import base64url from 'base64url';
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node'
@@ -266,40 +271,16 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       }
     }
     const pubKeyCredParams = [];
-    // const params = [-7, -35, -36, -257, -258, -259, -37, -38, -39, -8];
-    const params = [-7, -257];
-    for (let param of params) {
+    for (const param of [-7, -257]) {
       pubKeyCredParams.push({ type: 'public-key', alg: param });
     }
-    const as = {}; // authenticatorSelection
-    const aa = req.body.authenticatorSelection.authenticatorAttachment;
-    const rr = req.body.authenticatorSelection.residentKey;
-    const uv = req.body.authenticatorSelection.userVerification;
-    const cp = req.body.attestation; // attestationConveyancePreference
-    let asFlag = false;
-    let authenticatorSelection;
-    let attestation = 'none';
+    const authenticatorSelection = {
+      authenticatorAttachment: 'platform',
+      residentKey: true
+    }
+    const attestationType = 'none';
 
-    if (aa && (aa == 'platform' || aa == 'cross-platform')) {
-      asFlag = true;
-      as.authenticatorAttachment = aa;
-    }
-    if (rr && (rr == 'required' || rr === 'preferred' || rr === 'discouraged')) {
-      asFlag = true;
-      as.residentKey = rr;
-    }
-    if (uv && (uv == 'required' || uv == 'preferred' || uv == 'discouraged')) {
-      asFlag = true;
-      as.userVerification = uv;
-    }
-    if (asFlag) {
-      authenticatorSelection = as;
-    }
-    if (cp && (cp == 'none' || cp == 'indirect' || cp == 'direct')) {
-      attestation = cp;
-    }
-
-    const options = fido2.generateRegistrationOptions({
+    const options = generateRegistrationOptions({
       rpName: RP_NAME,
       rpID: process.env.HOSTNAME,
       userID: user.id,
@@ -307,7 +288,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       userDisplayName: user.displayName || user.username,
       timeout: TIMEOUT,
       // Prompt users for additional information about the authenticator.
-      attestationType: attestation,
+      attestationType,
       // Prevent users from re-registering existing authenticators
       excludeCredentials,
       authenticatorSelection,
@@ -337,7 +318,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
 
   try {
 
-    const verification = await fido2.verifyRegistrationResponse({
+    const verification = await verifyRegistrationResponse({
       credential,
       expectedChallenge,
       expectedOrigin,
@@ -410,7 +391,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
       });
     }
 
-    const options = await fido2.generateAuthenticationOptions({
+    const options = await generateAuthenticationOptions({
       timeout: TIMEOUT,
       rpID: process.env.HOSTNAME,
       allowCredentials,
@@ -460,7 +441,7 @@ console.log('[discoveryResponse] user', user);
       transports: auth.transports,
     };
 
-    const verification = await fido2.verifyAuthenticationResponse({
+    const verification = await verifyAuthenticationResponse({
       credential,
       expectedChallenge,
       expectedOrigin,
