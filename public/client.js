@@ -110,7 +110,7 @@ let ac;
 
 export async function authenticate(opts = {}) {
   const { username } = opts;
-  const options = await _fetch('/auth/discoveryRequest', opts);
+  const options = await _fetch('/auth/signinRequest', opts);
   let mediation;
   
   if (ac && ac.signal.aborted === false) {
@@ -161,7 +161,7 @@ export async function authenticate(opts = {}) {
     };
   }
 
-  return await _fetch(`/auth/discoveryResponse`, credential);
+  return await _fetch(`/auth/signinResponse`, credential);
 };
 
 export async function updateCredential(credId, newName) {

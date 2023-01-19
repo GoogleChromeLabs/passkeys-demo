@@ -165,16 +165,14 @@ router.post('/password', (req, res) => {
 });
 
 router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
-  // const user = findUserByUsername(req.session.username);
-  const user = req.locals.user;
+  const { user } = req.locals;
   return res.json(user);
 });
 
 router.post('/updateDisplayName', csrfCheck, sessionCheck, async (req, res) => {
   const { newName } = req.body;
   if (newName) {
-    // const user = findUserByUsername(req.session.username);
-    const user = req.locals.user;
+    const { user } = req.locals;
     user.displayName = newName;
     await updateUser(user);
     return res.json(user);
@@ -211,16 +209,13 @@ router.get('/signout', (req, res) => {
  ```
  **/
 router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
-  // const user = findUserByUsername(req.session.username);
-  const user = req.locals.user;
+  const { user } = req.locals;
   return res.json(user || {});
 });
 
 router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
-  // const username = req.session.username;
-  // const user = findUserByUsername(username);
-  const user = req.locals.user;
+  const { user } = req.locals;
   const newCreds = user.credentials.map(cred => {
     if (cred.credId === credId) {
       cred.name = newName;
@@ -238,9 +233,7 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
  **/
 router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
   const credId = req.query.credId;
-  // const username = req.session.username;
-  // const user = findUserByUsername(username);
-  const user = req.locals.user;
+  const { user } = req.locals;
 
   const newCreds = user.credentials.filter((cred) => {
     // Leave credential ids that do not match
@@ -260,9 +253,7 @@ router.get('/resetDB', async (req, res) => {
 });
 
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
-  // const { username } = req.session;
-  // const user = findUserByUsername(username);
-  const user = req.locals.user;
+  const { user } = req.locals;
   try {
     const excludeCredentials = [];
     if (user.credentials.length > 0) {
@@ -338,7 +329,6 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 });
 
 router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
-  // const username = req.session.username;
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
@@ -364,8 +354,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const base64PublicKey = base64url.encode(credentialPublicKey);
     const base64CredentialID = base64url.encode(credentialID);
 
-    // const user = findUserByUsername(username);
-    const user = req.locals.user;
+    const { user } = req.locals;
 
     const existingCred = user.credentials.find(
       (cred) => cred.credID === base64CredentialID,
@@ -396,7 +385,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   }
 });
 
-router.post('/discoveryRequest', csrfCheck, async (req, res) => {
+router.post('/signinRequest', csrfCheck, async (req, res) => {
   try {
     const username = req.body.username;
 
@@ -442,7 +431,7 @@ console.log('[discoveryRequest] options', options);
   }
 });
 
-router.post('/discoveryResponse', csrfCheck, async (req, res) => {
+router.post('/signinResponse', csrfCheck, async (req, res) => {
   const { body: credential } = req;
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
