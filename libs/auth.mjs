@@ -215,21 +215,20 @@ router.get('/signout', (req, res) => {
  **/
 router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
   const { user } = res.locals;
-  return res.json(user || {});
+  const credentials = Credentials.findByUserId(user.id);
+  return res.json(credentials || {});
 });
 
 router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
   const { user } = res.locals;
-  const newCreds = user.credentials.map(cred => {
-    if (cred.id === credId) {
-      cred.name = newName;
-    }
-    return cred;
-  });
-  user.credentials = newCreds;
-  await Users.update(user);
-  return res.json({});
+  const credential = Credentials.findById(credId);
+  if (user.id !== credential.user_id) {
+    return res.status(401).json({ error: 'User not authorized.' });
+  }
+  credential.name = newName;
+  await Credentials.update(credential);
+  return res.json(credential);
 });
 
 /**
@@ -240,6 +239,7 @@ router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
   const credId = req.query.credId;
   const { user } = res.locals;
 
+  const credentials = Credentials.findByUserId(user.id);
   const newCreds = user.credentials.filter((cred) => {
     // Leave credential ids that do not match
     return cred.id !== credId;

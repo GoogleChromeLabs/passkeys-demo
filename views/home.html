@@ -105,9 +105,9 @@
           cable: "devices",
           hybrid: "devices",
         };
-        const creds = html`${res.credentials.length > 0 ? html`
+        const creds = html`${res.length > 0 ? html`
         <mwc-list>
-          ${res.credentials.map(cred => html`
+          ${res.map(cred => html`
             <mwc-list-item>
               <div class="list-item">
                 <div class="entity-name">

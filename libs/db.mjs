@@ -80,5 +80,10 @@ export const Credentials = {
       db.data.credentials.push(credential);
     }
     return db.write();
+  },
+  
+  remove: (credential_id, user_id) {
+    db.data.credentials.splice()
+
   }
 }
