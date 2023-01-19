@@ -24,45 +24,52 @@ import {
   verifyAuthenticationResponse
 } from '@simplewebauthn/server';
 import base64url from 'base64url';
-import { Low } from 'lowdb';
-import { JSONFile } from 'lowdb/node'
+import {
+  findUserByUsername,
+  findUserByUserId,
+  updateUser,
+  findCredentialById,
+  updateCredential,
+} from './db';
+// import { Low } from 'lowdb';
+// import { JSONFile } from 'lowdb/node'
 
-const adapter = new JSONFile('.data/db.json');
-const db = new Low(adapter);
-await db.read();
+// const adapter = new JSONFile('.data/db.json');
+// const db = new Low(adapter);
+// await db.read();
 
 router.use(express.json());
 
 const RP_NAME = 'Passkey Form Demo';
 const TIMEOUT = 30 * 1000 * 60;
 
-db.data ||= { users: [] } ;
+// db.data ||= { users: [] } ;
 
-function findUserByUsername(username) {
-  const user = db.data.users.find(user => user.username === username);
-  return user;
-}
+// function findUserByUsername(username) {
+//   const user = db.data.users.find(user => user.username === username);
+//   return user;
+// }
 
-function findUserByUserId(user_id) {
-  const user = db.data.users.find(user => user.id === user_id);
-  return user;
-}
+// function findUserByUserId(user_id) {
+//   const user = db.data.users.find(user => user.id === user_id);
+//   return user;
+// }
 
-async function updateUser(user) {
-  let found = false;
-  db.data.users = db.data.users.map(_user => {
-    if (_user.id === user.id) {
-      found = true;
-      return user;
-    } else {
-      return _user;
-    }
-  });
-  if (!found) {
-    db.data.users.push(user);
-  }
-  return db.write();
-}
+// async function updateUser(user) {
+//   let found = false;
+//   db.data.users = db.data.users.map(_user => {
+//     if (_user.id === user.id) {
+//       found = true;
+//       return user;
+//     } else {
+//       return _user;
+//     }
+//   });
+//   if (!found) {
+//     db.data.users.push(user);
+//   }
+//   return db.write();
+// }
 
 function csrfCheck(req, res, next) {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
@@ -120,7 +127,7 @@ function getOrigin(userAgent) {
  * Set a `username` in the session.
  **/
 router.post('/username', async (req, res) => {
-  const username = req.body.username;
+  const { username } = req.body;
 
   try {
      // Only check username, no need to check password as this is a mock
@@ -130,7 +137,7 @@ router.post('/username', async (req, res) => {
       // If user entry is not created yet, create one
       if (!user) {
         user = {
-          username: username,
+          username,
           displayName: username,
           id: base64url.encode(crypto.randomBytes(32)),
           credentials: [],
