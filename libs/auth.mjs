@@ -24,13 +24,7 @@ import {
   verifyAuthenticationResponse
 } from '@simplewebauthn/server';
 import base64url from 'base64url';
-import {
-  findUserByUsername,
-  findUserByUserId,
-  updateUser,
-  findCredentialById,
-  updateCredential,
-} from './db';
+import { Users, Credentials } from './db';
 // import { Low } from 'lowdb';
 // import { JSONFile } from 'lowdb/node'
 
@@ -86,7 +80,7 @@ function sessionCheck(req, res, next) {
   if (!req.session['signed-in'] || !req.session.username) {
     return res.status(401).json({ error: 'not signed in.' });
   }
-  const user = findUserByUsername(req.session.username);
+  const user = Users.findByUsername(req.session.username);
   if (!user) {
     return res.status(401).json({ error: 'user not found.' });    
   }
@@ -133,7 +127,7 @@ router.post('/username', async (req, res) => {
      // Only check username, no need to check password as this is a mock
     if (username && /^[a-zA-Z0-9@\.\-_]+$/.test(username)) {
       // See if account already exists
-      let user = findUserByUsername(username);
+      let user = Users.findByUsername(username);
       // If user entry is not created yet, create one
       if (!user) {
         user = {
@@ -142,7 +136,7 @@ router.post('/username', async (req, res) => {
           id: base64url.encode(crypto.randomBytes(32)),
           credentials: [],
         };
-        await updateUser(user);
+        await Users.update(user);
       }
       // Set username in the session
       req.session.username = username;
@@ -166,7 +160,7 @@ router.post('/password', (req, res) => {
   if (!req.body.password) {
     return res.status(401).json({ error: 'Enter at least one random letter.' });
   }
-  const user = findUserByUsername(req.session.username);
+  const user = Users.findByUsername(req.session.username);
 
   if (!user) {
     return res.status(401).json({ error: 'Enter username first.' });
@@ -186,7 +180,7 @@ router.post('/updateDisplayName', csrfCheck, sessionCheck, async (req, res) => {
   if (newName) {
     const { user } = req.locals;
     user.displayName = newName;
-    await updateUser(user);
+    await Users.update(user);
     return res.json(user);
   } else {
     return res.status(400);
@@ -235,7 +229,7 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
     return cred;
   });
   user.credentials = newCreds;
-  await updateUser(user);
+  await Users.update(user);
   return res.json({});
 });
 
@@ -253,15 +247,9 @@ router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
   });
   user.credentials = newCreds;
 
-  await updateUser(user);
+  await Users.update(user);
 
   return res.json({});
-});
-
-router.get('/resetDB', async (req, res) => {
-  db.data = { users: [] };
-  await db.write();
-  return res.json(db.data.users);
 });
 
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
@@ -278,7 +266,8 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       }
     }
     const pubKeyCredParams = [];
-    for (const param of [-7, -257]) {
+    const params = [-7, -257];
+    for (const param of params) {
       pubKeyCredParams.push({ type: 'public-key', alg: param });
     }
     const authenticatorSelection = {
@@ -305,7 +294,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 
     // Temporary hack until SimpleWebAuthn supports `pubKeyCredParams`
     options.pubKeyCredParams = [];
-    for (let param of params) {
+    for (const param of params) {
       options.pubKeyCredParams.push({ type: 'public-key', alg: param });
     }
 
@@ -343,10 +332,12 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const base64CredentialID = base64url.encode(credentialID);
 
     const { user } = req.locals;
+    
+    const existingCred = Credentials.findById(base64CredentialID);
 
-    const existingCred = user.credentials.find(
-      (cred) => cred.credID === base64CredentialID,
-    );
+    // const existingCred = user.credentials.find(
+    //   (cred) => cred.credID === base64CredentialID,
+    // );
 
     if (!existingCred) {
       /**
@@ -360,7 +351,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       });
     }
 
-    await updateUser(user);
+    await Users.update(user);
 
     delete req.session.challenge;
 
@@ -379,7 +370,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     let user;
     if (username) {
-      user = findUserByUsername(username);
+      user = Users.findByUsername(username);
       if (!user) {
         // Send empty response if user is not registered yet.
         res.status(400).json({ error: 'User not found.' });
@@ -427,7 +418,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
   try {
     const user_id = credential.response.userHandle;
-    const user = findUserByUserId(user_id);
+    const user = Users.findById(user_id);
 
 console.log('[discoveryResponse] user', user);
 
@@ -464,7 +455,7 @@ console.log('[discoveryResponse] user', user);
 
     auth.prevCounter = authenticationInfo.newCounter;
 
-    await updateUser(user);
+    await Users.update(user);
 
     delete req.session.challenge;
     req.session.username = user.username;
