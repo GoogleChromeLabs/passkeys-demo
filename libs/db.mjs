@@ -7,6 +7,15 @@ await db.read();
 
 db.data ||= { users: [] } ;
 
+/**
+ * User data schema
+ * {
+ *   id: Base64URL encoded user ID,
+ *   username: string,
+ *   displayName: string,
+ * }
+ **/
+
 export const Users = {
   findById: (user_id) => {
     const user = db.data.users.find(user => user.id === user_id);
@@ -34,6 +43,16 @@ export const Users = {
     return db.write();
   }
 }
+
+/**
+ * User data schema
+ * {
+ *   publicKey: base64PublicKey,
+ *   credId: base64CredentialID,
+ *   name: req.useragent.platform,
+ *   transports: credential.response.transports || []
+ * }
+ **/
 
 export const Credentials = {
   findById: (credential_id) => {

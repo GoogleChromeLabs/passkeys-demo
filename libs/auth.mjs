@@ -131,10 +131,9 @@ router.post('/username', async (req, res) => {
       // If user entry is not created yet, create one
       if (!user) {
         user = {
+          id: base64url.encode(crypto.randomBytes(32)),
           username,
           displayName: username,
-          id: base64url.encode(crypto.randomBytes(32)),
-          credentials: [],
         };
         await Users.update(user);
       }
@@ -333,25 +332,30 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
 
     const { user } = req.locals;
     
-    const existingCred = Credentials.findById(base64CredentialID);
+    await Credentials.update({
+      publicKey: base64PublicKey,
+      credId: base64CredentialID,
+      name: req.useragent.platform,
+      transports: credential.response.transports || []
+    });
 
     // const existingCred = user.credentials.find(
     //   (cred) => cred.credID === base64CredentialID,
     // );
 
-    if (!existingCred) {
-      /**
-       * Add the returned device to the user's list of devices
-       */
-      user.credentials.push({
-        publicKey: base64PublicKey,
-        credId: base64CredentialID,
-        name: req.useragent.platform,
-        transports: credential.response.transports || []
-      });
-    }
+    // if (!existingCred) {
+    //   /**
+    //    * Add the returned device to the user's list of devices
+    //    */
+    //   user.credentials.push({
+    //     publicKey: base64PublicKey,
+    //     credId: base64CredentialID,
+    //     name: req.useragent.platform,
+    //     transports: credential.response.transports || []
+    //   });
+    // }
 
-    await Users.update(user);
+    // await Users.update(user);
 
     delete req.session.challenge;
 
@@ -366,21 +370,17 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
 
 router.post('/signinRequest', csrfCheck, async (req, res) => {
   try {
-    const username = req.body.username;
+    const { username } = req.body;
 
-    let user;
-    if (username) {
-      user = Users.findByUsername(username);
-      if (!user) {
-        // Send empty response if user is not registered yet.
-        res.status(400).json({ error: 'User not found.' });
-        return;
-      }
+    const user = Users.findByUsername(username);
+    if (!user) {
+      // Send empty response if user is not registered yet.
+      return res.status(400).json({ error: 'User not found.' });
     }
-    const userVerification = req.body.userVerification || 'preferred';
     let allowCredentials = [];
     if (user) {
-      allowCredentials = user.credentials.map(cred => {
+      const credentials = Credentials.findByUserId(user.id);
+      allowCredentials = credentials.map(cred => {
         return {
           id: base64url.toBuffer(cred.credId),
           type: 'public-key',
@@ -397,7 +397,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
        * This optional value controls whether or not the authenticator needs be able to uniquely
        * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
        */
-      userVerification,
+      // userVerification,
     });
     req.session.challenge = options.challenge;
 
