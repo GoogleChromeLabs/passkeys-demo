@@ -42,6 +42,8 @@ app.use(session({
   }
 }));
 
+const PROJECT_TITLE = 'Passkey Form Codelab';
+
 app.use((req, res, next) => {
   if (process.env.PROJECT_DOMAIN) {
     process.env.HOSTNAME = `${process.env.PROJECT_DOMAIN}.glitch.me`;
@@ -70,7 +72,8 @@ app.get('/', (req, res) => {
   }
   // If user is not signed in, show `index.html` with id/password form.
   res.render('index.html', {
-    project_name: process.env.PROJECT_NAME
+    project_name: process.env.PROJECT_NAME,
+    project_title: PROJECT_TITLE,
   });
 });
 
@@ -83,7 +86,8 @@ app.get('/home', (req, res) => {
   // `home.html` shows sign-out link
   res.render('home.html', {
     displayName: req.session.username,
-    project_name: process.env.PROJECT_NAME
+    project_name: process.env.PROJECT_NAME,
+    project_title: PROJECT_TITLE,
   });
 });
 
@@ -98,7 +102,8 @@ app.get('/reauth', (req, res) => {
   // Make XHR POST to `/signin`
   res.render('reauth.html', {
     username: username,
-    project_name: process.env.PROJECT_NAME
+    project_name: process.env.PROJECT_NAME,
+    project_title: PROJECT_TITLE,
   });
 });
 

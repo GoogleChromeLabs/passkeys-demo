@@ -110,7 +110,6 @@ function getOrigin(userAgent) {
  **/
 router.post('/username', async (req, res) => {
   const username = req.body.username;
-console.log('[username] username', username);
 
   try {
      // Only check username, no need to check password as this is a mock
@@ -249,38 +248,6 @@ router.get('/resetDB', async (req, res) => {
   return res.json(db.data.users);
 });
 
-/**
- * Respond with required information to call navigator.credential.create()
- * Input is passed via `req.body` with similar format as output
- * Output format:
- * ```{
-     rp: {
-       id: String,
-       name: String
-     },
-     user: {
-       displayName: String,
-       id: String,
-       name: String
-     },
-     publicKeyCredParams: [{  // @herrjemand
-       type: 'public-key', alg: -7
-     }],
-     timeout: Number,
-     challenge: String,
-     excludeCredentials: [{
-       id: String,
-       type: 'public-key',
-       transports: [('ble'|'nfc'|'usb'|'internal'), ...]
-     }, ...],
-     authenticatorSelection: {
-       authenticatorAttachment: ('platform'|'cross-platform'),
-       requireResidentKey: Boolean,
-       userVerification: ('required'|'preferred'|'discouraged')
-     },
-     attestation: ('none'|'indirect'|'direct')
- * }```
- **/
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   const { username } = req.session;
   const user = findUserByUsername(username);
@@ -358,21 +325,6 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   }
 });
 
-/**
- * Register user credential.
- * Input format:
- * ```{
-     id: String,
-     type: 'public-key',
-     rawId: String,
-     response: {
-       clientDataJSON: String,
-       attestationObject: String,
-       signature: String,
-       userHandle: String
-     }
- * }```
- **/
 router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const username = req.session.username;
   const expectedChallenge = req.session.challenge;
@@ -431,143 +383,6 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   }
 });
 
-/**
- * Respond with required information to call navigator.credential.get()
- * Input is passed via `req.body` with similar format as output
- * Output format:
- * ```{
-     challenge: String,
-     userVerification: ('required'|'preferred'|'discouraged'),
-     allowCredentials: [{
-       id: String,
-       type: 'public-key',
-       transports: [('ble'|'nfc'|'usb'|'internal'), ...]
-     }, ...]
- * }```
- **/
-router.post('/signinRequest', csrfCheck, async (req, res) => {
-  try {
-    const user = findUserByUsername(req.session.username);
-
-    if (!user) {
-      // Send empty response if user is not registered yet.
-      res.status(400).json({ error: 'User not found.' });
-      return;
-    }
-
-    const credId = req.query.credId;
-
-    const userVerification = req.body.userVerification || 'required';
-
-    const allowCredentials = [];
-    for (let cred of user.credentials) {
-      // `credId` is specified and matches
-      if (credId && cred.credId == credId) {
-        allowCredentials.push({
-          id: base64url.toBuffer(cred.credId),
-          type: 'public-key',
-          transports: cred.transports
-        });
-      }
-    }
-
-    const options = await fido2.generateAuthenticationOptions({
-      timeout: TIMEOUT,
-      rpID: process.env.HOSTNAME,
-      allowCredentials,
-      /**
-       * This optional value controls whether or not the authenticator needs be able to uniquely
-       * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
-       */
-      userVerification,
-    });
-console.log('[discoveryRequest] options', options);
-    req.session.challenge = options.challenge;
-
-    return res.json(options);
-  } catch (e) {
-    console.error(e);
-    return res.status(400).json({ error: e.message });
-  }
-});
-
-/**
- * Authenticate the user.
- * Input format:
- * ```{
-     id: String,
-     type: 'public-key',
-     rawId: String,
-     response: {
-       clientDataJSON: String,
-       authenticatorData: String,
-       signature: String,
-       userHandle: String
-     }
- * }```
- **/
-router.post('/signinResponse', csrfCheck, async (req, res) => {
-  const { body } = req;
-  const expectedChallenge = req.session.challenge;
-  const expectedOrigin = getOrigin(req.get('User-Agent'));
-  const expectedRPID = process.env.HOSTNAME;
-
-  // Query the user
-  const user = findUserByUsername(req.session.username);
-
-  let credential = user.credentials.find(cred => cred.credId === req.body.id);
-  
-  credential.credentialPublicKey = base64url.toBuffer(credential.publicKey);
-  credential.credentialID = base64url.toBuffer(credential.credId);
-  credential.counter = credential.prevCounter;
-
-  try {
-    if (!credential) {
-      throw new Error('Authenticating credential not found.');
-    }
-
-    const verification = await fido2.verifyAuthenticationResponse({
-      credential: body,
-      expectedChallenge,
-      expectedOrigin,
-      expectedRPID,
-      authenticator: credential,
-    });
-
-    const { verified, authenticationInfo } = verification;
-
-    if (!verified) {
-      throw new Error('User verification failed.');
-    }
-
-    credential.prevCounter = authenticationInfo.newCounter;
-
-    await updateUser(user);
-
-    delete req.session.challenge;
-    req.session['signed-in'] = 'yes';
-    return res.json(user);
-  } catch (e) {
-    delete req.session.challenge;
-    console.error(e);
-    return res.status(400).json({ error: e.message });
-  }
-});
-
-/**
- * Respond with required information to call navigator.credential.get()
- * Input is passed via `req.body` with similar format as output
- * Output format:
- * ```{
-     challenge: String,
-     userVerification: ('required'|'preferred'|'discouraged'),
-     allowCredentials: [{
-       id: String,
-       type: 'public-key',
-       transports: [('ble'|'nfc'|'usb'|'internal'), ...]
-     }, ...]
- * }```
- **/
 router.post('/discoveryRequest', csrfCheck, async (req, res) => {
   try {
     const username = req.body.username;
@@ -614,21 +429,6 @@ console.log('[discoveryRequest] options', options);
   }
 });
 
-/**
- * Authenticate the user.
- * Input format:
- * ```{
-     id: String,
-     type: 'public-key',
-     rawId: String,
-     response: {
-       clientDataJSON: String,
-       authenticatorData: String,
-       signature: String,
-       userHandle: String
-     }
- * }```
- **/
 router.post('/discoveryResponse', csrfCheck, async (req, res) => {
   const { body: credential } = req;
   const expectedChallenge = req.session.challenge;
