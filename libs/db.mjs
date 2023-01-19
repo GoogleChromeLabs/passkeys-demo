@@ -5,7 +5,7 @@ const adapter = new JSONFile('.data/db.json');
 const db = new Low(adapter);
 await db.read();
 
-db.data ||= { users: [] } ;
+db.data ||= { users: [], credentials: [] } ;
 
 /**
  * User data schema

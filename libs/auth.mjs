@@ -84,7 +84,7 @@ function sessionCheck(req, res, next) {
   if (!user) {
     return res.status(401).json({ error: 'user not found.' });    
   }
-  req.locals.user = user;
+  res.locals.user = user;
   next();
 };
 
@@ -170,14 +170,14 @@ router.post('/password', (req, res) => {
 });
 
 router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
-  const { user } = req.locals;
+  const { user } = res.locals;
   return res.json(user);
 });
 
 router.post('/updateDisplayName', csrfCheck, sessionCheck, async (req, res) => {
   const { newName } = req.body;
   if (newName) {
-    const { user } = req.locals;
+    const { user } = res.locals;
     user.displayName = newName;
     await Users.update(user);
     return res.json(user);
@@ -214,13 +214,13 @@ router.get('/signout', (req, res) => {
  ```
  **/
 router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
-  const { user } = req.locals;
+  const { user } = res.locals;
   return res.json(user || {});
 });
 
 router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
-  const { user } = req.locals;
+  const { user } = res.locals;
   const newCreds = user.credentials.map(cred => {
     if (cred.id === credId) {
       cred.name = newName;
@@ -238,7 +238,7 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
  **/
 router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
   const credId = req.query.credId;
-  const { user } = req.locals;
+  const { user } = res.locals;
 
   const newCreds = user.credentials.filter((cred) => {
     // Leave credential ids that do not match
@@ -252,7 +252,7 @@ router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
 });
 
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
-  const { user } = req.locals;
+  const { user } = res.locals;
   try {
     const excludeCredentials = [];
     if (user.credentials.length > 0) {
@@ -330,7 +330,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const base64PublicKey = base64url.encode(credentialPublicKey);
     const base64CredentialID = base64url.encode(credentialID);
 
-    const { user } = req.locals;
+    const { user } = res.locals;
     
     await Credentials.update({
       id: base64CredentialID,
