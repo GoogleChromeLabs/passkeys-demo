@@ -70,11 +70,10 @@ app.get('/', (req, res) => {
     res.redirect(307, '/reauth');
     return;
   }
-  console.log(PROJECT_TITLE);
   // If user is not signed in, show `index.html` with id/password form.
   res.render('index.html', {
     project_name: process.env.PROJECT_NAME,
-    title: 'PROJECT_TITLE',
+    title: PROJECT_TITLE,
   });
 });
 
