@@ -223,7 +223,8 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
   const { user } = res.locals;
   const credential = Credentials.findById(credId);
-  if (user.id !== credential.user_id) {
+  console.log(user, credential);
+  if (!user || user.id !== credential?.user_id) {
     return res.status(401).json({ error: 'User not authorized.' });
   }
   credential.name = newName;
