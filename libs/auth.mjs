@@ -25,45 +25,11 @@ import {
 } from '@simplewebauthn/server';
 import base64url from 'base64url';
 import { Users, Credentials } from './db.mjs';
-// import { Low } from 'lowdb';
-// import { JSONFile } from 'lowdb/node'
-
-// const adapter = new JSONFile('.data/db.json');
-// const db = new Low(adapter);
-// await db.read();
 
 router.use(express.json());
 
 const RP_NAME = 'Passkey Form Demo';
 const TIMEOUT = 30 * 1000 * 60;
-
-// db.data ||= { users: [] } ;
-
-// function findUserByUsername(username) {
-//   const user = db.data.users.find(user => user.username === username);
-//   return user;
-// }
-
-// function findUserByUserId(user_id) {
-//   const user = db.data.users.find(user => user.id === user_id);
-//   return user;
-// }
-
-// async function updateUser(user) {
-//   let found = false;
-//   db.data.users = db.data.users.map(_user => {
-//     if (_user.id === user.id) {
-//       found = true;
-//       return user;
-//     } else {
-//       return _user;
-//     }
-//   });
-//   if (!found) {
-//     db.data.users.push(user);
-//   }
-//   return db.write();
-// }
 
 function csrfCheck(req, res, next) {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
@@ -193,26 +159,6 @@ router.get('/signout', (req, res) => {
   return res.redirect(307, '/');
 });
 
-/**
- * Returns a credential id
- * (This server only stores one key per username.)
- * Response format:
- * ```{
- *   username: String,
- *   credentials: [Credential]
- * }```
-
- Credential
- ```
- {
-   credId: String,
-   publicKey: String,
-   aaguid: ??,
-   prevCounter: Int,
-   name: String
- };
- ```
- **/
 router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
   const { user } = res.locals;
   const credentials = Credentials.findByUserId(user.id);
