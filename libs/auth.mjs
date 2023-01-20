@@ -246,7 +246,6 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
   const credential = req.body;
-  const { id, type } = credential;
 
   try {
 
