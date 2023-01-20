@@ -28,9 +28,6 @@ import { Users, Credentials } from './db.mjs';
 
 router.use(express.json());
 
-const RP_NAME = 'Passkey Form Demo';
-const TIMEOUT = 30 * 1000 * 60;
-
 function csrfCheck(req, res, next) {
   if (req.header('X-Requested-With') != 'XMLHttpRequest') {
     return res.status(400).json({ error: 'invalid access.' });
@@ -217,12 +214,11 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     const attestationType = 'none';
 
     const options = generateRegistrationOptions({
-      rpName: RP_NAME,
+      rpName: process.env.RP_NAME,
       rpID: process.env.HOSTNAME,
       userID: user.id,
       userName: user.username,
       userDisplayName: user.displayName || user.username,
-      timeout: TIMEOUT,
       // Prompt users for additional information about the authenticator.
       attestationType,
       // Prevent users from re-registering existing authenticators
@@ -281,24 +277,6 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       user_id: user.id,
     });
 
-    // const existingCred = user.credentials.find(
-    //   (cred) => cred.credID === base64CredentialID,
-    // );
-
-    // if (!existingCred) {
-    //   /**
-    //    * Add the returned device to the user's list of devices
-    //    */
-    //   user.credentials.push({
-    //     publicKey: base64PublicKey,
-    //     credId: base64CredentialID,
-    //     name: req.useragent.platform,
-    //     transports: credential.response.transports || []
-    //   });
-    // }
-
-    // await Users.update(user);
-
     delete req.session.challenge;
 
     // Respond with user info
@@ -329,14 +307,8 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     }
 
     const options = await generateAuthenticationOptions({
-      timeout: TIMEOUT,
       rpID: process.env.HOSTNAME,
       allowCredentials,
-      /**
-       * This optional value controls whether or not the authenticator needs be able to uniquely
-       * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
-       */
-      // userVerification,
     });
     req.session.challenge = options.challenge;
 

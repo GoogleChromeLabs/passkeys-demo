@@ -42,7 +42,7 @@ app.use(session({
   }
 }));
 
-const PROJECT_TITLE = 'Passkey Form Codelab';
+const RP_NAME = 'Passkey Form Codelab';
 
 app.use((req, res, next) => {
   if (process.env.PROJECT_DOMAIN) {
@@ -52,6 +52,7 @@ app.use((req, res, next) => {
   }
   const protocol = /^localhost/.test(process.env.HOSTNAME) ? 'http' : 'https';
   process.env.ORIGIN = `${protocol}://${process.env.HOSTNAME}`;
+  process.env.RP_NAME = RP_NAME;
   if (
     req.get('x-forwarded-proto') &&
     req.get('x-forwarded-proto').split(',')[0] !== 'https'
@@ -73,7 +74,7 @@ app.get('/', (req, res) => {
   // If the user is not signed in, show `index.html` with id/password form.
   res.render('index.html', {
     project_name: process.env.PROJECT_NAME,
-    title: PROJECT_TITLE,
+    title: RP_NAME,
   });
 });
 
@@ -89,7 +90,7 @@ app.get('/reauth', (req, res) => {
   res.render('reauth.html', {
     username: username,
     project_name: process.env.PROJECT_NAME,
-    title: PROJECT_TITLE,
+    title: RP_NAME,
   });
 });
 
@@ -103,7 +104,7 @@ app.get('/home', (req, res) => {
   res.render('home.html', {
     displayName: req.session.username,
     project_name: process.env.PROJECT_NAME,
-    title: PROJECT_TITLE,
+    title: RP_NAME,
   });
 });
 
