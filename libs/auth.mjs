@@ -166,7 +166,6 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
   const { user } = res.locals;
   const credential = Credentials.findById(credId);
-  console.log(user, credential);
   if (!user || user.id !== credential?.user_id) {
     return res.status(401).json({ error: 'User not authorized.' });
   }
@@ -262,7 +261,8 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       throw new Error('User verification failed.');
     }
 
-    const { credentialPublicKey, credentialID, counter } = registrationInfo;
+    const { credentialPublicKey, credentialID } = registrationInfo;
+
     const base64PublicKey = base64url.encode(credentialPublicKey);
     const base64CredentialID = base64url.encode(credentialID);
 
@@ -282,6 +282,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     return res.json(user);
   } catch (e) {
     delete req.session.challenge;
+
     console.error(e);
     return res.status(400).send({ error: e.message });
   }
@@ -289,21 +290,22 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
 
 router.post('/signinRequest', csrfCheck, async (req, res) => {
   try {
-    const { username } = req.body;
+    const allowCredentials = [];
 
-    let allowCredentials = [];
+// Omit this section as we only assume empty allowCredentials
+//     const { username } = req.body;
 
-    const user = Users.findByUsername(username);
-    if (user) {
-      const credentials = Credentials.findByUserId(user.id);
-      allowCredentials = credentials.map(cred => {
-        return {
-          id: base64url.toBuffer(cred.id),
-          type: 'public-key',
-          transports: cred.transports,
-        }
-      });
-    }
+//     const user = Users.findByUsername(username);
+//     if (user) {
+//       const credentials = Credentials.findByUserId(user.id);
+//       allowCredentials = credentials.map(cred => {
+//         return {
+//           id: base64url.toBuffer(cred.id),
+//           type: 'public-key',
+//           transports: cred.transports,
+//         }
+//       });
+//     }
 
     const options = await generateAuthenticationOptions({
       rpID: process.env.HOSTNAME,
@@ -311,17 +313,16 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     });
     req.session.challenge = options.challenge;
 
-console.log('[discoveryRequest] options', options);
-
     return res.json(options);
   } catch (e) {
     console.error(e);
+
     return res.status(400).json({ error: e.message });
   }
 });
 
 router.post('/signinResponse', csrfCheck, async (req, res) => {
-  const { body: credential } = req;
+  const credential = req.body;
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
@@ -340,7 +341,6 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     const authenticator = {
       credentialPublicKey: base64url.toBuffer(cred.publicKey),
       credentialID: base64url.toBuffer(cred.id),
-      counter: cred.prevCounter,
       transports: cred.transports,
     };
 
@@ -359,12 +359,15 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     }
 
     delete req.session.challenge;
+
     req.session.username = user.username;
     req.session['signed-in'] = 'yes';
+
     return res.json(user);
   } catch (e) {
-    console.error(e);
     delete req.session.challenge;
+
+    console.error(e);
     return res.status(400).json({ error: e.message });
   }
 });
