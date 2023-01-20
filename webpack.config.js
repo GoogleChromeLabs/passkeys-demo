@@ -2,7 +2,6 @@ import sass from 'sass';
 
 export default {
   entry: {
-    'common-bundle': './public/common.js',
     'components-bundle': './public/components.js',
     'styles-bundle': './public/style.scss',
   },
@@ -36,7 +35,7 @@ export default {
         ],
       },
       {
-        test: /[components|common]\.js$/,
+        test: /components\.js$/,
       },
     ],
   },
