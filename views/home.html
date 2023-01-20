@@ -57,7 +57,7 @@
     <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
     <script type="module">
       import { $, _fetch, loading, registerCredential, updateCredential, unregisterCredential } from '/client.js';
-      import { html, render } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module';
+      import { html, render } from './common-bundle.js';
 
       $('#code').addEventListener('click', e => {
         location.href = 'https://glitch.com/edit/#!/{{project_name}}';

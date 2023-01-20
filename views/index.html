@@ -24,7 +24,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/bundle.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<!--     <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css"> -->
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <script src="https://cdn.jsdelivr.net/gh/herrjemand/Base64URL-ArrayBuffer@latest/lib/base64url-arraybuffer.js"></script>
     <script src="components-bundle.js"></script>
   </head>
@@ -67,11 +67,10 @@
         <p class="instructions">Any username can be accepted.</p>
         <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
       </form>
-<!--       <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script> -->
+      <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
       <script type="module">
-        import { MDCTextField } from '/common-bundle.js';
         import { $, _fetch, loading, authenticate } from '/client.js';
-        new MDCTextField($('.mdc-text-field'));
+        new mdc.textField.MDCTextField($('.mdc-text-field'));
 
         $('#code').addEventListener('click', e => {
           location.href = 'https://glitch.com/edit/#!/{{project_name}}';
