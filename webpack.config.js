@@ -2,6 +2,7 @@ import sass from 'sass';
 
 export default {
   entry: {
+    'common': './public/common.js',
     'components-bundle': './public/components.js',
     'styles-bundle': './public/style.scss',
   },

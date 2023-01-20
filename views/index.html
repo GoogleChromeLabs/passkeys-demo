@@ -69,6 +69,7 @@
       </form>
       <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
       <script type="module">
+        import { MDCTextField } from '/common.js';
         import { $, _fetch, loading, authenticate } from '/client.js';
         new mdc.textField.MDCTextField($('.mdc-text-field'));
 
