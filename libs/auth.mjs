@@ -102,10 +102,10 @@ router.post('/username', async (req, res) => {
       }
       // Set username in the session
       req.session.username = username;
-      // If sign-in succeeded, redirect to `/home`.
+
       return res.json(user);
     } else {
-      throw new Error('Invalid user name');
+      throw new Error('Invalid username');
     }
   } catch (e) {
     console.error(e);
