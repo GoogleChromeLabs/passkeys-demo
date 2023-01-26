@@ -290,26 +290,9 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
 
 router.post('/signinRequest', csrfCheck, async (req, res) => {
   try {
-    const allowCredentials = [];
-
-// Omit this section as we only assume empty allowCredentials
-//     const { username } = req.body;
-
-//     const user = Users.findByUsername(username);
-//     if (user) {
-//       const credentials = Credentials.findByUserId(user.id);
-//       allowCredentials = credentials.map(cred => {
-//         return {
-//           id: base64url.toBuffer(cred.id),
-//           type: 'public-key',
-//           transports: cred.transports,
-//         }
-//       });
-//     }
-
     const options = await generateAuthenticationOptions({
       rpID: process.env.HOSTNAME,
-      allowCredentials,
+      allowCredentials: [],
     });
     req.session.challenge = options.challenge;
 
