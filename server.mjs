@@ -1,6 +1,6 @@
 /*
  * @license
- * Copyright 2019 Google Inc. All rights reserved.
+ * Copyright 2023 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ app.use(session({
   }
 }));
 
-const RP_NAME = 'Passkey Form Codelab';
+const RP_NAME = 'Passkeys Codelab';
 
 app.use((req, res, next) => {
   if (process.env.PROJECT_DOMAIN) {
