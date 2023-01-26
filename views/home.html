@@ -180,29 +180,20 @@
         }
       };
 
-      function register(authenticatorAttachment) {
-        return async function(e) {
-          try {
-            loading.start();
-            await registerCredential({
-              attestation: 'none',
-              authenticatorSelection: {
-                authenticatorAttachment,
-                userVerification: 'required',
-                residentKey: 'required'
-              }
-            });
-            loading.stop();
-            renderCredentials();
-          } catch (e) {
-            loading.stop();
-            console.error(e);
-            alert(e.message);
-          }        
-        };
+      async function register() {
+        try {
+          loading.start();
+          await registerCredential();
+          loading.stop();
+          renderCredentials();
+        } catch (e) {
+          loading.stop();
+          console.error(e);
+          alert(e.message);
+        }
       };
 
-      addUVPA.addEventListener('click', register('platform'));
+      addUVPA.addEventListener('click', register());
     </script>
   </body>
 </html>

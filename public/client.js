@@ -62,8 +62,8 @@ class Loading {
 
 export const loading = new Loading();
 
-export async function registerCredential(opts) {
-  const options = await _fetch('/auth/registerRequest', opts);
+export async function registerCredential() {
+  const options = await _fetch('/auth/registerRequest');
 
   options.user.id = base64url.decode(options.user.id);
   options.challenge = base64url.decode(options.challenge);
@@ -106,37 +106,13 @@ export async function registerCredential(opts) {
   return await _fetch('/auth/registerResponse', credential);
 };
 
-let ac;
-
 export async function authenticate(opts = {}) {
-  const { username } = opts;
-  const options = await _fetch('/auth/signinRequest', opts);
-  let mediation;
-  
-  if (ac && ac.signal.aborted === false) {
-    ac.abort('canceled');
-  }
-  ac = new AbortController();
-
-  if (options.allowCredentials.length === 0) {
-    if (username) {
-      throw new Error('User is not using passkeys.');
-    } else {
-      mediation = 'conditional';
-    }
-  } else {
-    options.allowCredentials = options.allowCredentials.map(cred => {
-      cred.id = base64url.decode(cred.id);
-      return cred;
-    });
-  }
-
+  const options = await _fetch('/auth/signinRequest', opts);  
   options.challenge = base64url.decode(options.challenge);
 
   const cred = await navigator.credentials.get({
     publicKey: options,
-    mediation,
-    signal: ac.signal
+    mediation: 'conditional'
   });
 
   const credential = {};
