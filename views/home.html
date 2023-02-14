@@ -97,14 +97,6 @@
       async function renderCredentials() {
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
-        const transportIconMap = {
-          internal: "fingerprint",
-          usb: "usb",
-          nfc: "nfc",
-          ble: "bluetooth",
-          cable: "devices",
-          hybrid: "devices",
-        };
         const creds = html`${res.length > 0 ? html`
         <mwc-list>
           ${res.map(cred => html`
@@ -112,9 +104,6 @@
               <div class="list-item">
                 <div class="entity-name">
                   <span>${cred.name || 'Unnamed' }</span>
-                  ${cred.transports.map(transport => html`
-                  <mwc-icon class="mini">${transportIconMap[transport]}</mwc-icon>
-                  `)}
                 </div>
                 <div class="buttons">
                   <mwc-icon-button data-cred-id="${cred.id}" data-name="${cred.name || 'Unnamed' }" @click="${rename}" icon="edit"></mwc-icon-button>
@@ -122,7 +111,10 @@
                 </div>
               </div>
             </mwc-list-item>`)}
-        </mwc-list>` : html`<mwc-list><mwc-list-item>No credentials found.</mwc-list-item></mwc-list>`}`;
+        </mwc-list>` : html`
+        <mwc-list>
+          <mwc-list-item>No credentials found.</mwc-list-item>
+        </mwc-list>`}`;
         render(creds, list);
       };
 
@@ -193,7 +185,7 @@
         }
       };
 
-      addUVPA.addEventListener('click', register());
+      addUVPA.addEventListener('click', register);
     </script>
   </body>
 </html>

@@ -208,7 +208,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     }
     const authenticatorSelection = {
       authenticatorAttachment: 'platform',
-      residentKey: true
+      requireResidentKey: true
     }
     const attestationType = 'none';
 
