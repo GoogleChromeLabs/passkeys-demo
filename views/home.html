@@ -94,6 +94,8 @@
         <mwc-list>`, $('#display-name'));
       };
 
+      renderDisplayName();
+
       async function renderCredentials() {
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
@@ -118,8 +120,6 @@
         render(creds, list);
       };
 
-      renderDisplayName();
-
       const createPasskey = $('#create-passkey');
 
       if (window.PublicKeyCredential &&
@@ -139,6 +139,19 @@
       }
 
       renderCredentials();
+
+      async function register() {
+        try {
+          loading.start();
+          await registerCredential();
+          loading.stop();
+          renderCredentials();
+        } catch (e) {
+          loading.stop();
+          console.error(e);
+          alert(e.message);
+        }
+      };
       
       async function rename(e) {
         const { credId, name } = e.target.dataset;
@@ -162,19 +175,6 @@
         try {
           loading.start();
           await unregisterCredential(e.target.dataset.credId);
-          loading.stop();
-          renderCredentials();
-        } catch (e) {
-          loading.stop();
-          console.error(e);
-          alert(e.message);
-        }
-      };
-
-      async function register() {
-        try {
-          loading.start();
-          await registerCredential();
           loading.stop();
           renderCredentials();
         } catch (e) {
