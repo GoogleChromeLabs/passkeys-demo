@@ -96,50 +96,6 @@
 
       renderDisplayName();
 
-      async function renderCredentials() {
-        const res = await _fetch('/auth/getKeys');
-        const list = $('#list');
-        const creds = html`${res.length > 0 ? html`
-        <mwc-list>
-          ${res.map(cred => html`
-            <mwc-list-item>
-              <div class="list-item">
-                <div class="entity-name">
-                  <span>${cred.name || 'Unnamed' }</span>
-                </div>
-                <div class="buttons">
-                  <mwc-icon-button data-cred-id="${cred.id}" data-name="${cred.name || 'Unnamed' }" @click="${rename}" icon="edit"></mwc-icon-button>
-                  <mwc-icon-button data-cred-id="${cred.id}" @click="${remove}" icon="delete"></mwc-icon-button>
-                </div>
-              </div>
-            </mwc-list-item>`)}
-        </mwc-list>` : html`
-        <mwc-list>
-          <mwc-list-item>No credentials found.</mwc-list-item>
-        </mwc-list>`}`;
-        render(creds, list);
-      };
-
-      const createPasskey = $('#create-passkey');
-
-      if (window.PublicKeyCredential &&
-          PublicKeyCredential.isConditionalMediationAvailable) {
-        try {
-          const cma = await PublicKeyCredential.isConditionalMediationAvailable();
-          if (cma) {
-            createPasskey.classList.remove('hidden');
-          } else {
-            $('#message').innerText = 'This device does not support passkeys.';
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        $('#message').innerText = 'This device does not support passkeys.';
-      }
-
-      renderCredentials();
-
       async function register() {
         try {
           loading.start();
@@ -183,6 +139,50 @@
           alert(e.message);
         }
       };
+
+      async function renderCredentials() {
+        const res = await _fetch('/auth/getKeys');
+        const list = $('#list');
+        const creds = html`${res.length > 0 ? html`
+        <mwc-list>
+          ${res.map(cred => html`
+            <mwc-list-item>
+              <div class="list-item">
+                <div class="entity-name">
+                  <span>${cred.name || 'Unnamed' }</span>
+                </div>
+                <div class="buttons">
+                  <mwc-icon-button data-cred-id="${cred.id}" data-name="${cred.name || 'Unnamed' }" @click="${rename}" icon="edit"></mwc-icon-button>
+                  <mwc-icon-button data-cred-id="${cred.id}" @click="${remove}" icon="delete"></mwc-icon-button>
+                </div>
+              </div>
+            </mwc-list-item>`)}
+        </mwc-list>` : html`
+        <mwc-list>
+          <mwc-list-item>No credentials found.</mwc-list-item>
+        </mwc-list>`}`;
+        render(creds, list);
+      };
+
+      const createPasskey = $('#create-passkey');
+
+      if (window.PublicKeyCredential &&
+          PublicKeyCredential.isConditionalMediationAvailable) {
+        try {
+          const cma = await PublicKeyCredential.isConditionalMediationAvailable();
+          if (cma) {
+            createPasskey.classList.remove('hidden');
+          } else {
+            $('#message').innerText = 'This device does not support passkeys.';
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        $('#message').innerText = 'This device does not support passkeys.';
+      }
+
+      renderCredentials();
 
       createPasskey.addEventListener('click', register);
     </script>
