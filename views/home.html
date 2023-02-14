@@ -51,7 +51,7 @@
         <div id="list"></div>
       </section>
       <p id="message" class="instructions"></p>
-      <mwc-button id="addUVPA" class="hidden" icon="fingerprint" raised>Add this device</mwc-button>
+      <mwc-button id="create-passkey" class="hidden" icon="fingerprint" raised>Add this device</mwc-button>
       <mwc-button><a href="/auth/signout">Sign out</a></mwc-button>
     </main>
     <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
@@ -120,15 +120,14 @@
 
       renderDisplayName();
 
-      const addUVPA = $('#addUVPA');
+      const createPasskey = $('#create-passkey');
 
       if (window.PublicKeyCredential &&
           PublicKeyCredential.isConditionalMediationAvailable) {
         try {
           const cma = await PublicKeyCredential.isConditionalMediationAvailable();
           if (cma) {
-            addUVPA.classList.remove('hidden');
-            $('#message').innerText = 'This device supports passkeys.';
+            createPasskey.classList.remove('hidden');
           } else {
             $('#message').innerText = 'This device does not support passkeys.';
           }
@@ -185,7 +184,7 @@
         }
       };
 
-      addUVPA.addEventListener('click', register);
+      createPasskey.addEventListener('click', register);
     </script>
   </body>
 </html>
