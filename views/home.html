@@ -96,19 +96,6 @@
 
       renderDisplayName();
 
-      async function register() {
-        try {
-          loading.start();
-          await registerCredential();
-          loading.stop();
-          renderCredentials();
-        } catch (e) {
-          loading.stop();
-          console.error(e);
-          alert(e.message);
-        }
-      };
-      
       async function rename(e) {
         const { credId, name } = e.target.dataset;
         const newName = prompt('Enter a new credential name.', name);
@@ -140,6 +127,24 @@
         }
       };
 
+      const createPasskey = $('#create-passkey');
+
+      if (window.PublicKeyCredential &&
+          PublicKeyCredential.isConditionalMediationAvailable) {
+        try {
+          const cma = await PublicKeyCredential.isConditionalMediationAvailable();
+          if (cma) {
+            createPasskey.classList.remove('hidden');
+          } else {
+            $('#message').innerText = 'This device does not support passkeys.';
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        $('#message').innerText = 'This device does not support passkeys.';
+      }
+
       async function renderCredentials() {
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
@@ -164,25 +169,20 @@
         render(creds, list);
       };
 
-      const createPasskey = $('#create-passkey');
-
-      if (window.PublicKeyCredential &&
-          PublicKeyCredential.isConditionalMediationAvailable) {
-        try {
-          const cma = await PublicKeyCredential.isConditionalMediationAvailable();
-          if (cma) {
-            createPasskey.classList.remove('hidden');
-          } else {
-            $('#message').innerText = 'This device does not support passkeys.';
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        $('#message').innerText = 'This device does not support passkeys.';
-      }
-
       renderCredentials();
+
+      async function register() {
+        try {
+          loading.start();
+          await registerCredential();
+          loading.stop();
+          renderCredentials();
+        } catch (e) {
+          loading.stop();
+          console.error(e);
+          alert(e.message);
+        }
+      };
 
       createPasskey.addEventListener('click', register);
     </script>
