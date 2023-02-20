@@ -201,11 +201,6 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
         });
       }
     }
-    const pubKeyCredParams = [];
-    const params = [-7, -257];
-    for (const param of params) {
-      pubKeyCredParams.push({ type: 'public-key', alg: param });
-    }
     const authenticatorSelection = {
       authenticatorAttachment: 'platform',
       requireResidentKey: true
@@ -226,12 +221,6 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     });
 
     req.session.challenge = options.challenge;
-
-    // Temporary hack until SimpleWebAuthn supports `pubKeyCredParams`
-    options.pubKeyCredParams = [];
-    for (const param of params) {
-      options.pubKeyCredParams.push({ type: 'public-key', alg: param });
-    }
 
     return res.json(options);
   } catch (e) {

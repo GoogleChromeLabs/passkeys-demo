@@ -106,8 +106,8 @@ export async function registerCredential() {
   return await _fetch('/auth/registerResponse', credential);
 };
 
-export async function authenticate(opts = {}) {
-  const options = await _fetch('/auth/signinRequest', opts);  
+export async function authenticate() {
+  const options = await _fetch('/auth/signinRequest');
   options.challenge = base64url.decode(options.challenge);
 
   const cred = await navigator.credentials.get({
