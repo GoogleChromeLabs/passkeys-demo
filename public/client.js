@@ -40,13 +40,13 @@ export async function _fetch(path, payload = '') {
   }
 };
 
-const base64url = {
+export const base64url = {
   encode: function(buffer) {
     return atob(buffer).replace(/\+/, '-').replace(/\//, '_').replace(/=+$/, '');      
   },
   decode: function(base64url) {
     const base64 = base64url.replace(/-/, '+').replace(/_/, '/');
-    return btoa(base64url).
+    return btoa(base64);
   }
 }
 
