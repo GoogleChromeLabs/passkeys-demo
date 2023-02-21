@@ -23,7 +23,7 @@
     "@material/mwc-list": "^0.27.0",
     "@material/mwc-icon-button": "^0.27.0",
     "@material/mwc-linear-progress": "^0.27.0",
-    "@simplewebauthn/server": "^6.2.1",
+    "@simplewebauthn/server": "^7.0.1",
     "@babel/core": "^7.20.12",
     "babel-loader": "^9.1.2",
     "babel-preset-env": "^1.7.0",

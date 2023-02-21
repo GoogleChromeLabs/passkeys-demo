@@ -23,7 +23,7 @@ import {
   generateAuthenticationOptions,
   verifyAuthenticationResponse
 } from '@simplewebauthn/server';
-import base64url from 'base64url';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Users, Credentials } from './db.mjs';
 
 router.use(express.json());
@@ -68,7 +68,7 @@ function getOrigin(userAgent) {
           const octArray = hashes[i].split(':').map((h) =>
             parseInt(h, 16),
           );
-          const androidHash = base64url.encode(octArray);
+          const androidHash = isoBase64URL.fromBuffer(octArray);
           origin = `android:apk-key-hash:${androidHash}`;
           break;
         }
@@ -94,7 +94,7 @@ router.post('/username', async (req, res) => {
       // If user entry is not created yet, create one
       if (!user) {
         user = {
-          id: base64url.encode(crypto.randomBytes(32)),
+          id: isoBase64URL.fromBuffer(crypto.randomBytes(32)),
           username,
           displayName: username,
         };
@@ -195,7 +195,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     if (credentials.length > 0) {
       for (const cred of credentials) {
         excludeCredentials.push({
-          id: base64url.toBuffer(cred.id),
+          id: isoBase64URL.toBuffer(cred.id),
           type: 'public-key',
           transports: cred.transports,
         });
@@ -252,8 +252,8 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
 
     const { credentialPublicKey, credentialID } = registrationInfo;
 
-    const base64PublicKey = base64url.encode(credentialPublicKey);
-    const base64CredentialID = base64url.encode(credentialID);
+    const base64PublicKey = isoBase64URL.fromBuffer(credentialPublicKey);
+    const base64CredentialID = isoBase64URL.fromBuffer(credentialID);
 
     const { user } = res.locals;
     
@@ -287,7 +287,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     return res.json(options);
   } catch (e) {
-    console.info(e);
+    console.error(e);
 
     return res.status(400).json({ error: e.message });
   }
@@ -311,8 +311,8 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     }
 
     const authenticator = {
-      credentialPublicKey: base64url.toBuffer(cred.publicKey),
-      credentialID: base64url.toBuffer(cred.id),
+      credentialPublicKey: isoBase64URL.toBuffer(cred.publicKey),
+      credentialID: isoBase64URL.toBuffer(cred.id),
       transports: cred.transports,
     };
 
@@ -339,7 +339,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   } catch (e) {
     delete req.session.challenge;
 
-    console.info(e);
+    console.error(e);
     return res.status(400).json({ error: e.message });
   }
 });
