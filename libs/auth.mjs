@@ -287,7 +287,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
 
     return res.json(options);
   } catch (e) {
-    console.error(e);
+    console.info(e);
 
     return res.status(400).json({ error: e.message });
   }
@@ -339,7 +339,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   } catch (e) {
     delete req.session.challenge;
 
-    console.error(e);
+    console.info(e);
     return res.status(400).json({ error: e.message });
   }
 });
