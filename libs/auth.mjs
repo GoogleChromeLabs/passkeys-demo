@@ -192,15 +192,15 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   try {
     const excludeCredentials = [];
     const credentials = Credentials.findByUserId(user.id);
-    if (credentials.length > 0) {
-      for (const cred of credentials) {
-        excludeCredentials.push({
-          id: isoBase64URL.toBuffer(cred.id),
-          type: 'public-key',
-          transports: cred.transports,
-        });
-      }
-    }
+    // if (credentials.length > 0) {
+    //   for (const cred of credentials) {
+    //     excludeCredentials.push({
+    //       id: isoBase64URL.toBuffer(cred.id),
+    //       type: 'public-key',
+    //       transports: cred.transports,
+    //     });
+    //   }
+    // }
     const authenticatorSelection = {
       authenticatorAttachment: 'platform',
       requireResidentKey: true
@@ -238,7 +238,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   try {
 
     const verification = await verifyRegistrationResponse({
-      credential,
+      response: credential,
       expectedChallenge,
       expectedOrigin,
       expectedRPID,
@@ -317,7 +317,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     };
 
     const verification = await verifyAuthenticationResponse({
-      credential,
+      response: credential,
       expectedChallenge,
       expectedOrigin,
       expectedRPID,
