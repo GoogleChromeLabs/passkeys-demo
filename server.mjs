@@ -42,7 +42,7 @@ app.use(session({
   }
 }));
 
-const RP_NAME = 'Passkeys Codelab';
+const RP_NAME = 'Passkeys Form Demo';
 
 app.use((req, res, next) => {
   if (process.env.PROJECT_DOMAIN) {

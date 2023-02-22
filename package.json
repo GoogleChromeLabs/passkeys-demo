@@ -1,7 +1,7 @@
 {
-  "name": "passkey-form-codelab",
-  "version": "0.0.3",
-  "description": "Passkey Form Codelab",
+  "name": "passkeys-codelab",
+  "version": "1.0.0",
+  "description": "Passkeys Codelab",
   "main": "server.mjs",
   "type": "module",
   "scripts": {
