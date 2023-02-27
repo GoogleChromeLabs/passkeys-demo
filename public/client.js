@@ -40,15 +40,21 @@ export async function _fetch(path, payload = '') {
   }
 };
 
-// export const base64url = {
-//   encode: function(buffer) {
-//     return atob(buffer).replace(/\+/, '-').replace(/\//, '_').replace(/=+$/, '');      
-//   },
-//   decode: function(base64url) {
-//     const base64 = base64url.replace(/-/, '+').replace(/_/, '/');
-//     return btoa(base64);
-//   }
-// }
+export const base64url = {
+  encode: function(buffer) {
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    return base64.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  },
+  decode: function(base64url) {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+    const binStr = window.atob(base64);
+    const bin = new Uint8Array(binStr.length);
+    for (let i = 0; i < binStr.length; i++) {
+      bin[i] = binStr.charCodeAt(i);
+    }
+    return bin.buffer;
+  }
+}
 
 class Loading {
   constructor() {
