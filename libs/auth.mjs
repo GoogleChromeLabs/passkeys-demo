@@ -192,15 +192,13 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   try {
     const excludeCredentials = [];
     const credentials = Credentials.findByUserId(user.id);
-    // if (credentials.length > 0) {
-    //   for (const cred of credentials) {
-    //     excludeCredentials.push({
-    //       id: isoBase64URL.toBuffer(cred.id),
-    //       type: 'public-key',
-    //       transports: cred.transports,
-    //     });
-    //   }
-    // }
+    for (const cred of credentials) {
+      excludeCredentials.push({
+        id: isoBase64URL.toBuffer(cred.id),
+        type: 'public-key',
+        transports: cred.transports,
+      });
+    }
     const authenticatorSelection = {
       authenticatorAttachment: 'platform',
       requireResidentKey: true
