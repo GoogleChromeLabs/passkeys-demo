@@ -179,8 +179,7 @@
         } catch (e) {
           // Stop the loading UI
           loading.stop();
-          // 'InvalidStateError' indicates one of the credentials included in
-          // `excludeCredentials` list matches the new credential.
+          // 'InvalidStateError' indicates a passkey already exists on the device.
           if (e.name === 'InvalidStateError') {
             alert('A passkey already exists for this device.');
           // `NotAllowedError` indicates the user canceled the operation.

@@ -81,6 +81,7 @@ export const loading = new Loading();
 export async function registerCredential() {
   const options = await _fetch('/auth/registerRequest');
 
+  // Base64URL decode some values
   options.user.id = base64url.decode(options.user.id);
   options.challenge = base64url.decode(options.challenge);
 
@@ -90,68 +91,78 @@ export async function registerCredential() {
     }
   }
 
+  // Use platform authenticator and discoverable credential
+  options.authenticatorSelection = {
+    authenticatorAttachment: 'platform',
+    requireResidentKey: true
+  }
+
+  // Invoke WebAuthn create
   const cred = await navigator.credentials.create({
     publicKey: options,
   });
 
   const credential = {};
   credential.id = cred.id;
+  // Base64URL encode `rawId`
   credential.rawId = base64url.encode(cred.rawId);
   credential.type = cred.type;
 
-  if (cred.response) {
-    const clientDataJSON =
-      base64url.encode(cred.response.clientDataJSON);
-    const attestationObject =
-      base64url.encode(cred.response.attestationObject);
-    let transports = [];
-    if (cred.response.getTransports) {
-      transports = cred.response.getTransports();
-    }
-    // If `getTransports` is not available, consider it's a platform authenticator
-    if (transports.length === 0) {
-      transports = ['internal'];
-    }
-    credential.response = {
-      clientDataJSON,
-      attestationObject,
-      transports
-    };
+  // `authenticatorAttachment` in PublicKeyCredential is a new addition in WebAuthn L3
+  if (cred.authenticatorAttachment) {
+    credential.authenticatorAttachment = cred.authenticatorAttachment;
   }
+
+  // Base64URL encode some values
+  const clientDataJSON = base64url.encode(cred.response.clientDataJSON);
+  const attestationObject = base64url.encode(cred.response.attestationObject);
+
+  // Obtain transports
+  const transports = cred.response.getTransports ? cred.response.getTransports() : [];
+
+  credential.response = {
+    clientDataJSON,
+    attestationObject,
+    transports
+  };
 
   return await _fetch('/auth/registerResponse', credential);
 };
 
 export async function authenticate() {
   const options = await _fetch('/auth/signinRequest');
+
+  // Base64URL decode the challenge
   options.challenge = base64url.decode(options.challenge);
 
+  // `allowCredentials` empty array invokes an account selector by discoverable credentials.
+  options.allowCredentials = [];
+
+  // Invoke WebAuthn get
   const cred = await navigator.credentials.get({
     publicKey: options,
+    // Request a conditional UI
     mediation: 'conditional'
   });
 
   const credential = {};
   credential.id = cred.id;
   credential.type = cred.type;
+  // Base64URL encode `rawId`
   credential.rawId = base64url.encode(cred.rawId);
 
-  if (cred.response) {
-    const clientDataJSON =
-      base64url.encode(cred.response.clientDataJSON);
-    const authenticatorData =
-      base64url.encode(cred.response.authenticatorData);
-    const signature =
-      base64url.encode(cred.response.signature);
-    const userHandle =
-      base64url.encode(cred.response.userHandle);
-    credential.response = {
-      clientDataJSON,
-      authenticatorData,
-      signature,
-      userHandle,
-    };
-  }
+  // Base64URL encode some values
+  const clientDataJSON = base64url.encode(cred.response.clientDataJSON);
+  const authenticatorData = base64url.encode(cred.response.authenticatorData);
+  const signature = base64url.encode(cred.response.signature);
+  const userHandle = base64url.encode(cred.response.userHandle);
+
+  credential.response = {
+    clientDataJSON,
+    authenticatorData,
+    signature,
+    userHandle,
+  };
 
   return await _fetch(`/auth/signinResponse`, credential);
 };
