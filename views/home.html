@@ -128,19 +128,28 @@
 
       const createPasskey = $('#create-passkey');
 
+     // Is WebAuthn available on this browser?
       if (window.PublicKeyCredential &&
+          PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
           PublicKeyCredential.isConditionalMediationAvailable) {
         try {
-          const cma = await PublicKeyCredential.isConditionalMediationAvailable();
-          if (cma) {
+          // Is conditional UI available on this browser?
+          const results = await Promise.all([
+            PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+            PublicKeyCredential.isConditionalMediationAvailable()
+          ]);
+          if (results.every(r => r === true)) {
+            // If conditional UI is available, reveal the "Create a passkey" button.
             createPasskey.classList.remove('hidden');
           } else {
+            // If conditional UI is not available, show a message.
             $('#message').innerText = 'This device does not support passkeys.';
           }
         } catch (e) {
           console.error(e);
         }
       } else {
+        // If WebAuthn is not available, show a message.
         $('#message').innerText = 'This device does not support passkeys.';
       }
 

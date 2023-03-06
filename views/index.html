@@ -108,7 +108,7 @@
           } catch (e) {
             loading.stop();
             console.error(e);
-            if (e !== 'canceled' && e.name !== 'NotAllowedError') {
+            if (e.name !== 'NotAllowedError') {
               alert(e.message);
             }
           }
