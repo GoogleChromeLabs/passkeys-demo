@@ -42,7 +42,7 @@ export async function _fetch(path, payload = '') {
 
 export const base64url = {
   encode: function(buffer) {
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    const base64 = window.btoa(String.fromCharCode(...new Uint8Array(buffer)));
     return base64.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
   },
   decode: function(base64url) {
