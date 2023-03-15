@@ -240,6 +240,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       expectedChallenge,
       expectedOrigin,
       expectedRPID,
+      requireUserVerification: false,
     });
 
     const { verified, registrationInfo } = verification;
@@ -320,6 +321,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
       expectedOrigin,
       expectedRPID,
       authenticator,
+      requireUserVerification: false,
     });
 
     const { verified, authenticationInfo } = verification;
