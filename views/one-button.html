@@ -35,73 +35,45 @@
     <mwc-linear-progress id="progress"></mwc-linear-progress>
     <main class="content center">
       <h2>
-        Enter a username
+        Choose your passkey to sign in
       </h2>
-      <form id="form" method="POST" action="/auth/username" class="center">
-        <div class="mdc-text-field mdc-text-field--filled">
-          <span class="mdc-text-field__ripple"></span>
-          <label class="mdc-floating-label" id="username-label">username</label>
-          <input
-           type="text"
-           id="username"
-           class="mdc-text-field__input"
-           aria-labelledby="username-label"
-           name="username"
-           autocomplete="username webauthn"
-           autofocus />
-          <span class="mdc-line-ripple"></span>
-        </div>
-        <input type="password" class="hidden" name="password" />
-        <p class="instructions">Any username can be accepted.</p>
-        <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
-        <mwc-button><a href="/one-button">Use one button sign-in instead</a></mwc-button>
-      </form>
+      <section class="center">
+        <mwc-button id="passkey-signin" icon="key" raised>Sign-in with passkey</mwc-button>
+        <mwc-button><a href="/">Use form based sign-in instead</a></mwc-button>
+      </section>
       <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
       <script type="module">
         import { $, _fetch, loading, authenticate } from '/client.js';
-        new mdc.textField.MDCTextField($('.mdc-text-field'));
 
         // $('#code').addEventListener('click', e => {
         //   location.href = 'https://glitch.com/edit/#!/{{project_name}}';
         // });
 
-        const form = $('#form');
-        form.addEventListener('submit', async s => {
-          s.preventDefault();
-          const form = new FormData(s.target);
-          const cred = {};
-          form.forEach((v, k) => cred[k] = v);
-          _fetch(s.target.action, cred)
-          .then(user => {
-            location.href = '/reauth';
-          }).catch(e => {
-            loading.stop();
-            console.error(e.message);
-            alert(e);
-          });
-        });
+        const redirect = (path) => {
+          location.href = path;
+        }
 
-        if (window.PublicKeyCredential &&
-            PublicKeyCredential.isConditionalMediationAvailable) {
-          try {
-            const cma= await PublicKeyCredential.isConditionalMediationAvailable();
-            if (cma) {
-              const user = await authenticate(true);
+        if (window.PublicKeyCredential) {
+          $('#passkey-signin').addEventListener('click', async e => {
+            try {
+              loading.start();
+              const user = await authenticate();
               if (user) {
-                $('#username').value = user.username;
-                loading.start();
-                location.href = '/home';
+                redirect('/home');
               } else {
                 throw new Error('User not found.');
               }
+            } catch (e) {
+              loading.stop();
+              console.error(e);
+              if (e.name !== 'NotAllowedError') {
+                alert(e.message);
+              }
             }
-          } catch (e) {
-            loading.stop();
-            console.error(e);
-            if (e.name !== 'NotAllowedError') {
-              alert(e.message);
-            }
-          }
+          });
+        } else {
+          alert("WebAuthn isn't supported on this browser. Redirecting to a form.")
+          redirect('/');
         }
 
       </script>

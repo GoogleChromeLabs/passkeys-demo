@@ -129,7 +129,7 @@ export async function registerCredential() {
   return await _fetch('/auth/registerResponse', credential);
 };
 
-export async function authenticate() {
+export async function authenticate(conditional = false) {
   const options = await _fetch('/auth/signinRequest');
 
   // Base64URL decode the challenge
@@ -142,7 +142,7 @@ export async function authenticate() {
   const cred = await navigator.credentials.get({
     publicKey: options,
     // Request a conditional UI
-    mediation: 'conditional'
+    mediation: conditional ? 'conditional' : 'optional'
   });
 
   const credential = {};

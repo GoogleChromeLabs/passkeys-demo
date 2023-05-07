@@ -72,7 +72,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// http://expressjs.com/en/starter/basic-routing.html
 app.get('/', (req, res) => {
   // Check session
   if (req.session.username) {
@@ -82,6 +81,20 @@ app.get('/', (req, res) => {
   }
   // If the user is not signed in, show `index.html` with id/password form.
   res.render('index.html', {
+    project_name: process.env.PROJECT_NAME,
+    title: RP_NAME,
+  });
+});
+
+app.get('/one-button', (req, res) => {
+  // Check session
+  if (req.session.username) {
+    // If username is known, redirect to `/reauth`.
+    res.redirect(307, '/reauth');
+    return;
+  }
+  // If the user is not signed in, show `index.html` with id/password form.
+  res.render('one-button.html', {
     project_name: process.env.PROJECT_NAME,
     title: RP_NAME,
   });
