@@ -20,6 +20,7 @@
     "@material/mwc-list": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
     "@material/mwc-top-app-bar-fixed": "^0.27.0",
+    "@material/web": "^1.0.0-pre.7",
     "@simplewebauthn/server": "^7.2.0",
     "base64url": "^3.0.1",
     "dotenv": "^16.0.3",

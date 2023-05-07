@@ -33,11 +33,11 @@
       <!-- <mwc-icon-button id="code" icon="code" slot="actionItems"></mwc-icon-button> -->
     </mwc-top-app-bar-fixed>
     <mwc-linear-progress id="progress"></mwc-linear-progress>
-    <main class="content">
+    <main class="content center">
+      <h2>
+        Enter a password
+      </h2>
       <form id="form" method="POST" action="/auth/password" class="center">
-        <h2>
-          Enter a password
-        </h2>
         <input type="text" name="username" value="{{username}}" class="hidden"/>
         <div class="mdc-text-field mdc-text-field--filled">
           <span class="mdc-text-field__ripple"></span>
