@@ -303,7 +303,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   try {
     const cred = await Credentials.findById(credential.id);
     if (!cred) {
-      throw new Error('Credential not found.');
+      throw new Error('Matching credential not found on the server. Try signing in with a password.');
     }
 
     const user = await Users.findById(cred.user_id);

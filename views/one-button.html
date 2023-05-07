@@ -1,38 +1,3 @@
-<!--
- Copyright 2023 Google Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>{{title}}</title>
-    <meta name="description" content="{{title}}">
-    <link id="favicon" rel="icon" href="/favicon.svg" type="image/x-icon">
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/bundle.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
-    <script src="components-bundle.js"></script>
-  </head>
-  <body class="mdc-typography">
-    <mwc-top-app-bar-fixed>
-      <span slot="title">{{title}}</span>
-      <!-- <mwc-icon-button id="code" icon="code" slot="actionItems"></mwc-icon-button> -->
-    </mwc-top-app-bar-fixed>
-    <mwc-linear-progress id="progress"></mwc-linear-progress>
     <main class="content center">
       <h2>
         Choose your passkey to sign in
@@ -41,42 +6,39 @@
         <mwc-button id="passkey-signin" icon="key" raised>Sign-in with passkey</mwc-button>
         <mwc-button><a href="/">Use form based sign-in instead</a></mwc-button>
       </section>
-      <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-      <script type="module">
-        import { $, _fetch, loading, authenticate } from '/client.js';
-
-        // $('#code').addEventListener('click', e => {
-        //   location.href = 'https://glitch.com/edit/#!/{{project_name}}';
-        // });
-
-        const redirect = (path) => {
-          location.href = path;
-        }
-
-        if (window.PublicKeyCredential) {
-          $('#passkey-signin').addEventListener('click', async e => {
-            try {
-              loading.start();
-              const user = await authenticate();
-              if (user) {
-                redirect('/home');
-              } else {
-                throw new Error('User not found.');
-              }
-            } catch (e) {
-              loading.stop();
-              console.error(e);
-              if (e.name !== 'NotAllowedError') {
-                alert(e.message);
-              }
-            }
-          });
-        } else {
-          alert("WebAuthn isn't supported on this browser. Redirecting to a form.")
-          redirect('/');
-        }
-
-      </script>
     </main>
-  </body>
-</html>
+    <script type="module">
+      import { $, _fetch, loading, authenticate } from '/client.js';
+
+      // $('#code').addEventListener('click', e => {
+      //   location.href = 'https://glitch.com/edit/#!/{{project_name}}';
+      // });
+
+      const redirect = (path) => {
+        location.href = path;
+      }
+
+      if (window.PublicKeyCredential) {
+        $('#passkey-signin').addEventListener('click', async e => {
+          try {
+            loading.start();
+            const user = await authenticate();
+            if (user) {
+              redirect('/home');
+            } else {
+              throw new Error('User not found.');
+            }
+          } catch (e) {
+            loading.stop();
+            console.error(e);
+            if (e.name !== 'NotAllowedError') {
+              alert(e.message);
+            }
+          }
+        });
+      } else {
+        alert("WebAuthn isn't supported on this browser. Redirecting to a form.")
+        redirect('/');
+      }
+
+    </script>

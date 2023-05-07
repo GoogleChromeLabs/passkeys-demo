@@ -30,15 +30,21 @@ if (process.env.NODE_ENV === 'localhost') {
 
 import express from 'express';
 import session from 'express-session';
-import hbs from 'hbs';
+import hbs from 'express-handlebars';
 const app = express();
 import useragent from 'express-useragent';
 import { getFirestore } from 'firebase-admin/firestore';
 import { FirestoreStore } from '@google-cloud/connect-firestore';
 import { auth } from './libs/auth.mjs';
 
+const views = path.join(__dirname, 'views');
 app.set('view engine', 'html');
-app.engine('html', hbs.__express);
+app.engine('html', hbs.engine({
+  extname: 'html',
+  defaultLayout: 'index',
+  layoutsDir: path.join(views, 'layouts'),
+  partialsDir: path.join(views, 'partials'),
+}));
 app.set('views', './views');
 app.use(express.json());
 app.use(useragent.express());
