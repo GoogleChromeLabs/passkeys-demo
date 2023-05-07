@@ -18,7 +18,7 @@
   <head>
     <title>{{title}}</title>
     <meta name="description" content="{{title}}">
-    <link id="favicon" rel="icon" href="https://cdn.glitch.global/97cbd2e1-3be5-4e48-ad9e-6f7ac3344e60/favicon.svg?v=1677059136681" type="image/x-icon">
+    <link id="favicon" rel="icon" href="/favicon.svg" type="image/x-icon">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,7 +30,7 @@
   <body class="mdc-typography">
     <mwc-top-app-bar-fixed>
       <span slot="title">{{title}}</span>
-      <mwc-icon-button id="code" icon="code" slot="actionItems"></mwc-icon-button>
+      <!-- <mwc-icon-button id="code" icon="code" slot="actionItems"></mwc-icon-button> -->
     </mwc-top-app-bar-fixed>
     <mwc-linear-progress id="progress"></mwc-linear-progress>
     <main class="content center">
@@ -58,9 +58,9 @@
       import { $, _fetch, loading, registerCredential, updateCredential, unregisterCredential } from '/client.js';
       import { html, render } from 'https://unpkg.com/lit-html@2.6.1/lit-html.js?module';
 
-      $('#code').addEventListener('click', e => {
-        location.href = 'https://glitch.com/edit/#!/{{project_name}}';
-      });
+      // $('#code').addEventListener('click', e => {
+      //   location.href = 'https://glitch.com/edit/#!/{{project_name}}';
+      // });
 
       async function changeDisplayName(e) {
         const newName = prompt('Enter a new display name', e.target.dataset.displayName);
@@ -93,8 +93,6 @@
         <mwc-list>`, $('#display-name'));
       };
 
-      renderDisplayName();
-
       async function rename(e) {
         const { credId, name } = e.target.dataset;
         const newName = prompt('Enter a new credential name.', name);
@@ -102,8 +100,8 @@
         try {
           loading.start();
           await updateCredential(credId, newName);
+          await renderCredentials();
           loading.stop();
-          renderCredentials();
         } catch (e) {
           loading.stop();
           console.error(e);
@@ -117,8 +115,8 @@
         try {
           loading.start();
           await unregisterCredential(e.target.dataset.credId);
+          await renderCredentials();
           loading.stop();
-          renderCredentials();
         } catch (e) {
           loading.stop();
           console.error(e);
@@ -177,14 +175,12 @@
         render(creds, list);
       };
 
-      renderCredentials();
-
       async function register() {
         try {
           loading.start();
           await registerCredential();
+          await renderCredentials();
           loading.stop();
-          renderCredentials();
         } catch (e) {
           // Stop the loading UI
           loading.stop();
@@ -201,6 +197,11 @@
           }
         }
       };
+
+      loading.start();
+      renderDisplayName();
+      await renderCredentials();
+      loading.stop();
 
       createPasskey.addEventListener('click', register);
     </script>

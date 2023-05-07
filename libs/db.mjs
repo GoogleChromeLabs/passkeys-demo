@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-import { Low } from 'lowdb';
-import { JSONFile } from 'lowdb/node'
+import { initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import base64url from 'base64url';
 
-const adapter = new JSONFile('.data/db.json');
-const db = new Low(adapter);
-await db.read();
-
-db.data ||= { users: [], credentials: [] } ;
+initializeApp();
+const store = getFirestore();
+store.settings({ ignoreUndefinedProperties: true });
 
 /**
  * User data schema
@@ -33,30 +32,29 @@ db.data ||= { users: [], credentials: [] } ;
  **/
 
 export const Users = {
-  findById: (user_id) => {
-    const user = db.data.users.find(user => user.id === user_id);
-    return user;
+  findById: async (user_id) => {
+    const doc = await store.collection('users').doc(user_id).get();
+    if (doc) {
+      const credential = doc.data();
+      return credential;
+    } else {
+      return;
+    }
   },
 
-  findByUsername: (username) => {
-    const user = db.data.users.find(user => user.username === username);
-    return user;
+  findByUsername: async (username) => {
+    const results = [];
+    const refs = await store.collection('users')
+      .where('username', '==', username).get();
+    if (refs) {
+      refs.forEach(user => results.push(user.data()));
+    }
+    return results.length > 0 ? results[0] : undefined;
   },
 
   update: async (user) => {
-    let found = false;
-    db.data.users = db.data.users.map(_user => {
-      if (_user.id === user.id) {
-        found = true;
-        return user;
-      } else {
-        return _user;
-      }
-    });
-    if (!found) {
-      db.data.users.push(user);
-    }
-    return db.write();
+    const ref = store.collection('users').doc(user.id);
+      return ref.set(user);
   }
 }
 
@@ -67,46 +65,39 @@ export const Users = {
  *   publicKey: string Base64URL encoded PublicKey,
  *   name: string name of the credential,
  *   transports: an array of transports,
+ *   registered: timestamp,
+ *   last_used: timestamp,
  *   user_id: string Base64URL encoded user ID of the owner,
  * }
  **/
 
 export const Credentials = {
-  findById: (credential_id) => {
-    const credential = db.data.credentials.find(credential => credential.id === credential_id);
-    return credential;
+  findById: async (credential_id) => {
+    const doc = await store.collection('credentials').doc(credential_id).get();
+    if (doc) {
+      const credential = doc.data();
+      return credential;
+    } else {
+      return;
+    }
   },
 
-  findByUserId: (user_id) => {
-    const credentials = db.data.credentials.filter(credential => credential.user_id === user_id);
-    return credentials;
+  findByUserId: async (user_id) => {
+    const results = [];
+    const refs = await store.collection('credentials')
+      .where('user_id', '==', user_id)
+      .orderBy('registered', 'desc').get();
+    refs.forEach(cred => results.push(cred.data()));
+    return results;
   },
 
   update: async (credential) => {
-    let found = false;
-    db.data.credentials = db.data.credentials.map(_credential => {
-      if (_credential.id === credential.id) {
-        found = true;
-        return credential;
-      } else {
-        return _credential;
-      }
-    });
-    if (!found) {
-      db.data.credentials.push(credential);
-    }
-    return db.write();
+    const ref = store.collection('credentials').doc(credential.id);
+    return ref.set(credential);
   },
   
   remove: async (credential_id, user_id) => {
-    db.data.credentials = db.data.credentials.filter(_cred => {
-      if (_cred.id !== credential_id) {
-        return true;
-      } else {
-        // Only when the user ID matches, remove it (return `false`).
-        return _cred.user_id !== user_id;
-      }
-    });
-    return db.write();
+    const ref = store.collection('credentials').doc(credential_id);
+    return ref.delete();
   }
 }

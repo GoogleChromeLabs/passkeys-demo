@@ -39,11 +39,11 @@ function csrfCheck(req, res, next) {
  * Checks CSRF protection using custom header `X-Requested-With`
  * If the session doesn't contain `signed-in`, consider the user is not authenticated.
  **/
-function sessionCheck(req, res, next) {
+async function sessionCheck(req, res, next) {
   if (!req.session['signed-in'] || !req.session.username) {
     return res.status(401).json({ error: 'not signed in.' });
   }
-  const user = Users.findByUsername(req.session.username);
+  const user = await Users.findByUsername(req.session.username);
   if (!user) {
     return res.status(401).json({ error: 'user not found.' });    
   }
@@ -90,7 +90,7 @@ router.post('/username', async (req, res) => {
      // Only check username, no need to check password as this is a mock
     if (username && /^[a-zA-Z0-9@\.\-_]+$/.test(username)) {
       // See if account already exists
-      let user = Users.findByUsername(username);
+      let user = await Users.findByUsername(username);
       // If user entry is not created yet, create one
       if (!user) {
         user = {
@@ -118,11 +118,11 @@ router.post('/username', async (req, res) => {
  * No preceding registration required.
  * This only checks if `username` is not empty string and ignores the password.
  **/
-router.post('/password', (req, res) => {
+router.post('/password', async (req, res) => {
   if (!req.body.password) {
     return res.status(401).json({ error: 'Enter at least one random letter.' });
   }
-  const user = Users.findByUsername(req.session.username);
+  const user = await Users.findByUsername(req.session.username);
 
   if (!user) {
     return res.status(401).json({ error: 'Enter username first.' });
@@ -158,14 +158,14 @@ router.get('/signout', (req, res) => {
 
 router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
   const { user } = res.locals;
-  const credentials = Credentials.findByUserId(user.id);
-  return res.json(credentials || {});
+  const credentials = await Credentials.findByUserId(user.id);
+  return res.json(credentials || []);
 });
 
 router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
   const { user } = res.locals;
-  const credential = Credentials.findById(credId);
+  const credential = await Credentials.findById(credId);
   if (!user || user.id !== credential?.user_id) {
     return res.status(401).json({ error: 'User not authorized.' });
   }
@@ -191,7 +191,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   const { user } = res.locals;
   try {
     const excludeCredentials = [];
-    const credentials = Credentials.findByUserId(user.id);
+    const credentials = await Credentials.findByUserId(user.id);
     for (const cred of credentials) {
       excludeCredentials.push({
         id: isoBase64URL.toBuffer(cred.id),
@@ -261,6 +261,8 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       publicKey: base64PublicKey,
       name: req.useragent.platform,
       transports: credential.response.transports || [],
+      registered: (new Date()).getTime(),
+      last_used: null,
       user_id: user.id,
     });
 
@@ -284,7 +286,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
     });
     req.session.challenge = options.challenge;
 
-    return res.json(options);
+    return res.json(options)
   } catch (e) {
     console.error(e);
 
@@ -299,12 +301,12 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   const expectedRPID = process.env.HOSTNAME;
 
   try {
-    const cred = Credentials.findById(credential.id);
+    const cred = await Credentials.findById(credential.id);
     if (!cred) {
       throw new Error('Credential not found.');
     }
 
-    const user = Users.findById(cred.user_id);
+    const user = await Users.findById(cred.user_id);
     if (!user) {
       throw new Error('User not found.');
     }
@@ -329,6 +331,10 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     if (!verified) {
       throw new Error('User verification failed.');
     }
+
+    // Update the last used timestamp.
+    cred.last_used = (new Date()).getTime();
+    await Credentials.update(cred);
 
     delete req.session.challenge;
 

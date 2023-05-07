@@ -18,7 +18,7 @@
   <head>
     <title>{{title}}</title>
     <meta name="description" content="{{title}}">
-    <link id="favicon" rel="icon" href="https://cdn.glitch.global/97cbd2e1-3be5-4e48-ad9e-6f7ac3344e60/favicon.svg?v=1677059136681" type="image/x-icon">
+    <link id="favicon" rel="icon" href="/favicon.svg" type="image/x-icon">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,7 +30,7 @@
   <body class="mdc-typography">
     <mwc-top-app-bar-fixed>
       <span slot="title">{{title}}</span>
-      <mwc-icon-button id="code" icon="code" slot="actionItems"></mwc-icon-button>
+      <!-- <mwc-icon-button id="code" icon="code" slot="actionItems"></mwc-icon-button> -->
     </mwc-top-app-bar-fixed>
     <mwc-linear-progress id="progress"></mwc-linear-progress>
     <main class="content center">
@@ -71,9 +71,9 @@
         import { $, _fetch, loading, authenticate } from '/client.js';
         new mdc.textField.MDCTextField($('.mdc-text-field'));
 
-        $('#code').addEventListener('click', e => {
-          location.href = 'https://glitch.com/edit/#!/{{project_name}}';
-        });
+        // $('#code').addEventListener('click', e => {
+        //   location.href = 'https://glitch.com/edit/#!/{{project_name}}';
+        // });
 
         const form = $('#form');
         form.addEventListener('submit', async s => {

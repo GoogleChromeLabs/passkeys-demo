@@ -16,12 +16,26 @@
  */
 
 // init project
+import path from 'path';
+import url from 'url';
+import dotenv from 'dotenv';
+import firebaseJson from './firebase.json' assert { type: 'json' };
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+dotenv.config({ path: path.join(__dirname, ".env") });
+
+if (process.env.NODE_ENV === 'localhost') {
+  // Ideally this is configured with `.env`;
+  process.env.FIRESTORE_EMULATOR_HOST = `${firebaseJson.emulators.firestore.host}:${firebaseJson.emulators.firestore.port}`;
+}
+
 import express from 'express';
 import session from 'express-session';
 import hbs from 'hbs';
-import { auth } from './libs/auth.mjs';
 const app = express();
 import useragent from 'express-useragent';
+import { getFirestore } from 'firebase-admin/firestore';
+import { FirestoreStore } from '@google-cloud/connect-firestore';
+import { auth } from './libs/auth.mjs';
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
@@ -35,30 +49,25 @@ app.use(session({
   resave: true,
   saveUninitialized: false,
   proxy: true,
+  store: new FirestoreStore({
+    dataset: getFirestore(),
+    kind: 'express-sessions',
+  }),
   cookie:{
+    path: '/',
     httpOnly: true,
-    secure: true,
-    sameSite: 'none'
+    secure: process.env.NODE_ENV !== 'localhost',
+    maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
   }
 }));
 
-const RP_NAME = 'Passkeys Form Demo';
+const RP_NAME = 'Passkeys Demo';
 
 app.use((req, res, next) => {
-  if (process.env.PROJECT_DOMAIN) {
-    process.env.HOSTNAME = `${process.env.PROJECT_DOMAIN}.glitch.me`;
-  } else {
-    process.env.HOSTNAME = req.headers.host;
-  }
-  const protocol = /^localhost/.test(process.env.HOSTNAME) ? 'http' : 'https';
-  process.env.ORIGIN = `${protocol}://${process.env.HOSTNAME}`;
+  process.env.HOSTNAME = req.hostname;
+  const protocol = process.env.NODE_ENV === 'localhost' ? 'http' : 'https';
+  process.env.ORIGIN = `${protocol}://${req.headers.host}`;
   process.env.RP_NAME = RP_NAME;
-  if (
-    req.get('x-forwarded-proto') &&
-    req.get('x-forwarded-proto').split(',')[0] !== 'https'
-  ) {
-    return res.redirect(301, process.env.ORIGIN);
-  }
   req.schema = 'https';
   next();
 });
@@ -138,14 +147,8 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
   res.json(assetlinks);
 });
 
-app.get('/test', (req, res) => {
-  res.render('test.html');
-})
-
 app.use('/auth', auth);
 
-// listen for req :)
-const port = process.env.GLITCH_DEBUGGER ? null : 8080;
-const listener = app.listen(port || process.env.PORT, () => {
+const listener = app.listen(process.env.PORT || 8080, () => {
   console.log('Your app is listening on port ' + listener.address().port);
 });
