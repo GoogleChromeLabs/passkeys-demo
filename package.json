@@ -29,7 +29,6 @@
     "express-session": "^1.17.3",
     "express-useragent": "^1.0.15",
     "firebase-admin": "^11.8.0",
-    "hbs": "^4.2.0",
     "lit": "^2.7.4",
     "lowdb": "^5.1.0",
     "material-components-web": "^14.0.0"

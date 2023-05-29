@@ -36,6 +36,10 @@ body {
   color: gray;
 }
 
+.narrow {
+  max-width: 400px;
+}
+
 .center {
   display: flex;
   flex-direction: column;
