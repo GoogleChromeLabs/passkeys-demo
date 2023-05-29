@@ -16,6 +16,12 @@
  */
 export const $ = document.querySelector.bind(document);
 
+/**
+ * Sends a POST request with payload. Throws when the response is not 200.
+ * @param path The endpoint path.
+ * @param payload The payload JSON object.
+ * @returns 
+ */
 export async function _fetch(path, payload = '') {
   const headers = {
     'X-Requested-With': 'XMLHttpRequest',
@@ -40,6 +46,9 @@ export async function _fetch(path, payload = '') {
   }
 };
 
+/**
+ * Encode given buffer or decode given string with Base64URL.
+ */
 export const base64url = {
   encode: function(buffer) {
     const base64 = window.btoa(String.fromCharCode(...new Uint8Array(buffer)));
@@ -56,6 +65,9 @@ export const base64url = {
   }
 }
 
+/**
+ * Indicate loading status using a material progress web component.
+ */
 class Loading {
   constructor() {
     this.progress = $('#progress');
@@ -78,13 +90,17 @@ class Loading {
 
 export const loading = new Loading();
 
+/**
+ * Create and register a new passkey
+ * @returns A promise that resolves with a server response.
+ */
 export async function registerCredential() {
+  // Fetch passkey creation options from the server.
   const options = await _fetch('/auth/registerRequest');
 
   // Base64URL decode some values
   options.user.id = base64url.decode(options.user.id);
   options.challenge = base64url.decode(options.challenge);
-
   if (options.excludeCredentials) {
     for (let cred of options.excludeCredentials) {
       cred.id = base64url.decode(cred.id);
@@ -117,7 +133,7 @@ export async function registerCredential() {
   const clientDataJSON = base64url.encode(cred.response.clientDataJSON);
   const attestationObject = base64url.encode(cred.response.attestationObject);
 
-  // Obtain transports
+  // Obtain transports if they are available.
   const transports = cred.response.getTransports ? cred.response.getTransports() : [];
 
   credential.response = {
@@ -126,10 +142,17 @@ export async function registerCredential() {
     transports
   };
 
+  // Send the result to the server and return the promise.
   return await _fetch('/auth/registerResponse', credential);
 };
 
+/**
+ * Authenticate with a passkey.
+ * @param { boolean } conditional Set to `true` if this is for a conditional UI.
+ * @returns A promise that resolves with a server response.
+ */
 export async function authenticate(conditional = false) {
+  // Fetch passkey request options from the server.
   const options = await _fetch('/auth/signinRequest');
 
   // Base64URL decode the challenge
@@ -164,13 +187,25 @@ export async function authenticate(conditional = false) {
     userHandle,
   };
 
+  // Send the result to the server and return the promise.
   return await _fetch(`/auth/signinResponse`, credential);
 };
 
+/**
+ * Request to update the namme of a passkey.
+ * @param { string } credId A Base64URL encoded credential ID of the passkey to unregister.
+ * @param { string } newName A new name for the passkey.
+ * @returns a promise that resolves with a server response.
+ */
 export async function updateCredential(credId, newName) {
   return _fetch(`/auth/renameKey`, { credId, newName });
 }
 
+/**
+ * Request to unregister a passkey.
+ * @param { string } credId A Base64URL encoded credential ID of the passkey to unregister.
+ * @returns a promise that resolves with a server response.
+ */
 export async function unregisterCredential(credId) {
   return _fetch(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
 };

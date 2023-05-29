@@ -51,6 +51,12 @@ async function sessionCheck(req, res, next) {
   next();
 };
 
+/**
+ * Get the expected origin that the user agent is claiming to be at. If the
+ * requester is Android, construct an expected `origin` parameter.
+ * @param { string } userAgent A user agent string used to check if it's a web browser.
+ * @returns A string that indicates an expected origin.
+ */
 function getOrigin(userAgent) {
   let origin = process.env.ORIGIN;
   
@@ -59,9 +65,12 @@ function getOrigin(userAgent) {
   if (match) {
     // Check if UserAgent comes from a supported Android app.
     if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
+      // `process.env.ANDROID_PACKAGENAME` is expected to have a comma separated package names.
       const package_names = process.env.ANDROID_PACKAGENAME.split(",").map(name => name.trim());
+      // `process.env.ANDROID_SHA256HASH` is expected to have a comma separated hash values.
       const hashes = process.env.ANDROID_SHA256HASH.split(",").map(hash => hash.trim());
       const appName = match[0];
+      // Find and construct the expected origin string.
       for (let i = 0; i < package_names.length; i++) {
         if (appName === package_names[i]) {
           // We recognize this app, so use the corresponding hash.
@@ -132,11 +141,17 @@ router.post('/password', async (req, res) => {
   return res.json(user);
 });
 
+/**
+ * Response with user information.
+ */
 router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
   const { user } = res.locals;
   return res.json(user);
 });
 
+/**
+ * Update the user's display name.
+ */
 router.post('/updateDisplayName', csrfCheck, sessionCheck, async (req, res) => {
   const { newName } = req.body;
   if (newName) {
@@ -149,6 +164,9 @@ router.post('/updateDisplayName', csrfCheck, sessionCheck, async (req, res) => {
   }
 });
 
+/**
+ * Sign out the user.
+ */
 router.get('/signout', (req, res) => {
   // Remove the session
   req.session.destroy()
@@ -156,12 +174,18 @@ router.get('/signout', (req, res) => {
   return res.redirect(307, '/');
 });
 
+/**
+ * Respond with a list of stored credentials.
+ */
 router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
   const { user } = res.locals;
   const credentials = await Credentials.findByUserId(user.id);
   return res.json(credentials || []);
 });
 
+/**
+ * Update the name of a passkey.
+ */
 router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { credId, newName } = req.body;
   const { user } = res.locals;
@@ -175,8 +199,8 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
 });
 
 /**
- * Removes a credential id attached to the user
- * Responds with empty JSON `{}`
+ * Removes a credential id attached to the user.
+ * Responds with empty JSON `{}`.
  **/
 router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
   const credId = req.query.credId;
@@ -187,9 +211,13 @@ router.post('/removeKey', csrfCheck, sessionCheck, async (req, res) => {
   return res.json({});
 });
 
+/**
+ * Start creating a new passkey by serving registration options.
+ */
 router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   const { user } = res.locals;
   try {
+    // Create `excludeCredentials` from a list of stored credentials.
     const excludeCredentials = [];
     const credentials = await Credentials.findByUserId(user.id);
     for (const cred of credentials) {
@@ -199,12 +227,14 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
         transports: cred.transports,
       });
     }
+    // Set `authenticatorSelection`.
     const authenticatorSelection = {
       authenticatorAttachment: 'platform',
       requireResidentKey: true
     }
     const attestationType = 'none';
 
+    // Use SimpleWebAuthn's handy function to create registration options.
     const options = generateRegistrationOptions({
       rpName: process.env.RP_NAME,
       rpID: process.env.HOSTNAME,
@@ -218,8 +248,10 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
       authenticatorSelection,
     });
 
+    // Keep the challenge value in a session.
     req.session.challenge = options.challenge;
 
+    // Respond with the registration options.
     return res.json(options);
   } catch (e) {
     console.error(e);
@@ -227,7 +259,11 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
   }
 });
 
+/**
+ * Register a new passkey to the server.
+ */
 router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
+  // Set expected values.
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
@@ -235,6 +271,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
 
   try {
 
+    // Use SimpleWebAuthn's handy function to verify the registration request.
     const verification = await verifyRegistrationResponse({
       response: credential,
       expectedChallenge,
@@ -245,17 +282,20 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
 
     const { verified, registrationInfo } = verification;
 
+    // If the verification failed, throw.
     if (!verified) {
       throw new Error('User verification failed.');
     }
 
     const { credentialPublicKey, credentialID } = registrationInfo;
 
+    // Base64URL encode ArrayBuffers.
     const base64PublicKey = isoBase64URL.fromBuffer(credentialPublicKey);
     const base64CredentialID = isoBase64URL.fromBuffer(credentialID);
 
     const { user } = res.locals;
     
+    // Store the registration result.
     await Credentials.update({
       id: base64CredentialID,
       publicKey: base64PublicKey,
@@ -266,9 +306,10 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       user_id: user.id,
     });
 
+    // Delete the challenge from the session.
     delete req.session.challenge;
 
-    // Respond with user info
+    // Respond with the user information.
     return res.json(user);
   } catch (e) {
     delete req.session.challenge;
@@ -278,12 +319,18 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   }
 });
 
+/**
+ * Start authenticating the user.
+ */
 router.post('/signinRequest', csrfCheck, async (req, res) => {
   try {
+    // Use SimpleWebAuthn's handy function to create a new authentication request.
     const options = await generateAuthenticationOptions({
       rpID: process.env.HOSTNAME,
       allowCredentials: [],
     });
+
+    // Keep the challenge value in a session.
     req.session.challenge = options.challenge;
 
     return res.json(options)
@@ -294,29 +341,38 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
   }
 });
 
+/**
+ * Verify the authentication request.
+ */
 router.post('/signinResponse', csrfCheck, async (req, res) => {
+  // Set expected values.
   const credential = req.body;
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
 
   try {
+
+    // Find the matching credential from the credential ID
     const cred = await Credentials.findById(credential.id);
     if (!cred) {
       throw new Error('Matching credential not found on the server. Try signing in with a password.');
     }
 
+    // Find the matching user from the user ID contained in the credential.
     const user = await Users.findById(cred.user_id);
     if (!user) {
       throw new Error('User not found.');
     }
 
+    // Decode ArrayBuffers and construct an authenticator object.
     const authenticator = {
       credentialPublicKey: isoBase64URL.toBuffer(cred.publicKey),
       credentialID: isoBase64URL.toBuffer(cred.id),
       transports: cred.transports,
     };
 
+    // Use SimpleWebAuthn's handy function to verify the authentication request.
     const verification = await verifyAuthenticationResponse({
       response: credential,
       expectedChallenge,
@@ -328,6 +384,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
     const { verified, authenticationInfo } = verification;
 
+    // If the authentication failed, throw.
     if (!verified) {
       throw new Error('User verification failed.');
     }
@@ -336,8 +393,10 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     cred.last_used = (new Date()).getTime();
     await Credentials.update(cred);
 
+    // Delete the challenge from the session.
     delete req.session.challenge;
 
+    // Start a new session.
     req.session.username = user.username;
     req.session['signed-in'] = 'yes';
 
