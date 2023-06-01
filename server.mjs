@@ -18,16 +18,7 @@
 // init project
 import path from 'path';
 import url from 'url';
-import dotenv from 'dotenv';
-import firebaseJson from './firebase.json' assert { type: 'json' };
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-dotenv.config({ path: path.join(__dirname, ".env") });
-
-if (process.env.NODE_ENV === 'localhost') {
-  // Ideally this is configured with `.env`;
-  process.env.FIRESTORE_EMULATOR_HOST = `${firebaseJson.emulators.firestore.host}:${firebaseJson.emulators.firestore.port}`;
-}
-
 import express from 'express';
 import session from 'express-session';
 import hbs from 'express-handlebars';
