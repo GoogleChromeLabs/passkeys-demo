@@ -8,6 +8,7 @@ passkeys-demo is a demo web application developers can have a look and try thems
 
 * node.js 18
 * gcloud
+* java 11+
 
 ### Install
 
@@ -21,4 +22,5 @@ passkeys-demo is a demo web application developers can have a look and try thems
 
 > $ npm run emulator & npm run dev
 
+Open [http://localhost:8080](http://localhost:8080).
 

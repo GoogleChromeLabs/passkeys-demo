@@ -24,7 +24,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp } from 'firebase-admin/app';
 
 if (process.env.NODE_ENV === 'localhost') {
-  // Ideally this is configured with `.env`;
+  process.env.GOOGLE_CLOUD_PROJECT = 'passkeys-demo';
   process.env.FIRESTORE_EMULATOR_HOST = `${firebaseJson.emulators.firestore.host}:${firebaseJson.emulators.firestore.port}`;
 }
 
