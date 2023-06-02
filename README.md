@@ -12,15 +12,21 @@ passkeys-demo is a demo web application developers can have a look and try thems
 
 ### Install
 
-> $ npm i
+```shell
+npm i
+```
 
 ### Bulid
 
-> $ npm run build
+```shell
+npm run build
+```
 
 ### Run
 
-> $ npm run emulator & npm run dev
+```shell
+npm run emulator & npm run dev
+```
 
 Open [http://localhost:8080](http://localhost:8080).
 
