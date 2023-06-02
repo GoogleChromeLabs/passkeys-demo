@@ -8,7 +8,7 @@
     "build": "webpack",
     "dev": "NODE_ENV=localhost node server.mjs",
     "start": "node server.mjs",
-    "deploy": "gcloud app deploy --project passkeys-demo app.yaml",
+    "deploy": "npm run build && gcloud app deploy --project passkeys-demo app.yaml",
     "emulator": "firebase emulators:start --only firestore --project passkeys-demo --import=./.data --export-on-exit"
   },
   "dependencies": {
