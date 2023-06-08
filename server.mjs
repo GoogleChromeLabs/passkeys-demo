@@ -155,7 +155,7 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
   return res.json(assetlinks);
 });
 
-app.get('/.well-known/passkey-enrollment', (req, res) => {
+app.get('/.well-known/passkey-endpoints', (req, res) => {
   const web_endpoint = `${process.env.DOMAIN}/home`;
   const enroll = { 'web': web_endpoint };
   const manage = { 'web': web_endpoint };
