@@ -66,18 +66,17 @@ app.use((req, res, next) => {
   process.env.ORIGIN = `${protocol}://${req.headers.host}`;
   process.env.RP_NAME = RP_NAME;
   req.schema = 'https';
-  next();
+  return next();
 });
 
 app.get('/', (req, res) => {
   // Check session
   if (req.session.username) {
     // If username is known, redirect to `/reauth`.
-    res.redirect(307, '/reauth');
-    return;
+    return res.redirect(307, '/reauth');
   }
   // If the user is not signed in, show `index.html` with id/password form.
-  res.render('index.html', {
+  return res.render('index.html', {
     project_name: process.env.PROJECT_NAME,
     title: RP_NAME,
   });
@@ -87,11 +86,10 @@ app.get('/one-button', (req, res) => {
   // Check session
   if (req.session.username) {
     // If username is known, redirect to `/reauth`.
-    res.redirect(307, '/reauth');
-    return;
+    return res.redirect(307, '/reauth');
   }
   // If the user is not signed in, show `index.html` with id/password form.
-  res.render('one-button.html', {
+  return res.render('one-button.html', {
     project_name: process.env.PROJECT_NAME,
     title: RP_NAME,
   });
@@ -120,7 +118,7 @@ app.get('/home', (req, res) => {
     return;
   }
   // `home.html` shows sign-out link
-  res.render('home.html', {
+  return res.render('home.html', {
     displayName: req.session.username,
     project_name: process.env.PROJECT_NAME,
     title: RP_NAME,
@@ -154,7 +152,14 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
       });
     }
   }
-  res.json(assetlinks);
+  return res.json(assetlinks);
+});
+
+app.get('/.well-known/passkey-enrollment', (req, res) => {
+  const web_endpoint = `${process.env.DOMAIN}/home`;
+  const enroll = { 'web': web_endpoint };
+  const manage = { 'web': web_endpoint };
+  return res.json({ enroll, manage });
 });
 
 app.use('/auth', auth);
