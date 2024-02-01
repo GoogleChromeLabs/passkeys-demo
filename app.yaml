@@ -15,7 +15,7 @@ runtime: nodejs18
 env_variables:
   NODE_ENV: production
 handlers:
-- url: /.*
+- url: 
   secure: always
-  redirect_http_response_code: 301
+  redirect_http_response_code: 200
   script: auto
