@@ -21,6 +21,7 @@
     <script type="module">
       import { $, _fetch, loading, registerCredential, updateCredential, unregisterCredential } from '/client.js';
       import { html, render } from 'https://unpkg.com/lit-html@2.6.1/lit-html.js?module';
+      const aaguids = await fetch('/auth/aaguids').then(res => res.json());
 
       $('#code').addEventListener('click', e => {
         location.href = 'https://github.com/GoogleChromeLabs/passkeys-demo';
@@ -139,6 +140,12 @@
             <mwc-list-item>
               <div class="list-item">
                 <div class="entity-name">
+                  ${cred.aaguid &&
+                    cred.aaguid !== '00000000-0000-0000-0000-000000000000'?html`
+                  <mwc-icon-button>
+                    <img src="${aaguids[cred.aaguid].icon_light}">
+                  </mwc-icon-button>
+                  `:''}
                   <span>${cred.name || 'Unnamed' }</span>
                 </div>
                 <div class="buttons">

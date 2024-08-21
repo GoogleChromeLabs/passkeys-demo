@@ -25,6 +25,7 @@ import {
 } from '@simplewebauthn/server';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Users, Credentials } from './db.mjs';
+import aaguids from 'aaguid' with { type: 'json' };
 
 router.use(express.json());
 
@@ -87,6 +88,13 @@ function getOrigin(userAgent) {
   
   return origin;
 }
+
+router.get('/aaguids', (req, res) => {
+  if (Object.keys(aaguids).length === 0) {
+    return res.json();
+  }
+  return res.json(aaguids);
+});
 
 /**
  * Check username, create a new account if it doesn't exist.
@@ -222,7 +230,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     const credentials = await Credentials.findByUserId(user.id);
     for (const cred of credentials) {
       excludeCredentials.push({
-        id: isoBase64URL.toBuffer(cred.id),
+        id: cred.id,
         type: 'public-key',
         transports: cred.transports,
       });
@@ -238,7 +246,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     const options = await generateRegistrationOptions({
       rpName: process.env.RP_NAME,
       rpID: process.env.HOSTNAME,
-      userID: user.id,
+      userID: isoBase64URL.toBuffer(user.id),
       userName: user.username,
       userDisplayName: user.displayName || user.username,
       // Prompt users for additional information about the authenticator.
@@ -287,20 +295,28 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       throw new Error('User verification failed.');
     }
 
-    const { credentialPublicKey, credentialID } = registrationInfo;
+    const {
+      credentialPublicKey,
+      credentialID,
+      aaguid = '00000000-0000-0000-0000-000000000000', 
+    } = registrationInfo;
 
     // Base64URL encode ArrayBuffers.
     const base64PublicKey = isoBase64URL.fromBuffer(credentialPublicKey);
-    const base64CredentialID = isoBase64URL.fromBuffer(credentialID);
 
     const { user } = res.locals;
+
+    // Determine the name of the authenticator from the AAGUID.
+    const name = (Object.keys(aaguids).length > 0 && aaguids[aaguid]?.name)
+                  || req.useragent.platform;
     
     // Store the registration result.
     await Credentials.update({
-      id: base64CredentialID,
+      id: credentialID,
       publicKey: base64PublicKey,
-      name: req.useragent.platform,
+      name,
       transports: credential.response.transports || [],
+      aaguid,
       registered: (new Date()).getTime(),
       last_used: null,
       user_id: user.id,
@@ -367,8 +383,8 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
     // Decode ArrayBuffers and construct an authenticator object.
     const authenticator = {
+      credentialID: cred.id,
       credentialPublicKey: isoBase64URL.toBuffer(cred.publicKey),
-      credentialID: isoBase64URL.toBuffer(cred.id),
       transports: cred.transports,
     };
 
