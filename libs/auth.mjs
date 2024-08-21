@@ -317,6 +317,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       name,
       transports: credential.response.transports || [],
       aaguid,
+      created_on: req.useragent.platform,
       registered: (new Date()).getTime(),
       last_used: null,
       user_id: user.id,
