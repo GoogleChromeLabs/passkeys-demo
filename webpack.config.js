@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-import sass from 'sass';
+import * as sass from 'sass';
 
 export default {
   entry: {
@@ -42,7 +42,7 @@ export default {
             loader: 'sass-loader',
             options: {
               implementation: sass,
-              webpackImporter: false,
+              webpackImporter: true,
               sassOptions: {
                 includePaths: ['./node_modules'],
               },
