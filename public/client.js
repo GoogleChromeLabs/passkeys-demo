@@ -49,12 +49,13 @@ export async function _fetch(path, payload = '') {
 /**
  * Encode given buffer or decode given string with Base64URL.
  */
-export const base64url = {
-  encode: function(buffer) {
+class base64url {
+  static encode(buffer) {
     const base64 = window.btoa(String.fromCharCode(...new Uint8Array(buffer)));
     return base64.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-  },
-  decode: function(base64url) {
+  }
+
+  static decode(base64url) {
     const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
     const binStr = window.atob(base64);
     const bin = new Uint8Array(binStr.length);
@@ -62,6 +63,93 @@ export const base64url = {
       bin[i] = binStr.charCodeAt(i);
     }
     return bin.buffer;
+  }
+}
+
+if (PublicKeyCredential) {
+  if (!PublicKeyCredential?.parseCreationOptionsFromJSON) {
+    PublicKeyCredential.parseCreationOptionsFromJSON = (options) => {
+      const user = {
+        ...options.user,
+        id: base64url.decode(options.user.id),
+      };
+      const challenge = base64url.decode(options.challenge);
+      const excludeCredentials =
+        options.excludeCredentials?.map((cred) => {
+          return {
+            ...cred,
+            id: base64url.decode(cred.id),
+          };
+        }) ?? [];
+      return {
+        ...options,
+        user,
+        challenge,
+        excludeCredentials,
+      };
+    };
+  }
+
+  if (!PublicKeyCredential?.parseRequestOptionsFromJSON) {
+    PublicKeyCredential.parseRequestOptionsFromJSON = (options) => {
+      const challenge = base64url.decode(options.challenge);
+      const allowCredentials =
+        options.allowCredentials?.map((cred) => {
+          return {
+            ...cred,
+            id: base64url.decode(cred.id),
+          };
+        }) ?? [];
+      return {
+        ...options,
+        allowCredentials,
+        challenge,
+      };
+    };
+  }
+
+  if (!PublicKeyCredential.prototype.toJSON) {
+    PublicKeyCredential.prototype.toJSON = function(that) {
+      try {
+        const id = that.id;
+        const rawId = base64url.encode(that.rawId);
+        const authenticatorAttachment = that.authenticatorAttachment;
+        const clientExtensionResults = {};
+        const type = that.type;
+        // This is authentication.
+        if (that.response.signature) {
+          return {
+            id,
+            rawId,
+            response: {
+              authenticatorData: base64url.encode(that.response.authenticatorData),
+              clientDataJSON: base64url.encode(that.response.clientDataJSON),
+              signature: base64url.encode(that.response.signature),
+              userHandle: base64url.encode(that.response.userHandle),
+            },
+            authenticatorAttachment,
+            clientExtensionResults,
+            type,
+          };
+        } else {
+          return {
+            id,
+            rawId,
+            response: {
+              clientDataJSON: base64url.encode(that.response.clientDataJSON),
+              attestationObject: base64url.encode(that.response.attestationObject),
+              transports: that.response?.getTransports() || [],
+            },
+            authenticatorAttachment,
+            clientExtensionResults,
+            type,
+          };
+        }
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    }
   }
 }
 
@@ -96,16 +184,10 @@ export const loading = new Loading();
  */
 export async function registerCredential() {
   // Fetch passkey creation options from the server.
-  const options = await _fetch('/auth/registerRequest');
+  const _options = await _fetch('/auth/registerRequest');
 
   // Base64URL decode some values
-  options.user.id = base64url.decode(options.user.id);
-  options.challenge = base64url.decode(options.challenge);
-  if (options.excludeCredentials) {
-    for (let cred of options.excludeCredentials) {
-      cred.id = base64url.decode(cred.id);
-    }
-  }
+  const options = PublicKeyCredential.parseCreationOptionsFromJSON(_options);
 
   // Use platform authenticator and discoverable credential
   options.authenticatorSelection = {
@@ -118,29 +200,11 @@ export async function registerCredential() {
     publicKey: options,
   });
 
-  const credential = {};
-  credential.id = cred.id;
-  // Base64URL encode `rawId`
-  credential.rawId = base64url.encode(cred.rawId);
-  credential.type = cred.type;
-
-  // `authenticatorAttachment` in PublicKeyCredential is a new addition in WebAuthn L3
-  if (cred.authenticatorAttachment) {
-    credential.authenticatorAttachment = cred.authenticatorAttachment;
-  }
-
-  // Base64URL encode some values
-  const clientDataJSON = base64url.encode(cred.response.clientDataJSON);
-  const attestationObject = base64url.encode(cred.response.attestationObject);
+  const credential = cred.toJSON();
 
   // Obtain transports if they are available.
   const transports = cred.response.getTransports ? cred.response.getTransports() : [];
-
-  credential.response = {
-    clientDataJSON,
-    attestationObject,
-    transports
-  };
+  credential.response.transports = transports;
 
   // Send the result to the server and return the promise.
   return await _fetch('/auth/registerResponse', credential);
@@ -153,10 +217,9 @@ export async function registerCredential() {
  */
 export async function authenticate(conditional = false) {
   // Fetch passkey request options from the server.
-  const options = await _fetch('/auth/signinRequest');
+  const _options = await _fetch('/auth/signinRequest');
 
-  // Base64URL decode the challenge
-  options.challenge = base64url.decode(options.challenge);
+  const options = PublicKeyCredential.parseRequestOptionsFromJSON(_options);
 
   // `allowCredentials` empty array invokes an account selector by discoverable credentials.
   options.allowCredentials = [];
@@ -168,24 +231,7 @@ export async function authenticate(conditional = false) {
     mediation: conditional ? 'conditional' : 'optional'
   });
 
-  const credential = {};
-  credential.id = cred.id;
-  credential.type = cred.type;
-  // Base64URL encode `rawId`
-  credential.rawId = base64url.encode(cred.rawId);
-
-  // Base64URL encode some values
-  const clientDataJSON = base64url.encode(cred.response.clientDataJSON);
-  const authenticatorData = base64url.encode(cred.response.authenticatorData);
-  const signature = base64url.encode(cred.response.signature);
-  const userHandle = base64url.encode(cred.response.userHandle);
-
-  credential.response = {
-    clientDataJSON,
-    authenticatorData,
-    signature,
-    userHandle,
-  };
+  const credential = cred.toJSON();
 
   // Send the result to the server and return the promise.
   return await _fetch(`/auth/signinResponse`, credential);
