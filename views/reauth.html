@@ -1,34 +1,20 @@
     <main class="content center">
-      <h2>
-        Enter a password
-      </h2>
+      <h2>Enter a password</h2>
       <form id="form" method="POST" action="/auth/password" class="center">
         <input type="text" name="username" value="{{username}}" class="hidden"/>
-        <div class="mdc-text-field mdc-text-field--filled">
-          <span class="mdc-text-field__ripple"></span>
-          <label class="mdc-floating-label" id="password-label">password</label>
-          <input
-            type="password"
-            class="mdc-text-field__input"
-            aria-labelledby="password-label"
-            name="password"
-            value="password"
-            autocomplete="current-password"
-            autofocus />
-          <span class="mdc-line-ripple"></span>
-        </div>
-        <input type="submit" class="mdc-button mdc-button--raised" value="Sign-In" />
+        <mdui-text-field
+          label="password"
+          type="password"
+          name="password"
+          autocomplete="current-password"
+          value="password"
+          autofocus></mdui-text-field>
+        <mdui-button type="submit">Sign-in</mdui-button>
         <p class="instructions">password will be ignored in this demo.</p>
       </form>
     </main>
-    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
     <script type="module">
       import { $, _fetch } from '/client.js';
-      new mdc.textField.MDCTextField($('.mdc-text-field'));
-      
-      $('#code').addEventListener('click', e => {
-        location.href = 'https://github.com/GoogleChromeLabs/passkeys-demo';
-      });
       
       const form = $('#form');
       form.addEventListener('submit', e => {

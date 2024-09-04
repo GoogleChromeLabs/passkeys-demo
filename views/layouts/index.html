@@ -14,16 +14,25 @@
  limitations under the License.
 -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="mdui-theme-auto">
   <head>
     {{> head this}}
   </head>
-  <body class="mdc-typography">
-    <mwc-top-app-bar-fixed>
+  <body class="mdui-prose">
+    <mdui-top-app-bar>
+      <mdui-top-app-bar-title>{{title}}</mdui-top-app-bar-title>
+      <mdui-button-icon
+        id="code"
+        icon="code"
+        href="{{github_repository}}"
+        target="_blank"></mdui-button-icon>
+    </mdui-top-app-bar>
+    <!-- <mwc-top-app-bar-fixed>
       <span slot="title">{{title}}</span>
       <mwc-icon-button id="code" icon="code" slot="actionItems"></mwc-icon-button>
-    </mwc-top-app-bar-fixed>
-    <mwc-linear-progress id="progress"></mwc-linear-progress>
+    </mwc-top-app-bar-fixed> -->
+    <mdui-linear-progress id="progress" max="100" value="0"></mdui-linear-progress>
+    <!-- <mwc-linear-progress id="progress"></mwc-linear-progress> -->
     <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
     {{{body}}}
   </body>

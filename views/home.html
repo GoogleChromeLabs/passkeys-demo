@@ -1,31 +1,21 @@
     <main class="content center">
-      <h2>
-        Welcome, {{displayName}}!
-      </h2>
+      <h2>Welcome, {{displayName}}!</h2>
       <section>
-        <h3>
-          Your name:
-        </h3>
+        <h3>Your name:</h3>
         <div id="display-name"></div>
       </section>
       <section>
-        <h3 class="mdc-typography mdc-typography--headline6">
-          Your registered passkeys:
-        </h3>
+        <h3>Your registered passkeys:</h3>
         <div id="list"></div>
       </section>
       <p id="message" class="instructions"></p>
-      <mwc-button id="create-passkey" class="hidden" icon="fingerprint" raised>Create a passkey</mwc-button>
-      <mwc-button><a href="/auth/signout">Sign out</a></mwc-button>
+      <mdui-button id="create-passkey" class="hidden" icon="fingerprint">Create a passkey</mdui-button>
+      <mdui-button variant="outlined" href="/auth/signout">Sign out</mdui-button>
     </main>
     <script type="module">
       import { $, _fetch, loading, registerCredential, updateCredential, unregisterCredential } from '/client.js';
       import { html, render } from 'https://unpkg.com/lit-html@2.6.1/lit-html.js?module';
       const aaguids = await fetch('/auth/aaguids').then(res => res.json());
-
-      $('#code').addEventListener('click', e => {
-        location.href = 'https://github.com/GoogleChromeLabs/passkeys-demo';
-      });
 
       /**
        * Change and update the user's display name.
@@ -46,21 +36,16 @@
       async function renderDisplayName() {
         const res = await _fetch('/auth/userinfo');
         render(html`
-        <mwc-list>
-          <mwc-list-item>
-            <div class="list-item">
-              <div class="entity-name">
-                <span>${res.displayName || res.username}</span>
-              </div>
-              <div class="buttons">
-                <mwc-icon-button
-                  data-display-name="${res.displayName || res.username }"
-                  @click="${changeDisplayName}"
-                  title="Edit your display name"
-                  icon="edit"></mwc-icon-button>
-              </div>
-            </div>
-          </mwc-list-item>
+        <mdui-list>
+          <mdui-list-item nonclickable>
+            ${res.displayName || res.username}
+            <mdui-button-icon
+              data-display-name="${res.displayName || res.username }"
+              @click="${changeDisplayName}"
+              title="Edit your display name"
+              icon="edit"
+              slot="end-icon"></mdui-button-icon>
+          </mdui-list-item>
         <mwc-list>`, $('#display-name'));
       };
 
@@ -135,36 +120,29 @@
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
         const creds = html`${res.length > 0 ? html`
-        <mwc-list>
-          ${res.map(cred => html`
-            <mwc-list-item>
-              <div class="list-item">
-                <div class="entity-name">
-                  ${cred.aaguid &&
-                    cred.aaguid !== '00000000-0000-0000-0000-000000000000'?html`
-                  <mwc-icon-button>
-                    <img src="${aaguids[cred.aaguid].icon_light}">
-                  </mwc-icon-button>
-                  `:''}
-                  <span>${cred.name || 'Unnamed' }</span>
-                </div>
-                <div class="buttons">
-                  <mwc-icon-button
-                    data-cred-id="${cred.id}"
-                    data-name="${cred.name || 'Unnamed' }"
-                    @click="${rename}"
-                    icon="edit"></mwc-icon-button>
-                  <mwc-icon-button
-                    data-cred-id="${cred.id}"
-                    @click="${remove}"
-                    icon="delete"></mwc-icon-button>
-                </div>
-              </div>
-            </mwc-list-item>`)}
-        </mwc-list>` : html`
-        <mwc-list>
-          <mwc-list-item>No credentials found.</mwc-list-item>
-        </mwc-list>`}`;
+        <mdui-list>${res.map(cred => html`
+          <mdui-list-item nonclickable>
+            ${cred.aaguid && cred.aaguid !== '00000000-0000-0000-0000-000000000000'
+            ?html`
+            <mdui-icon slot="icon" nonclickable src="${aaguids[cred.aaguid].icon_light}"></mdui-icon>
+            `:''}
+            ${cred.name || 'Unnamed' }
+            <div class="buttons" slot="end-icon">
+              <mdui-button-icon
+                data-cred-id="${cred.id}"
+                data-name="${cred.name || 'Unnamed' }"
+                @click="${rename}"
+                icon="edit"></mdui-button-icon>
+              <mdui-button-icon
+                data-cred-id="${cred.id}"
+                @click="${remove}"
+                icon="delete"></mdui-button-icon>
+            </div>
+          </mdui-list-item>`)}
+        </mdui-list>` : html`
+        <mdui-list>
+          <mdui-list-item>No credentials found.</mdui-list-item>
+        </mdui-list>`}`;
         render(creds, list);
       };
 

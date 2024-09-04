@@ -15,17 +15,17 @@
  * limitations under the License
  */
 
-@use '@material/typography';
-@use '@material/textfield';
+@import 'mdui/mdui.css';
 
 * {
   box-sizing: border-box;
-  --mdc-theme-secondary: red;
+  --mdui-color-secondary: red;
 }
 
 body {
   margin: 0;
   padding: 0;
+  font-family: Roboto,Noto Sans,sans-serif
 }
 
 .content {
@@ -65,9 +65,18 @@ h3 {
   padding: 0 16px;
 }
 
-mwc-list {
+mdui-top-app-bar {
+  background-color: var(--mdui-color-primary);
+}
+
+mdui-linear-progress {
+  position: relative;
+  top: -16px;
+}
+
+mwc-list, mdui-list {
   width: 400px;
-  mwc-list-item {
+  mwc-list-item, mdui-list-item {
     .list-item {
       width: 368px;
       display: flex;
@@ -78,7 +87,7 @@ mwc-list {
       .entity-name {
         line-height: var(--mdc-icon-button-size, 48px);
         flex: 1 1 auto;
-        mwc-icon.mini {
+        mwc-icon.mini, mdui-button-icon.mini {
           margin: 4px;
           --mdc-icon-size: 16px;
           vertical-align: middle;
@@ -91,7 +100,7 @@ mwc-list {
   }
 }
 
-mwc-button, .mdc-button {
+mwc-button, .mdc-button, mdui-button {
   margin: 8px 0;
   a {
     text-decoration: none;
