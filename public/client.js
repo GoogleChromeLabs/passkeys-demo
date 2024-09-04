@@ -109,23 +109,23 @@ if (PublicKeyCredential) {
   }
 
   if (!PublicKeyCredential.prototype.toJSON) {
-    PublicKeyCredential.prototype.toJSON = function(that) {
+    PublicKeyCredential.prototype.toJSON = function() {
       try {
-        const id = that.id;
-        const rawId = base64url.encode(that.rawId);
-        const authenticatorAttachment = that.authenticatorAttachment;
+        const id = this.id;
+        const rawId = base64url.encode(this.rawId);
+        const authenticatorAttachment = this.authenticatorAttachment;
         const clientExtensionResults = {};
-        const type = that.type;
+        const type = this.type;
         // This is authentication.
-        if (that.response.signature) {
+        if (this.response.signature) {
           return {
             id,
             rawId,
             response: {
-              authenticatorData: base64url.encode(that.response.authenticatorData),
-              clientDataJSON: base64url.encode(that.response.clientDataJSON),
-              signature: base64url.encode(that.response.signature),
-              userHandle: base64url.encode(that.response.userHandle),
+              authenticatorData: base64url.encode(this.response.authenticatorData),
+              clientDataJSON: base64url.encode(this.response.clientDataJSON),
+              signature: base64url.encode(this.response.signature),
+              userHandle: base64url.encode(this.response.userHandle),
             },
             authenticatorAttachment,
             clientExtensionResults,
@@ -136,9 +136,9 @@ if (PublicKeyCredential) {
             id,
             rawId,
             response: {
-              clientDataJSON: base64url.encode(that.response.clientDataJSON),
-              attestationObject: base64url.encode(that.response.attestationObject),
-              transports: that.response?.getTransports() || [],
+              clientDataJSON: base64url.encode(this.response.clientDataJSON),
+              attestationObject: base64url.encode(this.response.attestationObject),
+              transports: this.response?.getTransports() || [],
             },
             authenticatorAttachment,
             clientExtensionResults,
