@@ -1,25 +1,17 @@
     <main class="content center">
-      <h2>
-        Enter a username
-      </h2>
+      <h2>Enter a username</h2>
       <form id="form" method="POST" action="/auth/username" class="center">
-        <div class="mdc-text-field mdc-text-field--filled">
-          <span class="mdc-text-field__ripple"></span>
-          <label class="mdc-floating-label" id="username-label">username</label>
-          <input
-           type="text"
-           id="username"
-           class="mdc-text-field__input"
-           aria-labelledby="username-label"
-           name="username"
-           autocomplete="username webauthn"
-           autofocus />
-          <span class="mdc-line-ripple"></span>
-        </div>
+        <mdui-text-field
+          type="text"
+          id="username"
+          name="username"
+          autocomplete="username webauthn"
+          label="username"
+          autofocus></mdui-text-field>
         <input type="password" class="hidden" name="password" />
         <p class="instructions">Any username can be accepted.</p>
-        <input type="submit" class="mdc-button mdc-button--raised" value="Next" />
-        <mwc-button><a href="/one-button">Use one button sign-in instead</a></mwc-button>
+        <mdui-button type="submit">Next</mdui-button>
+        <mdui-button href="/one-button" variant="text">Use one button sign-in instead</mdui-button>
         <ol class="instructions narrow">
           <li>Sign in with a random username and password.</li>
           <li>Create a passkey.</li>
@@ -33,11 +25,6 @@
     </main>
     <script type="module">
       import { $, _fetch, loading, authenticate } from '/client.js';
-      new mdc.textField.MDCTextField($('.mdc-text-field'));
-
-      $('#code').addEventListener('click', e => {
-        location.href = 'https://github.com/GoogleChromeLabs/passkeys-demo';
-      });
 
       const form = $('#form');
       // When the form is submitted, proceed to the password form.

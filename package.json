@@ -13,13 +13,6 @@
   },
   "dependencies": {
     "@google-cloud/connect-firestore": "^3.0.0",
-    "@material/mwc-button": "^0.27.0",
-    "@material/mwc-fab": "^0.27.0",
-    "@material/mwc-icon-button": "^0.27.0",
-    "@material/mwc-linear-progress": "^0.27.0",
-    "@material/mwc-list": "^0.27.0",
-    "@material/mwc-textfield": "^0.27.0",
-    "@material/mwc-top-app-bar-fixed": "^0.27.0",
     "@simplewebauthn/server": "^10.0.1",
     "aaguid": "git+https://github.com/agektmr/passkey-authenticator-aaguids.git",
     "base64url": "^3.0.1",
@@ -30,7 +23,7 @@
     "express-useragent": "^1.0.15",
     "firebase-admin": "^12.6.0",
     "lit": "^3.2.1",
-    "material-components-web": "^14.0.0"
+    "mdui": "^2.1.2"
   },
   "engines": {
     "node": ">=18.x"

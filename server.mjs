@@ -66,6 +66,9 @@ app.use((req, res, next) => {
   process.env.ORIGIN = `${protocol}://${req.headers.host}`;
   process.env.RP_NAME = RP_NAME;
   req.schema = 'https';
+  res.locals.project_name = process.env.PROJECT_NAME;
+  res.locals.title = process.env.RP_NAME;
+  res.locals.github_repository = 'https://github.com/GoogleChromeLabs/passkeys-demo';
   return next();
 });
 
@@ -76,10 +79,7 @@ app.get('/', (req, res) => {
     return res.redirect(307, '/reauth');
   }
   // If the user is not signed in, show `index.html` with id/password form.
-  return res.render('index.html', {
-    project_name: process.env.PROJECT_NAME,
-    title: RP_NAME,
-  });
+  return res.render('index.html');
 });
 
 app.get('/one-button', (req, res) => {

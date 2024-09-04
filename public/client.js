@@ -161,14 +161,14 @@ class Loading {
     this.progress = $('#progress');
   }
   start() {
-    this.progress.indeterminate = true;
+    this.progress.value = '';
     const inputs = document.querySelectorAll('input');
     if (inputs) {
       inputs.forEach(input => input.disabled = true);
     }
   }
   stop() {
-    this.progress.indeterminate = false;
+    this.progress.value = 0;
     const inputs = document.querySelectorAll('input');
     if (inputs) {
       inputs.forEach(input => input.disabled = false);
