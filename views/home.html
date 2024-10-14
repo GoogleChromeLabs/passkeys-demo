@@ -1,7 +1,42 @@
+    <div id="help">
+      <div class="help-headline">
+        Home page
+      </div>
+      <div class="help-content">
+        In this page, you can edit your display name, create a passkey, and
+        manage your passkeys. Once you create a passkey, sign out and try
+        signing in with the passkey.
+
+        ### Display name
+
+        Created passkeys are saved with your username and a display name. Edit
+        your display name to see how it appears in the account selection of your
+        passkey sign-in.
+
+        ### Create a passkey
+
+        Press **Create a passkey** to create a new passkey. The passkey's name
+        is automatically assigned based on its
+        [AAGUID](https://web.dev/articles/webauthn-aaguid), but you can change
+        it as you want.
+
+        ### Manage passkeys
+        
+        Press the **Edit** button to rename a passkey, or press the **Delete**
+        button to remove it.
+
+        ### Learn more
+
+        Learn how to build this experience at [Create a passkey for passwordless
+        logins](https://web.dev/articles/passkey-registration) and [Server-side
+        passkey
+        registration](https://developers.google.com/identity/passkeys/developer-guides/server-registration).
+      </div>
+    </div>
     <main class="content center">
       <h2>Welcome, {{displayName}}!</h2>
       <section>
-        <h3>Your name:</h3>
+        <h3>Your display name:</h3>
         <div id="display-name"></div>
       </section>
       <section>
@@ -9,7 +44,13 @@
         <div id="list"></div>
       </section>
       <p id="message" class="instructions"></p>
-      <mdui-button id="create-passkey" class="hidden" icon="fingerprint">Create a passkey</mdui-button>
+      <mdui-button
+        id="create-passkey"
+        class="hidden"
+        icon="fingerprint"
+        variant="tonal">
+        Create a passkey
+      </mdui-button>
       <mdui-button variant="outlined" href="/auth/signout">Sign out</mdui-button>
     </main>
     <script type="module">
@@ -120,13 +161,38 @@
         const res = await _fetch('/auth/getKeys');
         const list = $('#list');
         const creds = html`${res.length > 0 ? html`
-        <mdui-list>${res.map(cred => html`
+        <mdui-list>${res.map(cred => {
+          const created = new Date(cred.registered);
+          const createdDate = created.toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric',
+          });
+          const createdTime = created.toLocaleTimeString(undefined, {
+            timeStyle: 'short',
+            hour12: false,
+          });
+          const createdStr = `Created: ${createdDate}, ${createdTime}`;
+          let lastUsedStr = '';
+          if (cred.last_used) {
+            const lastUsed = new Date(cred.last_used);
+            const lastUsedDate = lastUsed.toLocaleDateString(undefined, {
+              month: 'short',
+              day: 'numeric',
+            });
+            const lastUsedTime = lastUsed.toLocaleTimeString(undefined, {
+              timeStyle: 'short',
+              hour12: false,
+            });
+            lastUsedStr = cred.last_used?`, Last Used: ${lastUsedDate}, ${lastUsedTime}`:'';
+          }
+          return html`
           <mdui-list-item nonclickable>
             ${cred.aaguid && cred.aaguid !== '00000000-0000-0000-0000-000000000000'
             ?html`
             <mdui-icon slot="icon" nonclickable src="${aaguids[cred.aaguid].icon_light}"></mdui-icon>
             `:''}
             ${cred.name || 'Unnamed' }
+            <div slot="description">${createdStr}${lastUsedStr}</div>
             <div class="buttons" slot="end-icon">
               <mdui-button-icon
                 data-cred-id="${cred.id}"
@@ -138,7 +204,7 @@
                 @click="${remove}"
                 icon="delete"></mdui-button-icon>
             </div>
-          </mdui-list-item>`)}
+          </mdui-list-item>`})}
         </mdui-list>` : html`
         <mdui-list>
           <mdui-list-item>No credentials found.</mdui-list-item>

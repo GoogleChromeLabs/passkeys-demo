@@ -19,21 +19,31 @@
     {{> head this}}
   </head>
   <body class="mdui-prose">
-    <mdui-top-app-bar>
+    <mdui-top-app-bar scroll-behavior="elevate">
+      <mdui-linear-progress id="progress" max="100" value="0"></mdui-linear-progress>
       <mdui-top-app-bar-title>{{title}}</mdui-top-app-bar-title>
       <mdui-button-icon
         id="code"
         icon="code"
         href="{{github_repository}}"
         target="_blank"></mdui-button-icon>
+      <mdui-button-icon id="drawer-button" icon="help"></mdui-button-icon>
     </mdui-top-app-bar>
-    <!-- <mwc-top-app-bar-fixed>
-      <span slot="title">{{title}}</span>
-      <mwc-icon-button id="code" icon="code" slot="actionItems"></mwc-icon-button>
-    </mwc-top-app-bar-fixed> -->
-    <mdui-linear-progress id="progress" max="100" value="0"></mdui-linear-progress>
-    <!-- <mwc-linear-progress id="progress"></mwc-linear-progress> -->
-    <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script>
+    <mdui-navigation-drawer
+      close-on-esc modal
+      close-on-overlay-click
+      placement="right"
+      id="drawer">
+      <mdui-list>
+        <mdui-list-item nonclickable>
+          <h2 id="help-headline"></h2>
+        </mdui-list-item>
+        <mdui-list-item id="help-content" nonclickable>
+          No help content available for this page.
+        </mdui-list-item>
+      </mdui-list>
+    </mdui-navigation-drawer>
+    <!-- <script src="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.js"></script> -->
     {{{body}}}
   </body>
 </html>

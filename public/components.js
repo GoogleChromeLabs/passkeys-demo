@@ -19,6 +19,28 @@ import 'mdui/components/text-field.js';
 import 'mdui/components/list.js';
 import 'mdui/components/list-item.js';
 import 'mdui/components/button-icon.js';
+import 'mdui/components/tooltip.js';
 import 'mdui/components/top-app-bar.js';
 import 'mdui/components/top-app-bar-title.js';
+import 'mdui/components/navigation-drawer.js';
 import 'mdui/components/linear-progress.js';
+import { marked } from 'marked';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const drawer = document.querySelector('#drawer');
+  const drawerButton = document.querySelector('#drawer-button');
+  drawerButton.addEventListener('click', () => {
+    drawer.open = !drawer.open;
+  });
+  const content = document.querySelector('#help .help-content')?.innerText?.trim();
+  const headline = document.querySelector('#help .help-headline')?.innerText?.trim();
+  if (headline) {
+    document.querySelector('#help-headline').innerHTML = headline;
+  }
+  if (content) {
+    const serialized = content.split('\n').map((line) => line.trim()).join('\n');
+    const mkContent = marked.parse(serialized)
+    document.querySelector('#help-content').innerHTML = mkContent;
+  }
+});
+

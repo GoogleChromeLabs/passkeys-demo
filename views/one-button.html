@@ -1,15 +1,24 @@
+    <div id="help">
+      <div class="help-headline">
+        One-button sign-in
+      </div>
+      <div class="help-content">
+        Sign in with your passkey. If you haven't created a passkey yet, go back
+        to the top page by clicking **Use form based sign-in instead** and
+        follow the instructions to create one.
+
+        ### Sign in with a passkey
+
+        Press **Sign-in with passkey** and perform [user
+        verification](https://web.dev/articles/webauthn-user-verification) to
+        sign in with your passkey.
+      </div>
+    </div>
     <main class="content center">
       <h2>Choose your passkey to sign in</h2>
       <section class="center">
         <mdui-button id="passkey-signin" icon="key">Sign-in with passkey</mdui-button>
-        <mdui-button variant="outlined" href="/">Use form based sign-in instead</mdui-button>
-        <ol class="instructions narrow">
-          <li>If you haven't created a passkey yet, go back to <a href="/">the top page</a> and follow the instructions to create one.</li>
-          <li>If you already have a passkey, click on the "Sign in with passkey" button.</li>
-          <li>Select a passkey.</li>
-          <li>Authenticate.</li>
-          <li>You are signed in.</li>
-        </ol>
+        <mdui-button variant="text" href="/">Use form based sign-in instead</mdui-button>
       </section>
     </main>
     <script type="module">

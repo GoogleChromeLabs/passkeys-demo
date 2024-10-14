@@ -17,19 +17,14 @@
 
 @import 'mdui/mdui.css';
 
-* {
-  box-sizing: border-box;
-  --mdui-color-secondary: red;
-}
+// * {
+//   box-sizing: border-box;
+// }
 
 body {
   margin: 0;
   padding: 0;
   font-family: Roboto,Noto Sans,sans-serif
-}
-
-.content {
-  margin: 0 16px 20px 16px;
 }
 
 .instructions {
@@ -65,42 +60,68 @@ h3 {
   padding: 0 16px;
 }
 
+#help {
+  display: none;
+}
+
 mdui-top-app-bar {
-  background-color: var(--mdui-color-primary);
+  background-color: rgb(var(--mdui-color-primary));
+  mdui-top-app-bar-title, mdui-button-icon {
+    color: white;
+  }
+  mdui-linear-progress {
+    position: absolute;
+    top: 64px;
+    right: 0;
+    margin: 0;
+  }
 }
 
-mdui-linear-progress {
-  position: relative;
-  top: -16px;
+mdui-navigation-drawer {
+  mdui-list {
+    padding-top: 64px;
+    mdui-list-item h3 {
+      font-size: 1.25em !important;
+      margin: 1.2em 0 0.5em 0 !important;
+      line-height: 1.5 !important;
+      padding: 0;
+    }
+  }
 }
 
-mwc-list, mdui-list {
-  width: 400px;
-  mwc-list-item, mdui-list-item {
-    .list-item {
-      width: 368px;
-      display: flex;
-      justify-content: space-between;
-      * {
-        display: inline-block;
-      }
-      .entity-name {
-        line-height: var(--mdc-icon-button-size, 48px);
-        flex: 1 1 auto;
-        mwc-icon.mini, mdui-button-icon.mini {
-          margin: 4px;
-          --mdc-icon-size: 16px;
-          vertical-align: middle;
+.content {
+  margin: 64px 16px 20px 16px;
+  mdui-text-field {
+    width: 260px;
+  }
+  mwc-list, mdui-list {
+    width: 500px;
+    mwc-list-item, mdui-list-item {
+      .list-item {
+        width: 368px;
+        display: flex;
+        justify-content: space-between;
+        * {
+          display: inline-block;
         }
-      }
-      .buttons {
-        flex: 0 1 auto;
+        .entity-name {
+          line-height: var(--mdc-icon-button-size, 48px);
+          flex: 1 1 auto;
+          mwc-icon.mini, mdui-button-icon.mini {
+            margin: 4px;
+            --mdc-icon-size: 16px;
+            vertical-align: middle;
+          }
+        }
+        .buttons {
+          flex: 0 1 auto;
+        }
       }
     }
   }
 }
 
-mwc-button, .mdc-button, mdui-button {
+mdui-button {
   margin: 8px 0;
   a {
     text-decoration: none;

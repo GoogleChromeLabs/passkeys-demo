@@ -23,6 +23,7 @@
     "express-useragent": "^1.0.15",
     "firebase-admin": "^12.6.0",
     "lit": "^3.2.1",
+    "marked": "^13.0.3",
     "mdui": "^2.1.2"
   },
   "engines": {

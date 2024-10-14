@@ -1,3 +1,33 @@
+    <div id="help">
+      <div class="help-headline">
+        Sign-in
+      </div>
+      <div class="help-content">
+        Sign in with a username and password if you haven't created a passkey
+        yet. You can use a random username, no account creation is needed.
+        
+        Once you are signed in, create a new passkey and sign out to come back
+        here.
+
+        ### Sign in with a passkey
+
+        Once a passkey is created, place your cursor in the username field and
+        you'll notice the autofill dialog contains your passkeys. Select a
+        passkey and perform [user
+        verification](https://web.dev/articles/webauthn-user-verification) to
+        sign in.
+
+        Alternatively, you can use the one-button sign-in experience by pressing
+        **Use a one-button sign-in instead** button.
+
+        ### Learn more
+
+        Learn how to build this experience at [Sign in with a passkey through
+        form autofill](https://web.dev/articles/passkey-form-autofill) and
+        [Server-side passkey
+        authentication](https://developers.google.com/identity/passkeys/developer-guides/server-authentication).
+      </div>
+    </div>
     <main class="content center">
       <h2>Enter a username</h2>
       <form id="form" method="POST" action="/auth/username" class="center">
@@ -9,18 +39,8 @@
           label="username"
           autofocus></mdui-text-field>
         <input type="password" class="hidden" name="password" />
-        <p class="instructions">Any username can be accepted.</p>
         <mdui-button type="submit">Next</mdui-button>
         <mdui-button href="/one-button" variant="text">Use one button sign-in instead</mdui-button>
-        <ol class="instructions narrow">
-          <li>Sign in with a random username and password.</li>
-          <li>Create a passkey.</li>
-          <li>Sign out.</li>
-          <li>Click or tap on the username input field to show an autofill dialog.</li>
-          <li>Select a passkey.</li>
-          <li>Authenticate.</li>
-          <li>You are signed in.</li>
-        </ol>
       </form>
     </main>
     <script type="module">
