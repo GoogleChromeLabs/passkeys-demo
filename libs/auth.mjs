@@ -299,6 +299,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       credentialPublicKey,
       credentialID,
       aaguid = '00000000-0000-0000-0000-000000000000', 
+      credentialDeviceType,
     } = registrationInfo;
 
     // Base64URL encode ArrayBuffers.
@@ -320,6 +321,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       created_on: req.useragent.platform,
       registered: (new Date()).getTime(),
       last_used: null,
+      be: credentialDeviceType === 'multiDevice',
       user_id: user.id,
     });
 

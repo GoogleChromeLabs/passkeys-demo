@@ -194,6 +194,9 @@
             ${cred.name || 'Unnamed' }
             <div slot="description">${createdStr}${lastUsedStr}</div>
             <div class="buttons" slot="end-icon">
+              ${cred.be === false?html`
+              <mdui-button-icon
+                icon="sync_disabled"></mdui-button-icon>`:''}
               <mdui-button-icon
                 data-cred-id="${cred.id}"
                 data-name="${cred.name || 'Unnamed' }"
