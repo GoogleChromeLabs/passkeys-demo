@@ -154,6 +154,7 @@ router.post('/password', async (req, res) => {
  */
 router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
   const { user } = res.locals;
+  user.rpId = process.env.HOSTNAME;
   return res.json(user);
 });
 

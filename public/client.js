@@ -177,6 +177,10 @@ class Loading {
 }
 
 export const loading = new Loading();
+const metadata = {
+  rpId: '',
+  userId: '',
+};
 
 /**
  * Create and register a new passkey
@@ -248,10 +252,55 @@ export async function updateCredential(credId, newName) {
 }
 
 /**
- * Request to unregister a passkey.
- * @param { string } credId A Base64URL encoded credential ID of the passkey to unregister.
- * @returns a promise that resolves with a server response.
+ * Request to unregister a passkey and signal the removed passkey so that the
+ * password manager can delete it.
+ * @param { string } credId A Base64URL encoded credential ID of the passkey to
+ * unregister.
+ * @returns a promise that resolves with undefined.
  */
 export async function unregisterCredential(credId) {
-  return _fetch(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
+  await _fetch(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
+  if (PublicKeyCredential.signalUnknownCredential) {
+    await PublicKeyCredential.signalUnknownCredential({
+      rpId: metadata.rpId,
+      credentialId: credId,
+    });
+    console.info('The passkey associated with the credential just deleted has been signaled to the password manager.');
+  }
 };
+
+/**
+ * Signal the list of credentials so the password manager can synchronize.
+ * @param { object } credentials An array of credentials that contains a
+ * Base64URL encoded credential ID.
+ * @returns a promise that resolve with undefined.
+ */
+export async function updateListOfPasskeys(credentials) {
+  if (PublicKeyCredential.signalAllAcceptedCredentials) {
+    const credentialIds = credentials.map(cred => cred.id);
+    await PublicKeyCredential.signalAllAcceptedCredentials({
+      rpId: metadata.rpId,
+      userId: metadata.userId, // base64url encoded user ID
+      allAcceptedCredentialIds: credentialIds
+    });
+    console.info('Passkeys list have been signaled to the password manager.');
+  }
+}
+
+/**
+ * Signal the current user details so that password manager can synchronize passkeys' user info.
+ * @param { string } rpId An RP ID string
+ * @param { string } userId A Base64URL encoded user ID
+ * @param { string } name A username
+ * @param { string } displayName The user's display name
+ * @returns a promise that resolve with undefined.
+ */
+export async function updateCurrentUserDetails(rpId, userId, name, displayName) {
+  // This is an initialization
+  metadata.rpId = rpId;
+  metadata.userId = userId;
+  if (PublicKeyCredential.signalCurrentUserDetails) {
+    await PublicKeyCredential.signalCurrentUserDetails({ rpId, userId, name, displayName, });
+    console.info('User info attached to passkeys have been signaled to the password manager.');
+  }
+}
