@@ -64,11 +64,11 @@
       });
 
       // Feature detection: check if WebAuthn and conditional UI are supported.
-      if (window.PublicKeyCredential &&
-          PublicKeyCredential.isConditionalMediationAvailable) {
+      if (window.PublicKeyCredential) {
         try {
-          const cma= await PublicKeyCredential.isConditionalMediationAvailable();
-          if (cma) {
+          const capabilities = await PublicKeyCredential.getClientCapabilities();
+          if (capabilities.passkeyPlatformAuthenticator &&
+              capabilities.conditionalGet) {
             // If a conditional UI is supported, invoke the conditional `authenticate()` immediately.
             const user = await authenticate(true);
             if (user) {

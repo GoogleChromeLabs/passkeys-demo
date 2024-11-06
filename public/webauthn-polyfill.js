@@ -18,6 +18,21 @@ export class base64url {
 }
 
 if (window.PublicKeyCredential) {
+  const uap = new UAParser();
+  const browser = uap.getBrowser();
+  if (!browser?.version) {
+    throw new Error('Browser major version not found.');
+  }
+  const browserName = browser.name;
+  const browserVer = parseFloat(browser.version.replace(/^([0-9]+\.[0-9]+).*$/, '$1'));
+
+  const engine = uap.getEngine();
+  if (!engine?.version) {
+    throw new Error('Engine version not found.');
+  }
+  const engineName = engine.name;
+  const engineVer = parseFloat(engine.version.replace(/^([0-9]+\.[0-9]+)\.*$/, '$1'));
+
   if (!window.PublicKeyCredential?.parseCreationOptionsFromJSON) {
     PublicKeyCredential.parseCreationOptionsFromJSON = (options) => {
       const user = {
@@ -103,7 +118,9 @@ if (window.PublicKeyCredential) {
     }
   }
 
-  if (!PublicKeyCredential.getClientCapabilities) {
+  if (!PublicKeyCredential.getClientCapabilities ||
+      // If this is Safari 17.4+, there's a spec glitch.
+      (browserName === 'Safari' && browserVer >= 17.4)) {
     PublicKeyCredential.getClientCapabilities = async () => {
       let conditionalCreate = false;
       let conditionalGet = false;
@@ -134,27 +151,18 @@ if (window.PublicKeyCredential) {
         signalUnknownCredential = true;
       }
 
-      const uap = new UAParser();
-      const browser = uap.getBrowser();
-      const browserName = browser.name;
-      const browserVer = parseInt(browser.major);
-      const engine = uap.getEngine();
-      const engineName = engine.name;
-      const engineVer = parseInt(engine.version.replace(/^([0-9]+)\.*$/, '$1'));
-
       // `conditionalCreate` is `true` on Safari 15+
-      if (browserName === 'Safari' && browserVer >= 15) {
+      if (browserName === 'Safari' && browserVer >= 18) {
         conditionalCreate = true;
       }
       // `hybridTransport` is `true` on Firefox 119+, Chromium 108+ and Safari 16+
-      // TODO: These version numbers may not be precise.
       if ((engineName === 'Blink' && engineVer >= 108) ||
           (browserName === 'Firefox' && browserVer >= 119) ||
           (browserName === 'Safari' && browserVer >= 16)) {
         hybridTransport = true;
       } 
-      // `passkeyPlatformAuthenticator` is `true` if `hybridTransport` and `userVerifyingPlatformAuthenticator` are `true`.
-      if (hybridTransport && userVerifyingPlatformAuthenticator) {
+      // `passkeyPlatformAuthenticator` is `true` if `hybridTransport` or `userVerifyingPlatformAuthenticator` is `true`.
+      if (hybridTransport || userVerifyingPlatformAuthenticator) {
         passkeyPlatformAuthenticator = true;
       }
       // `relatedOrigins` is `true` on Chromium 128+
@@ -166,13 +174,12 @@ if (window.PublicKeyCredential) {
         conditionalGet,
         hybridTransport,
         passkeyPlatformAuthenticator,
-        userVerifyingPlatformAuthenticator,
         relatedOrigins,
         signalAllAcceptedCredentials,
         signalCurrentUserDetails,
-        signalUnknownCredential
+        signalUnknownCredential,
+        userVerifyingPlatformAuthenticator,
       }
     };
   }
 }
-
