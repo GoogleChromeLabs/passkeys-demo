@@ -24,7 +24,7 @@ import 'mdui/components/top-app-bar.js';
 import 'mdui/components/top-app-bar-title.js';
 import 'mdui/components/navigation-drawer.js';
 import 'mdui/components/linear-progress.js';
-import './webauthn-polyfill.js';
+import 'webauthn-polyfills';
 import { marked } from 'marked';
 
 document.addEventListener('DOMContentLoaded', () => {

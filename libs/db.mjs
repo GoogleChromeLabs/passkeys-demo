@@ -17,7 +17,7 @@
 // import path from 'path';
 // import url from 'url';
 // import dotenv from 'dotenv';
-import firebaseJson from '../firebase.json' assert { type: 'json' };
+import firebaseJson from '../firebase.json' with { type: 'json' };
 // const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 // dotenv.config({ path: path.join(__dirname, ".env") });
 import { getFirestore } from 'firebase-admin/firestore';
