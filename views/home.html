@@ -143,7 +143,7 @@
       if (window.PublicKeyCredential) {
         const capabilities = await PublicKeyCredential.getClientCapabilities();
         if (capabilities.conditionalGet &&
-            capabilities.passkeyPlatformAuthenticator) {
+            capabilities.userVerifiyingPlatformAuthenticator) {
           createPasskey.classList.remove('hidden');
         } else {
           // If either is not available, show a message.
