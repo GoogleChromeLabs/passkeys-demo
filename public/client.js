@@ -42,6 +42,7 @@ export async function post(path, payload = '') {
   } else {
     // Server authentication failed
     const result = await res.json();
+    result.status = res.status;
     throw new Error(result.error);
   }
 };
@@ -99,12 +100,22 @@ export async function registerCredential() {
 
   const credential = cred.toJSON();
 
-  // Obtain transports if they are available.
-  const transports = cred.response.getTransports ? cred.response.getTransports() : [];
-  credential.response.transports = transports;
-
   // Send the result to the server and return the promise.
-  return await post('/auth/registerResponse', credential);
+  try {
+    const result = await post('/auth/registerResponse', credential);
+    return result;
+  } catch (e) {
+    // Detect if the credential was not found.
+    if (e.status === 404 && PublicKeyCredential.signalUnknownCredential) {
+      // Send a signal to delete the credential that iwas just created.
+      await PublicKeyCredential.signalUnknownCredential({
+        rpId: metadata.rpId,
+        credentialId: credential.id,
+      });
+      console.info('The passkey associated with the credential failed to register has been signaled to the password manager.');
+    }
+    throw new Error(e);
+  }
 };
 
 /**
@@ -130,8 +141,23 @@ export async function authenticate(conditional = false) {
 
   const credential = cred.toJSON();
 
-  // Send the result to the server and return the promise.
-  return await post(`/auth/signinResponse`, credential);
+  try {
+    // Send the result to the server and return the promise.
+    const result = await post(`/auth/signinResponse`, credential);
+    return result;
+  } catch (e) {
+    // TODO: Instead of directly returning, watch the result.
+    // TODO: Detect if the credential was not found.
+    // TODO: Send a signal to delete the credential that iwas just created.
+    if (e.status === 404 && PublicKeyCredential.signalUnknownCredential) {
+      await PublicKeyCredential.signalUnknownCredential({
+        rpId: metadata.rpId,
+        credentialId: credential.id,
+      });
+      console.info('The passkey associated with the credential not found has been signaled to the password manager.');
+    }
+    throw new Error(e);
+  }
 };
 
 /**
@@ -153,13 +179,6 @@ export async function updateCredential(credId, newName) {
  */
 export async function unregisterCredential(credId) {
   await post(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
-  if (PublicKeyCredential.signalUnknownCredential) {
-    await PublicKeyCredential.signalUnknownCredential({
-      rpId: metadata.rpId,
-      credentialId: credId,
-    });
-    console.info('The passkey associated with the credential just deleted has been signaled to the password manager.');
-  }
 };
 
 /**
@@ -168,7 +187,8 @@ export async function unregisterCredential(credId) {
  * Base64URL encoded credential ID.
  * @returns a promise that resolve with undefined.
  */
-export async function updateListOfPasskeys(credentials) {
+export async function getAllCredentials() {
+  const credentials = await post('/auth/getKeys');
   if (PublicKeyCredential.signalAllAcceptedCredentials) {
     const credentialIds = credentials.map(cred => cred.id);
     await PublicKeyCredential.signalAllAcceptedCredentials({
