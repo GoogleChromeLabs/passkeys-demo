@@ -61,7 +61,7 @@
         registerCredential,
         updateCredential,
         unregisterCredential,
-        updateListOfPasskeys,
+        getAllCredentials,
         updateCurrentUserDetails
       } from '/client.js';
       import { html, render } from 'https://unpkg.com/lit-html@2.6.1/lit-html.js?module';
@@ -158,7 +158,8 @@
        * Render the list of saved credentials.
        */
       async function renderCredentials() {
-        const res = await post('/auth/getKeys');
+        // TODO: What if this get exception?
+        const res = await getAllCredentials();
         const list = $('#list');
         const creds = html`${res.length > 0 ? html`
         <mdui-list>${res.map(cred => {
@@ -213,7 +214,6 @@
           <mdui-list-item>No credentials found.</mdui-list-item>
         </mdui-list>`}`;
         render(creds, list);
-        await updateListOfPasskeys(res);
       };
 
       /**
