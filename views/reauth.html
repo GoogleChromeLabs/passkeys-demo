@@ -14,7 +14,7 @@
       </form>
     </main>
     <script type="module">
-      import { $, _fetch } from '/client.js';
+      import { $, post } from '/client.js';
       
       const form = $('#form');
       form.addEventListener('submit', e => {
@@ -22,7 +22,7 @@
         const form = new FormData(e.target);
         const cred = {};
         form.forEach((v, k) => cred[k] = v);
-        _fetch(e.target.action, cred)
+        post(e.target.action, cred)
         .then(user => {
           location.href = '/home';
         })

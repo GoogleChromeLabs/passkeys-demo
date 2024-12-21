@@ -22,7 +22,7 @@ export const $ = document.querySelector.bind(document);
  * @param payload The payload JSON object.
  * @returns 
  */
-export async function _fetch(path, payload = '') {
+export async function post(path, payload = '') {
   const headers = {
     'X-Requested-With': 'XMLHttpRequest',
   };
@@ -81,7 +81,7 @@ const metadata = {
  */
 export async function registerCredential() {
   // Fetch passkey creation options from the server.
-  const _options = await _fetch('/auth/registerRequest');
+  const _options = await post('/auth/registerRequest');
 
   // Base64URL decode some values
   const options = PublicKeyCredential.parseCreationOptionsFromJSON(_options);
@@ -104,7 +104,7 @@ export async function registerCredential() {
   credential.response.transports = transports;
 
   // Send the result to the server and return the promise.
-  return await _fetch('/auth/registerResponse', credential);
+  return await post('/auth/registerResponse', credential);
 };
 
 /**
@@ -114,7 +114,7 @@ export async function registerCredential() {
  */
 export async function authenticate(conditional = false) {
   // Fetch passkey request options from the server.
-  const _options = await _fetch('/auth/signinRequest');
+  const _options = await post('/auth/signinRequest');
 
   const options = PublicKeyCredential.parseRequestOptionsFromJSON(_options);
 
@@ -131,7 +131,7 @@ export async function authenticate(conditional = false) {
   const credential = cred.toJSON();
 
   // Send the result to the server and return the promise.
-  return await _fetch(`/auth/signinResponse`, credential);
+  return await post(`/auth/signinResponse`, credential);
 };
 
 /**
@@ -141,7 +141,7 @@ export async function authenticate(conditional = false) {
  * @returns a promise that resolves with a server response.
  */
 export async function updateCredential(credId, newName) {
-  return _fetch(`/auth/renameKey`, { credId, newName });
+  return post(`/auth/renameKey`, { credId, newName });
 }
 
 /**
@@ -152,7 +152,7 @@ export async function updateCredential(credId, newName) {
  * @returns a promise that resolves with undefined.
  */
 export async function unregisterCredential(credId) {
-  await _fetch(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
+  await post(`/auth/removeKey?credId=${encodeURIComponent(credId)}`);
   if (PublicKeyCredential.signalUnknownCredential) {
     await PublicKeyCredential.signalUnknownCredential({
       rpId: metadata.rpId,

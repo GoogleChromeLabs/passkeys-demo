@@ -44,7 +44,7 @@
       </form>
     </main>
     <script type="module">
-      import { $, _fetch, loading, authenticate } from '/client.js';
+      import { $, post, loading, authenticate } from '/client.js';
 
       const form = $('#form');
       // When the form is submitted, proceed to the password form.
@@ -53,7 +53,7 @@
         const form = new FormData(s.target);
         const cred = {};
         form.forEach((v, k) => cred[k] = v);
-        _fetch(s.target.action, cred)
+        post(s.target.action, cred)
         .then(user => {
           location.href = '/reauth';
         }).catch(e => {

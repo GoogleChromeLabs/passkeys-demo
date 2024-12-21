@@ -56,7 +56,7 @@
     <script type="module">
       import {
         $,
-        _fetch,
+        post,
         loading,
         registerCredential,
         updateCredential,
@@ -74,7 +74,7 @@
         const newName = prompt('Enter a new display name', e.target.dataset.displayName);
         if (newName) {
           loading.start();
-          await _fetch('/auth/updateDisplayName', { newName });
+          await post('/auth/updateDisplayName', { newName });
           loading.stop();
           renderDisplayName();
         }
@@ -84,7 +84,7 @@
        * Render the user's display name.
        */
       async function renderDisplayName() {
-        const res = await _fetch('/auth/userinfo');
+        const res = await post('/auth/userinfo');
         render(html`
         <mdui-list>
           <mdui-list-item nonclickable>
@@ -158,7 +158,7 @@
        * Render the list of saved credentials.
        */
       async function renderCredentials() {
-        const res = await _fetch('/auth/getKeys');
+        const res = await post('/auth/getKeys');
         const list = $('#list');
         const creds = html`${res.length > 0 ? html`
         <mdui-list>${res.map(cred => {
