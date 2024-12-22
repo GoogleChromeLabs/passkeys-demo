@@ -200,7 +200,7 @@ router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
   const { user } = res.locals;
   const credential = await Credentials.findById(credId);
   if (!user || user.id !== credential?.user_id) {
-    return res.status(401).json({ error: 'User not authorized.' });
+    return res.status(401).json({ message: 'User not authorized.' });
   }
   credential.name = newName;
   await Credentials.update(credential);
@@ -264,7 +264,7 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
     return res.json(options);
   } catch (e) {
     console.error(e);
-    return res.status(400).send({ error: e.message });
+    return res.status(400).send({ message: e.message });
   }
 });
 
@@ -335,7 +335,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     delete req.session.challenge;
 
     console.error(e);
-    return res.status(400).send({ error: e.message });
+    return res.status(400).send({ message: e.message });
   }
 });
 
@@ -357,7 +357,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
   } catch (e) {
     console.error(e);
 
-    return res.status(400).json({ error: e.message });
+    return res.status(400).json({ message: e.message });
   }
 });
 
@@ -378,9 +378,9 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     if (!cred) {
       delete req.session.challenge;
 
-      console.error(e);
       const message = 'Matching credential not found. Try signing in with a password.';
-      return res.status(404).json({ error: message });
+      console.error(message);
+      return res.status(404).json({ message });
     }
 
     // Find the matching user from the user ID contained in the credential.

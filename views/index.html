@@ -82,7 +82,7 @@
           }
         } catch (e) {
           loading.stop();
-          console.error(e);
+          console.error(e.message);
           // `NotAllowedError` indicates a user cancellation.
           if (e.name !== 'NotAllowedError') {
             alert(e.message);
