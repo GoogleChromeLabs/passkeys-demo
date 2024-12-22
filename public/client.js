@@ -36,14 +36,14 @@ export async function post(path, payload = '') {
     headers: headers,
     body: payload,
   });
-  if (res.status === 200) {
+  if (res.ok) {
     // Server authentication succeeded
     return res.json();
   } else {
     // Server authentication failed
     const result = await res.json();
     result.status = res.status;
-    throw new Error(result.error);
+    throw result;
   }
 };
 
@@ -106,15 +106,15 @@ export async function registerCredential() {
     return result;
   } catch (e) {
     // Detect if the credential was not found.
-    if (e.status === 404 && PublicKeyCredential.signalUnknownCredential) {
-      // Send a signal to delete the credential that iwas just created.
+    if (PublicKeyCredential.signalUnknownCredential) {
+      // Send a signal to delete the credential that was just created.
       await PublicKeyCredential.signalUnknownCredential({
-        rpId: metadata.rpId,
+        rpId: options.rp.id,
         credentialId: credential.id,
       });
-      console.info('The passkey associated with the credential failed to register has been signaled to the password manager.');
+      console.info('The passkey failed to register has been signaled to the password manager.');
     }
-    throw new Error(e);
+    throw e;
   }
 };
 
@@ -151,12 +151,12 @@ export async function authenticate(conditional = false) {
     // TODO: Send a signal to delete the credential that iwas just created.
     if (e.status === 404 && PublicKeyCredential.signalUnknownCredential) {
       await PublicKeyCredential.signalUnknownCredential({
-        rpId: metadata.rpId,
+        rpId: options.rpId,
         credentialId: credential.id,
       });
       console.info('The passkey associated with the credential not found has been signaled to the password manager.');
     }
-    throw new Error(e);
+    throw e;
   }
 };
 
@@ -198,6 +198,7 @@ export async function getAllCredentials() {
     });
     console.info('Passkeys list have been signaled to the password manager.');
   }
+  return credentials;
 }
 
 /**
