@@ -376,7 +376,11 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     // Find the matching credential from the credential ID
     const cred = await Credentials.findById(credential.id);
     if (!cred) {
-      throw new Error('Matching credential not found on the server. Try signing in with a password.');
+      delete req.session.challenge;
+
+      console.error(e);
+      const message = 'Matching credential not found. Try signing in with a password.';
+      return res.status(404).json({ error: message });
     }
 
     // Find the matching user from the user ID contained in the credential.
