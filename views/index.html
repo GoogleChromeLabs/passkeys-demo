@@ -67,8 +67,7 @@
       if (window.PublicKeyCredential) {
         try {
           const capabilities = await PublicKeyCredential.getClientCapabilities();
-          if (capabilities.passkeyPlatformAuthenticator &&
-              capabilities.conditionalGet) {
+          if (capabilities.conditionalGet) {
             // If a conditional UI is supported, invoke the conditional `authenticate()` immediately.
             const user = await authenticate(true);
             if (user) {
