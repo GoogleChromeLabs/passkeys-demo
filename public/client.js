@@ -153,8 +153,11 @@ export async function authenticate(conditional = false) {
       await PublicKeyCredential.signalUnknownCredential({
         rpId: options.rpId,
         credentialId: credential.id,
+      }).then(() => {
+        console.info('The passkey associated with the credential not found has been signaled to the password manager.');
+      }).catch(e => {
+        console.error(e.message);
       });
-      console.info('The passkey associated with the credential not found has been signaled to the password manager.');
     }
     throw e;
   }
@@ -195,8 +198,11 @@ export async function getAllCredentials() {
       rpId: metadata.rpId,
       userId: metadata.userId, // base64url encoded user ID
       allAcceptedCredentialIds: credentialIds
+    }).then(() => {
+      console.info('Passkeys list have been signaled to the password manager.');
+    }).catch(e => {
+      console.error(e.message);
     });
-    console.info('Passkeys list have been signaled to the password manager.');
   }
   return credentials;
 }
@@ -214,7 +220,15 @@ export async function updateCurrentUserDetails(rpId, userId, name, displayName) 
   metadata.rpId = rpId;
   metadata.userId = userId;
   if (PublicKeyCredential.signalCurrentUserDetails) {
-    await PublicKeyCredential.signalCurrentUserDetails({ rpId, userId, name, displayName, });
-    console.info('User info attached to passkeys have been signaled to the password manager.');
+    await PublicKeyCredential.signalCurrentUserDetails({
+      rpId,
+      userId,
+      name,
+      displayName,
+    }).then(() => {
+      console.info('User info attached to passkeys have been signaled to the password manager.');
+    }).catch(e => {
+      console.error(e.message);
+    });
   }
 }
