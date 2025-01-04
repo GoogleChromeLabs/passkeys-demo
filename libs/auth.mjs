@@ -26,6 +26,7 @@ import {
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Users, Credentials } from './db.mjs';
 import aaguids from 'aaguid' with { type: 'json' };
+import { register } from 'module';
 
 router.use(express.json());
 
@@ -297,8 +298,11 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     }
 
     const {
-      credentialPublicKey,
-      credentialID,
+      publicKey: credentialPublicKey,
+      id: credentialID,
+    } = registrationInfo.credential;
+
+    const {
       aaguid = '00000000-0000-0000-0000-000000000000', 
       credentialDeviceType,
     } = registrationInfo;
@@ -366,7 +370,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
  */
 router.post('/signinResponse', csrfCheck, async (req, res) => {
   // Set expected values.
-  const credential = req.body;
+  const response = req.body;
   const expectedChallenge = req.session.challenge;
   const expectedOrigin = getOrigin(req.get('User-Agent'));
   const expectedRPID = process.env.HOSTNAME;
@@ -374,7 +378,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   try {
 
     // Find the matching credential from the credential ID
-    const cred = await Credentials.findById(credential.id);
+    const cred = await Credentials.findById(response.id);
     if (!cred) {
       delete req.session.challenge;
 
@@ -390,19 +394,19 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     }
 
     // Decode ArrayBuffers and construct an authenticator object.
-    const authenticator = {
-      credentialID: cred.id,
-      credentialPublicKey: isoBase64URL.toBuffer(cred.publicKey),
+    const credential = {
+      id: cred.id,
+      publicKey: isoBase64URL.toBuffer(cred.publicKey),
       transports: cred.transports,
     };
 
     // Use SimpleWebAuthn's handy function to verify the authentication request.
     const verification = await verifyAuthenticationResponse({
-      response: credential,
+      response,
       expectedChallenge,
       expectedOrigin,
       expectedRPID,
-      authenticator,
+      credential,
       requireUserVerification: false,
     });
 
