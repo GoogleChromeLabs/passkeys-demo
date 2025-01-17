@@ -14,6 +14,7 @@
 runtime: nodejs20
 env_variables:
   NODE_ENV: production
+  SESSION_SECRET: 'set your own secret'
 handlers:
 - url: /.*
   secure: always

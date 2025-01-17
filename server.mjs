@@ -24,9 +24,13 @@ import session from 'express-session';
 import hbs from 'express-handlebars';
 const app = express();
 import useragent from 'express-useragent';
-import { getFirestore } from 'firebase-admin/firestore';
 import { FirestoreStore } from '@google-cloud/connect-firestore';
+import { config, store } from './config.js';
 import { auth } from './libs/auth.mjs';
+
+const is_localhost = process.env.NODE_ENV === 'localhost';
+const title = config.rp_name;
+const project_name = config.project_name;
 
 const views = path.join(__dirname, 'views');
 app.set('view engine', 'html');
@@ -42,32 +46,25 @@ app.use(useragent.express());
 app.use(express.static('public'));
 app.use(express.static('dist'));
 app.use(session({
-  secret: 'secret', // You should specify a real secret here
+  secret: config.secret, 
   resave: true,
   saveUninitialized: false,
   proxy: true,
   store: new FirestoreStore({
-    dataset: getFirestore(),
+    dataset: store,
     kind: 'express-sessions',
   }),
   cookie:{
     path: '/',
     httpOnly: true,
-    secure: process.env.NODE_ENV !== 'localhost',
+    secure: !is_localhost,
     maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
   }
 }));
 
-const RP_NAME = 'Passkeys Demo';
-
 app.use((req, res, next) => {
-  process.env.HOSTNAME = req.hostname;
-  const protocol = process.env.NODE_ENV === 'localhost' ? 'http' : 'https';
-  process.env.ORIGIN = `${protocol}://${req.headers.host}`;
-  process.env.RP_NAME = RP_NAME;
-  req.schema = 'https';
-  res.locals.project_name = process.env.PROJECT_NAME;
-  res.locals.title = process.env.RP_NAME;
+  res.locals.project_name = config.project_name;
+  res.locals.title = config.rp_name;
   res.locals.github_repository = 'https://github.com/GoogleChromeLabs/passkeys-demo';
   return next();
 });
@@ -90,64 +87,57 @@ app.get('/one-button', (req, res) => {
   }
   // If the user is not signed in, show `index.html` with id/password form.
   return res.render('one-button.html', {
-    project_name: process.env.PROJECT_NAME,
-    title: RP_NAME,
+    project_name,
+    title,
   });
 });
 
 app.get('/reauth', (req, res) => {
   const username = req.session.username;
   if (!username) {
-    res.redirect(302, '/');
-    return;
+    return res.redirect(302, '/');
   }
   // Show `reauth.html`.
   // User is supposed to enter a password (which will be ignored)
   // Make XHR POST to `/signin`
-  res.render('reauth.html', {
+  return res.render('reauth.html', {
     username: username,
-    project_name: process.env.PROJECT_NAME,
-    title: RP_NAME,
+    project_name,
+    title,
   });
 });
 
 app.get('/home', (req, res) => {
   if (!req.session.username || req.session['signed-in'] != 'yes') {
     // If user is not signed in, redirect to `/`.
-    res.redirect(307, '/');
-    return;
+    return res.redirect(307, '/');
   }
   // `home.html` shows sign-out link
   return res.render('home.html', {
     displayName: req.session.username,
-    project_name: process.env.PROJECT_NAME,
-    title: RP_NAME,
+    project_name,
+    title,
   });
 });
 
 app.get('/.well-known/assetlinks.json', (req, res) => {
   const assetlinks = [];
-  const relation = [
-    'delegate_permission/common.handle_all_urls',
-    'delegate_permission/common.get_login_creds',
-  ];
-  assetlinks.push({
-    relation: relation,
-    target: {
-      namespace: 'web',
-      site: process.env.ORIGIN,
-    },
-  });
-  if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
-    const package_names = process.env.ANDROID_PACKAGENAME.split(",").map(name => name.trim());
-    const hashes = process.env.ANDROID_SHA256HASH.split(",").map(hash => hash.trim());
-    for (let i = 0; i < package_names.length; i++) {
+  for (let domain of config.associated_domains) {
+    if (domain?.sha256_cert_fingerprints) {
       assetlinks.push({
-        relation: relation,
+        relation: ['delegate_permission/common.get_login_creds'],
         target: {
           namespace: 'android_app',
-          package_name: package_names[i],
-          sha256_cert_fingerprints: [hashes[i]],
+          package_name: domain.package_name,
+          sha256_cert_fingerprints: [ domain.sha256_cert_fingerprints ]
+        },
+      });
+    } else {
+      assetlinks.push({
+        relation: ['delegate_permission/common.get_login_creds'],
+        target: {
+          namespace: 'web',
+          site: domain,
         },
       });
     }
@@ -156,7 +146,7 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
 });
 
 app.get('/.well-known/passkey-endpoints', (req, res) => {
-  const web_endpoint = `${process.env.ORIGIN}/home`;
+  const web_endpoint = `${config.origin}/home`;
   return res.json({ enroll: web_endpoint, manage: web_endpoint });
 });
 

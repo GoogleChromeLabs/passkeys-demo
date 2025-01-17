@@ -14,26 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-// import path from 'path';
-// import url from 'url';
-// import dotenv from 'dotenv';
-import firebaseJson from '../firebase.json' with { type: 'json' };
-// const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-// dotenv.config({ path: path.join(__dirname, ".env") });
-import { getFirestore } from 'firebase-admin/firestore';
-import { initializeApp } from 'firebase-admin/app';
-
-if (process.env.NODE_ENV === 'localhost') {
-  process.env.DOMAIN = 'http://localhost:8080';
-  process.env.GOOGLE_CLOUD_PROJECT = 'passkeys-demo';
-  process.env.FIRESTORE_EMULATOR_HOST = `${firebaseJson.emulators.firestore.host}:${firebaseJson.emulators.firestore.port}`;
-} else if (process.env.NODE_ENV === 'development') {
-  process.env.DOMAIN = 'https://passkeys-demo.appspot.com';
-}
-
-initializeApp();
-const store = getFirestore();
-store.settings({ ignoreUndefinedProperties: true });
+import { store } from '../config.js';
 
 /**
  * User data schema

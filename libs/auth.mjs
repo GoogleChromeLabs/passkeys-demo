@@ -26,7 +26,7 @@ import {
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Users, Credentials } from './db.mjs';
 import aaguids from 'aaguid' with { type: 'json' };
-import { register } from 'module';
+import { config } from '../config.js';
 
 router.use(express.json());
 
@@ -52,43 +52,6 @@ async function sessionCheck(req, res, next) {
   res.locals.user = user;
   next();
 };
-
-/**
- * Get the expected origin that the user agent is claiming to be at. If the
- * requester is Android, construct an expected `origin` parameter.
- * @param { string } userAgent A user agent string used to check if it's a web browser.
- * @returns A string that indicates an expected origin.
- */
-function getOrigin(userAgent) {
-  let origin = process.env.ORIGIN;
-  
-  const appRe = /^[a-zA-z0-9_.]+/;
-  const match = userAgent.match(appRe);
-  if (match) {
-    // Check if UserAgent comes from a supported Android app.
-    if (process.env.ANDROID_PACKAGENAME && process.env.ANDROID_SHA256HASH) {
-      // `process.env.ANDROID_PACKAGENAME` is expected to have a comma separated package names.
-      const package_names = process.env.ANDROID_PACKAGENAME.split(",").map(name => name.trim());
-      // `process.env.ANDROID_SHA256HASH` is expected to have a comma separated hash values.
-      const hashes = process.env.ANDROID_SHA256HASH.split(",").map(hash => hash.trim());
-      const appName = match[0];
-      // Find and construct the expected origin string.
-      for (let i = 0; i < package_names.length; i++) {
-        if (appName === package_names[i]) {
-          // We recognize this app, so use the corresponding hash.
-          const octArray = hashes[i].split(':').map((h) =>
-            parseInt(h, 16),
-          );
-          const androidHash = isoBase64URL.fromBuffer(octArray);
-          origin = `android:apk-key-hash:${androidHash}`;
-          break;
-        }
-      }
-    }
-  }
-  
-  return origin;
-}
 
 router.get('/aaguids', (req, res) => {
   if (Object.keys(aaguids).length === 0) {
@@ -155,7 +118,7 @@ router.post('/password', async (req, res) => {
  */
 router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
   const { user } = res.locals;
-  user.rpId = process.env.HOSTNAME;
+  user.rpId = config.hostname;
   return res.json(user);
 });
 
@@ -246,8 +209,8 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 
     // Use SimpleWebAuthn's handy function to create registration options.
     const options = await generateRegistrationOptions({
-      rpName: process.env.RP_NAME,
-      rpID: process.env.HOSTNAME,
+      rpName: config.rp_name,
+      rpID: config.hostname,
       userID: isoBase64URL.toBuffer(user.id),
       userName: user.username,
       userDisplayName: user.displayName || user.username,
@@ -275,8 +238,8 @@ router.post('/registerRequest', csrfCheck, sessionCheck, async (req, res) => {
 router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   // Set expected values.
   const expectedChallenge = req.session.challenge;
-  const expectedOrigin = getOrigin(req.get('User-Agent'));
-  const expectedRPID = process.env.HOSTNAME;
+  const expectedOrigin = config.associated_origins;
+  const expectedRPID = config.hostname;
   const credential = req.body;
 
   try {
@@ -350,7 +313,7 @@ router.post('/signinRequest', csrfCheck, async (req, res) => {
   try {
     // Use SimpleWebAuthn's handy function to create a new authentication request.
     const options = await generateAuthenticationOptions({
-      rpID: process.env.HOSTNAME,
+      rpID: config.hostname,
       allowCredentials: [],
     });
 
@@ -372,8 +335,8 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   // Set expected values.
   const response = req.body;
   const expectedChallenge = req.session.challenge;
-  const expectedOrigin = getOrigin(req.get('User-Agent'));
-  const expectedRPID = process.env.HOSTNAME;
+  const expectedOrigin = config.associated_origins;
+  const expectedRPID = config.hostname;
 
   try {
 
