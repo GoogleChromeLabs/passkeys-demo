@@ -1,12 +1,17 @@
 # passkeys-demo
 
-passkeys-demo is a demo web application developers can have a look and try themselves to learn how to develop a similar experience.
+**passkeys-demo** is a passkey implementation sample and a demo. You can learn how to build the following passkey experiences:
+* [Passkey autofill suggestions in form fields](https://developers.google.com/identity/passkeys/use-cases#passkey-autofill-suggestions-in-form-fields)
+* ["Sign in with a passkey" button](https://developers.google.com/identity/passkeys/use-cases#sign-in-with-a-passkey-button)
+* [Reauthentication](https://developers.google.com/identity/passkeys/use-cases#reauthentication)
+
+You can also learn through [a codelab](https://goo.gle/passkeys-codelab).
 
 ## How to run locally
 
 ### Prerequisite
 
-* node.js 18
+* node.js 22
 * gcloud
 * java 11+
 
@@ -28,5 +33,5 @@ npm run build
 npm run emulator & npm run dev
 ```
 
-Open [http://localhost:8080](http://localhost:8080).
+Open [http://localhost:8080](http://localhost:8080) in your browser.
 
