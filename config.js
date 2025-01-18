@@ -4,7 +4,7 @@ import { initializeApp } from 'firebase-admin/app';
 
 const is_localhost = process.env.NODE_ENV === 'localhost';
 const env = is_localhost ? 'development' : 'production';
-let hostname, domain, origin, associated_domains = [], associated_origins = [];
+const _config = (await import(`./${env}.config.json`, {with:{type: 'json'}})).default; 
 
 function generateApkKeyHash(fingerprint) {
   const hexString = fingerprint.replace(/:/g, '');
@@ -24,29 +24,12 @@ function generateApkKeyHash(fingerprint) {
   return `android:apk-key-hash:${base64url}`;
 }
 
-if (is_localhost) {
-  hostname = 'localhost';
-  associated_domains = [{
-    package_name: 'com.google.credentialmanager.sample',
-    sha256_cert_fingerprints: '4F:20:47:1F:D9:9A:BA:96:47:8D:59:27:C2:C8:A6:EA:8E:D2:8D:14:C0:B6:A2:39:99:9F:A3:4D:47:3D:FA:11'
-  }, {
-    package_name: 'com.example.android.authentication.shrine',
-    sha256_cert_fingerprints: '4F:20:47:1F:D9:9A:BA:96:47:8D:59:27:C2:C8:A6:EA:8E:D2:8D:14:C0:B6:A2:39:99:9F:A3:4D:47:3D:FA:11'
-  }];
-} else {
-  hostname = 'passkeys-demo.appspot.com';
-  associated_domains = [{
-    package_name: 'com.google.credentialmanager.sample',
-    sha256_cert_fingerprints: '4F:20:47:1F:D9:9A:BA:96:47:8D:59:27:C2:C8:A6:EA:8E:D2:8D:14:C0:B6:A2:39:99:9F:A3:4D:47:3D:FA:11'
-  }, {
-    package_name: 'com.example.android.authentication.shrine',
-    sha256_cert_fingerprints: '4F:20:47:1F:D9:9A:BA:96:47:8D:59:27:C2:C8:A6:EA:8E:D2:8D:14:C0:B6:A2:39:99:9F:A3:4D:47:3D:FA:11'
-  }];
-}
+const { hostname, port, associated_domains = [], secret, rp_name, project_name } = _config;
 
-domain = is_localhost ? `${hostname}:8080` : hostname;
-origin = is_localhost ? `http://${domain}` : `https://${domain}`;
+const domain = port ? `${hostname}:${port}` : hostname;
+const origin = is_localhost ? `http://${domain}` : `https://${domain}`;
 
+const associated_origins = [];
 for (let domain of associated_domains) {
   const associated_origin = generateApkKeyHash(domain.sha256_cert_fingerprints);
   associated_origins.push(associated_origin);
@@ -57,9 +40,9 @@ const config = {
   hostname,
   domain,
   origin,
-  secret: 'set your own secret',
-  rp_name: 'Passkeys Demo',
-  project_name: 'passkeys-demo',
+  secret: 'set your own secret in the config file',
+  rp_name: rp_name || 'Passkeys Demo',
+  project_name: project_name || 'passkeys-demo',
   associated_domains: [
     origin,
     ...associated_domains

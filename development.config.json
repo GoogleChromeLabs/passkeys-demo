@@ -1,0 +1,6 @@
+{
+  "hostname": "localhost",
+  "port": 8080,
+  "rp_name": "Passkeys Demo",
+  "project_name": "passkeys-demo"
+}

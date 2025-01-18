@@ -1,0 +1,12 @@
+{
+  "hostname": "passkeys-demo.appspot.com",
+  "associated_domains": [{
+    "package_name": "com.google.credentialmanager.sample",
+    "sha256_cert_fingerprints": "4F:20:47:1F:D9:9A:BA:96:47:8D:59:27:C2:C8:A6:EA:8E:D2:8D:14:C0:B6:A2:39:99:9F:A3:4D:47:3D:FA:11"
+  }, {
+    "package_name": "com.example.android.authentication.shrine",
+    "sha256_cert_fingerprints": "4F:20:47:1F:D9:9A:BA:96:47:8D:59:27:C2:C8:A6:EA:8E:D2:8D:14:C0:B6:A2:39:99:9F:A3:4D:47:3D:FA:11"
+  }],
+  "rp_name": "Passkeys Demo",
+  "project_name": "passkeys-demo"
+}
