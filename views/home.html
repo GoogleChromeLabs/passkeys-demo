@@ -1,11 +1,11 @@
     <div id="help">
       <div class="help-headline">
-        Home page
+        Manage passkeys
       </div>
       <div class="help-content">
-        In this page, you can edit your display name, create a passkey, and
-        manage your passkeys. Once you create a passkey, sign out and try
-        signing in with the passkey.
+
+        Edit your display name, create a passkey, or manage your passkeys. Once
+        you create your first passkey, sign out and try signing in with it.
 
         ### Display name
 
@@ -13,24 +13,39 @@
         your display name to see how it appears in the account selection of your
         passkey sign-in.
 
+        If the browser and the password manager support the [Signal
+        API](https://developer.chrome.com/docs/identity/webauthn-signal-api),
+        updated display name can be reflected to passkeys stored to the password
+        manager.
+
         ### Create a passkey
 
-        Press **Create a passkey** to create a new passkey. The passkey's name
-        is automatically assigned based on its
-        [AAGUID](https://web.dev/articles/webauthn-aaguid), but you can change
-        it as you want.
+        Press **Create a passkey** to create a new passkey. The passkey is named
+        based on its [AAGUID](https://web.dev/articles/webauthn-aaguid), but you
+        can change it as you want.
 
         ### Manage passkeys
         
         Press the **Edit** button to rename a passkey, or press the **Delete**
         button to remove it.
 
+        If the browser and the password manager support the [Signal
+        API](https://developer.chrome.com/docs/identity/webauthn-signal-api),
+        updated list of passkeys can be reflected to the password manager.
+
         ### Learn more
 
-        Learn how to build this experience at [Create a passkey for passwordless
-        logins](https://web.dev/articles/passkey-registration) and [Server-side
-        passkey
+        Learn how to [Create a passkey for passwordless
+        logins](https://web.dev/articles/passkey-registration) and build
+        [Server-side passkey
         registration](https://developers.google.com/identity/passkeys/developer-guides/server-registration).
+
+        Learn how to use the Signal API at [Keep passkeys consistent with
+        credentials on your server with the Signal API
+        ](https://developer.chrome.com/docs/identity/webauthn-signal-api) and
+        [Determine the passkey provider with
+        AAGUID](https://web.dev/articles/webauthn-aaguid).
+
       </div>
     </div>
     <main class="content center">
