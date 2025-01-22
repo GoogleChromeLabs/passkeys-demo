@@ -129,9 +129,6 @@ export async function authenticate(conditional = false) {
 
   const options = PublicKeyCredential.parseRequestOptionsFromJSON(_options);
 
-  // `allowCredentials` empty array invokes an account selector by discoverable credentials.
-  options.allowCredentials = [];
-
   // Invoke WebAuthn get
   const cred = await navigator.credentials.get({
     publicKey: options,
@@ -146,9 +143,6 @@ export async function authenticate(conditional = false) {
     const result = await post(`/auth/signinResponse`, credential);
     return result;
   } catch (e) {
-    // TODO: Instead of directly returning, watch the result.
-    // TODO: Detect if the credential was not found.
-    // TODO: Send a signal to delete the credential that iwas just created.
     if (e.status === 404 && PublicKeyCredential.signalUnknownCredential) {
       await PublicKeyCredential.signalUnknownCredential({
         rpId: options.rpId,

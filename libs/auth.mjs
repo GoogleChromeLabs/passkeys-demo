@@ -310,11 +310,27 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
  * Start authenticating the user.
  */
 router.post('/signinRequest', csrfCheck, async (req, res) => {
+  const allowCredentials = [];
+
+  if (req.session['signed-in'] && req.session.username) {
+    const user = await Users.findByUsername(req.session.username);
+    if (!user) {
+      return res.status(401).json({ error: 'Signed-in user not found.' });    
+    }
+    const credentials = await Credentials.findByUserId(user.id);
+    for (const cred of credentials) {
+      allowCredentials.push({
+        id: cred.id,
+        type: 'public-key',
+        transports: cred.transports,
+      });
+    }
+  }
   try {
     // Use SimpleWebAuthn's handy function to create a new authentication request.
     const options = await generateAuthenticationOptions({
       rpID: config.hostname,
-      allowCredentials: [],
+      allowCredentials,
     });
 
     // Keep the challenge value in a session.

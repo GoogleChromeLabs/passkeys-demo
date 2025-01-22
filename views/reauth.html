@@ -1,20 +1,53 @@
+    <div id="help">
+      <div class="help-headline">
+        Reauthentication
+      </div>
+      <div class="help-content">
+
+        You are already signed in, but need to be verified. This is requested
+        typically when:
+
+        * The user is about to perform a sensitive action such as purchasing an
+        item, changing the delivery address, adding a new passkey, etc.
+        * A certain duration has passed since the last authentication.
+
+        This is called "reauthentication".
+        
+        ### Reauthentication
+
+        Place your cursor in the password field and you'll notice the autofill
+        dialog contains your passkeys, but ones that are associated with your
+        current account.
+
+        Select a passkey and perform [user
+        verification](https://web.dev/articles/webauthn-user-verification) to
+        sign in.
+
+        ### Learn more
+
+        Learn how to build this experience at [Build your first WebAuthn
+        app](https://developers.google.com/codelabs/webauthn-reauth) and
+        [Server-side passkey
+        authentication](https://developers.google.com/identity/passkeys/developer-guides/server-authentication).
+      </div>
+    </div>
     <main class="content center">
       <h2>Enter a password</h2>
       <form id="form" method="POST" action="/auth/password" class="center">
         <input type="text" name="username" value="{{username}}" class="hidden"/>
         <mdui-text-field
           label="password"
+          id="password"
           type="password"
           name="password"
-          autocomplete="current-password"
-          value="password"
+          autocomplete="current-password webauthn"
           autofocus></mdui-text-field>
         <mdui-button type="submit">Sign-in</mdui-button>
         <p class="instructions">password will be ignored in this demo.</p>
       </form>
     </main>
     <script type="module">
-      import { $, post } from '/client.js';
+      import { $, post, loading, authenticate } from '/client.js';
       
       const form = $('#form');
       form.addEventListener('submit', e => {
@@ -28,4 +61,30 @@
         })
         .catch(e => alert(e));
       });
+
+      // Feature detection: check if WebAuthn and conditional UI are supported.
+      if (window.PublicKeyCredential) {
+        try {
+          const capabilities = await PublicKeyCredential.getClientCapabilities();
+          if (capabilities.conditionalGet) {
+            // If a conditional UI is supported, invoke the conditional `authenticate()` immediately.
+            const user = await authenticate(true);
+            if (user) {
+              // When the user is signed in, redirect to the home page.
+              $('#password').disabled = true;
+              loading.start();
+              location.href = '/home';
+            } else {
+              throw new Error('User not found.');
+            }
+          }
+        } catch (e) {
+          loading.stop();
+          console.error(e.message);
+          // `NotAllowedError` indicates a user cancellation.
+          if (e.name !== 'NotAllowedError') {
+            alert(e.message);
+          }
+        }
+      }
     </script>
