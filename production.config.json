@@ -6,6 +6,9 @@
   }, {
     "package_name": "com.example.android.authentication.shrine",
     "sha256_cert_fingerprints": "4F:20:47:1F:D9:9A:BA:96:47:8D:59:27:C2:C8:A6:EA:8E:D2:8D:14:C0:B6:A2:39:99:9F:A3:4D:47:3D:FA:11"
+  }, {
+    "package_name": "com.google.credentialmanager.webviewsample",
+    "sha256_cert_fingerprints": "ED:A5:A9:D9:44:A5:B0:62:28:BA:81:F0:0E:EC:7A:B6:40:10:AF:0F:61:3B:92:30:9E:2F:11:7D:4F:35:26:F1"
   }],
   "rp_name": "Passkeys Demo",
   "project_name": "passkeys-demo"
