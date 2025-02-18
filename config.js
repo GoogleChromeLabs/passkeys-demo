@@ -40,7 +40,7 @@ const config = {
   hostname,
   domain,
   origin,
-  secret: 'set your own secret in the config file',
+  secret: secret || 'set your own secret in the config file',
   rp_name: rp_name || 'Passkeys Demo',
   project_name: project_name || 'passkeys-demo',
   associated_domains: [

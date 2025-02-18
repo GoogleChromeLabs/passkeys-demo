@@ -355,7 +355,6 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
   const expectedRPID = config.hostname;
 
   try {
-
     // Find the matching credential from the credential ID
     const cred = await Credentials.findById(response.id);
     if (!cred) {
@@ -370,6 +369,10 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
     const user = await Users.findById(cred.user_id);
     if (!user) {
       throw new Error('User not found.');
+    } else if (req.session['signed-in'] === 'yes' &&
+        req.session.username !== user.username) {
+      // If the user is trying to sign in as a different user, fail.
+      throw new Error('Invalid sign-in attempt.');
     }
 
     // Decode ArrayBuffers and construct an authenticator object.
