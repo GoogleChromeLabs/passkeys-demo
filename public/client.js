@@ -76,11 +76,17 @@ const metadata = {
   userId: '',
 };
 
+let controller = new AbortController();
+
 /**
  * Create and register a new passkey
  * @returns A promise that resolves with a server response.
  */
-export async function registerCredential() {
+export async function registerCredential(conditional = false) {
+  // Abort ongoing WebAuthn request
+  controller.abort();
+  controller = new AbortController();
+
   // Fetch passkey creation options from the server.
   const _options = await post('/auth/registerRequest');
 
@@ -96,13 +102,18 @@ export async function registerCredential() {
   // Invoke WebAuthn create
   const cred = await navigator.credentials.create({
     publicKey: options,
+    signal: controller.signal,
+    // Request conditional creation
+    mediation: conditional ? 'conditional' : 'optional'
   });
 
   const credential = cred.toJSON();
 
+  const path = conditional ? '/auth/registerResponse?conditional' : '/auth/registerResponse';
+
   // Send the result to the server and return the promise.
   try {
-    const result = await post('/auth/registerResponse', credential);
+    const result = await post(path, credential);
     return result;
   } catch (e) {
     // Detect if the credential was not found.
@@ -124,6 +135,10 @@ export async function registerCredential() {
  * @returns A promise that resolves with a server response.
  */
 export async function authenticate(conditional = false) {
+  // Abort ongoing WebAuthn request
+  controller.abort();
+  controller = new AbortController();
+
   // Fetch passkey request options from the server.
   const _options = await post('/auth/signinRequest');
 
@@ -132,7 +147,8 @@ export async function authenticate(conditional = false) {
   // Invoke WebAuthn get
   const cred = await navigator.credentials.get({
     publicKey: options,
-    // Request a conditional UI
+    signal: controller.signal,
+    // Request conditional get
     mediation: conditional ? 'conditional' : 'optional'
   });
 
@@ -150,7 +166,7 @@ export async function authenticate(conditional = false) {
       }).then(() => {
         console.info('The passkey associated with the credential not found has been signaled to the password manager.');
       }).catch(e => {
-        console.error(e.message);
+        console.error(e);
       });
     }
     throw e;
@@ -195,7 +211,7 @@ export async function getAllCredentials() {
     }).then(() => {
       console.info('Passkeys list have been signaled to the password manager.');
     }).catch(e => {
-      console.error(e.message);
+      console.error(e);
     });
   }
   return credentials;
@@ -222,7 +238,7 @@ export async function updateCurrentUserDetails(rpId, userId, name, displayName) 
     }).then(() => {
       console.info('User info attached to passkeys have been signaled to the password manager.');
     }).catch(e => {
-      console.error(e.message);
+      console.error(e);
     });
   }
 }

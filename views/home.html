@@ -147,8 +147,8 @@
           loading.stop();
         } catch (e) {
           loading.stop();
-          console.error(e);
           alert(e.message);
+          console.error(e);
         }
       };
 
@@ -247,7 +247,7 @@
           if (e.name === 'InvalidStateError') {
             alert('A passkey already exists for this device.');
           // `NotAllowedError` indicates the user canceled the operation.
-          } else if (e.name === 'NotAllowedError') {
+          } else if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
             return;
           // Show other errors in an alert.
           } else {

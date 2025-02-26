@@ -241,6 +241,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const expectedOrigin = config.associated_origins;
   const expectedRPID = config.hostname;
   const credential = req.body;
+  const conditional = req.query.hasOwnProperty('conditional');
 
   try {
 
@@ -250,6 +251,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       expectedChallenge,
       expectedOrigin,
       expectedRPID,
+      requireUserPresence: !conditional,
       requireUserVerification: false,
     });
 

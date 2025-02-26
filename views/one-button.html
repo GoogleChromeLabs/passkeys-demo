@@ -40,10 +40,10 @@
             }
           } catch (e) {
             loading.stop();
-            console.error(e);
             if (e.name !== 'NotAllowedError') {
               alert(e.message);
             }
+            console.error(e);
           }
         });
       } else {

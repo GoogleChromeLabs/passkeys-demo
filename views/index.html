@@ -65,8 +65,8 @@
           location.href = '/reauth';
         }).catch(e => {
           loading.stop();
-          console.error(e.message);
-          alert(e);
+          console.error(e);
+          alert(e.message);
         });
       });
 
@@ -88,11 +88,11 @@
           }
         } catch (e) {
           loading.stop();
-          console.error(e.message);
           // `NotAllowedError` indicates a user cancellation.
-          if (e.name !== 'NotAllowedError') {
+          if (e.name !== 'NotAllowedError' && e.name !== 'AbortError') {
             alert(e.message);
           }
+          console.error(e);
         }
       }
 
