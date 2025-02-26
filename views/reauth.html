@@ -66,10 +66,13 @@
               try {
                 await registerCredential(true);
               } catch (e) {
-                if (['NotAllowedError', 'AbortError', 'InvalidStateError'].indexOf(e.name) === -1) {
-                  alert(e.message);
+                if (e.name === 'InvalidStateError') {
+                  console.info('A passkey is already registered for the user.');
+                } else if (e.name === 'NotAllowedError') {
+                  console.info("Passkey was not created because the password didn't match the one in the password manager.");
+                } else if (e.name !== 'AbortError') {
+                  console.error(e);
                 }
-                console.error(e);
               }
             }
             location.href = '/home';
