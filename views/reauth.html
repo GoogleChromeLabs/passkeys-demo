@@ -59,6 +59,7 @@
         const form = new FormData(e.target);
         const cred = {};
         form.forEach((v, k) => cred[k] = v);
+        loading.start();
         post(e.target.action, cred)
         .then(async (user) => {
           if (user) {
@@ -83,6 +84,8 @@
         .catch((e) => {
           alert(e)
           console.error(e);
+        }).finally(() => {
+          loading.stop();
         });
       });
 
@@ -93,19 +96,19 @@
           const user = await authenticate(true);
           if (user) {
             // When the user is signed in, redirect to the home page.
-            $('#password').disabled = true;
             loading.start();
             location.href = '/home';
           } else {
             throw new Error('User not found.');
           }
         } catch (e) {
-          loading.stop();
           // `NotAllowedError` indicates a user cancellation.
           if (e.name !== 'NotAllowedError' && e.name !== 'AbortError') {
             alert(e.message);
           }
           console.error(e);
+        } finally {
+          loading.stop();
         }
       }
     </script>

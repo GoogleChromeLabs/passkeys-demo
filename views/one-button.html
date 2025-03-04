@@ -39,11 +39,12 @@
               throw new Error('User not found.');
             }
           } catch (e) {
-            loading.stop();
             if (e.name !== 'NotAllowedError') {
               alert(e.message);
             }
             console.error(e);
+          } finally {
+            loading.stop();
           }
         });
       } else {

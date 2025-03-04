@@ -55,15 +55,15 @@ class Loading {
     this.progress = $('#progress');
   }
   start() {
-    this.progress.value = '';
-    const inputs = document.querySelectorAll('input');
+    this.progress.removeAttribute('value');
+    const inputs = document.querySelectorAll('mdui-text-field');
     if (inputs) {
       inputs.forEach(input => input.disabled = true);
     }
   }
   stop() {
     this.progress.value = 0;
-    const inputs = document.querySelectorAll('input');
+    const inputs = document.querySelectorAll('mdui-text-field');
     if (inputs) {
       inputs.forEach(input => input.disabled = false);
     }

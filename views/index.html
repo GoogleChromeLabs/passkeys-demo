@@ -60,13 +60,15 @@
         const form = new FormData(s.target);
         const cred = {};
         form.forEach((v, k) => cred[k] = v);
+        loading.start();
         post(s.target.action, cred)
         .then(user => {
           location.href = '/reauth';
         }).catch(e => {
-          loading.stop();
           console.error(e);
           alert(e.message);
+        }).finally(() => {
+          loading.stop();
         });
       });
 
@@ -87,12 +89,13 @@
             }
           }
         } catch (e) {
-          loading.stop();
           // `NotAllowedError` indicates a user cancellation.
           if (e.name !== 'NotAllowedError' && e.name !== 'AbortError') {
             alert(e.message);
           }
           console.error(e);
+        } finally {
+          loading.stop();
         }
       }
 
