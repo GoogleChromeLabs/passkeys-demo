@@ -22,6 +22,7 @@
     "express-session": "^1.18.1",
     "express-useragent": "^1.0.15",
     "firebase-admin": "^13.0.2",
+    "helmet": "^8.0.0",
     "lit": "^3.2.1",
     "marked": "^15.0.6",
     "mdui": "^2.1.3",

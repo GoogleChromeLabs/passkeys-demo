@@ -22,6 +22,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 import express from 'express';
 import session from 'express-session';
 import hbs from 'express-handlebars';
+import helmet from 'helmet';
 const app = express();
 import useragent from 'express-useragent';
 import { FirestoreStore } from '@google-cloud/connect-firestore';
@@ -33,6 +34,23 @@ const title = config.rp_name;
 const project_name = config.project_name;
 
 const views = path.join(__dirname, 'views');
+if (!config.is_localhost) {
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          connectSrc: ["'self'", 'data:'],
+          scriptSrc: ["'self'", "'unsafe-inline'", 'https://unpkg.com'],
+          imgSrc: ["'self'", 'data:', 'https://www.gravatar.com', 'https://gravatar.com'],
+          fontSrc: ['https://fonts.gstatic.com'],
+        },
+        // CSP is report-only if the app is running in debug mode.
+        reportOnly: config.debug,
+      },
+    })
+  );
+}
 app.set('view engine', 'html');
 app.engine('html', hbs.engine({
   extname: 'html',

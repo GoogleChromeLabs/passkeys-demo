@@ -38,6 +38,8 @@ for (let domain of associated_domains) {
 const config = {
   env,
   hostname,
+  is_localhost,
+  debug: is_localhost,
   domain,
   origin,
   secret: secret || 'set your own secret in the config file',

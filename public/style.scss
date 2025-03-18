@@ -94,9 +94,9 @@ mdui-navigation-drawer {
   mdui-text-field {
     width: 260px;
   }
-  mwc-list, mdui-list {
+  mdui-list {
     width: 400px;
-    mwc-list-item, mdui-list-item {
+    mdui-list-item {
       .list-item {
         width: 368px;
         display: flex;
@@ -107,7 +107,7 @@ mdui-navigation-drawer {
         .entity-name {
           line-height: var(--mdc-icon-button-size, 48px);
           flex: 1 1 auto;
-          mwc-icon.mini, mdui-button-icon.mini {
+          mdui-button-icon.mini {
             margin: 4px;
             --mdc-icon-size: 16px;
             vertical-align: middle;
