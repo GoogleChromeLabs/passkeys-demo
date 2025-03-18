@@ -125,7 +125,7 @@ export async function registerCredential(conditional = false) {
       });
       console.info('The passkey failed to register has been signaled to the password manager.');
     }
-    throw e;
+    throw new Error(e.error);
   }
 };
 
@@ -169,7 +169,7 @@ export async function authenticate(conditional = false) {
         console.error(e);
       });
     }
-    throw e;
+    throw new Error(e.error);
   }
 };
 

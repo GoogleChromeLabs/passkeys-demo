@@ -364,7 +364,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
       const message = 'Matching credential not found. Try signing in with a password.';
       console.error(message);
-      return res.status(404).json({ message });
+      return res.status(404).json({ error: message });
     }
 
     // Find the matching user from the user ID contained in the credential.

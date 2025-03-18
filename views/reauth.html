@@ -80,11 +80,9 @@
           } else {
             throw new Error('User not found.');
           }
-        })
-        .catch((e) => {
-          alert(e)
+        }).catch((e) => {
+          alert(e.error)
           console.error(e);
-        }).finally(() => {
           loading.stop();
         });
       });
@@ -106,9 +104,10 @@
           if (e.name !== 'NotAllowedError' && e.name !== 'AbortError') {
             alert(e.message);
           }
+          if (e.name !== 'AbortError') {
+            loading.stop();
+          }
           console.error(e);
-        } finally {
-          loading.stop();
         }
       }
     </script>

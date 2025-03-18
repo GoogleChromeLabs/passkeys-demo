@@ -66,8 +66,7 @@
           location.href = '/reauth';
         }).catch(e => {
           console.error(e);
-          alert(e.message);
-        }).finally(() => {
+          alert(e.error);
           loading.stop();
         });
       });
@@ -94,7 +93,6 @@
             alert(e.message);
           }
           console.error(e);
-        } finally {
           loading.stop();
         }
       }

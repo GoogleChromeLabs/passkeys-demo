@@ -111,7 +111,7 @@
               icon="edit"
               slot="end-icon"></mdui-button-icon>
           </mdui-list-item>
-        <mwc-list>`, $('#display-name'));
+        <mdui-list>`, $('#display-name'));
         await updateCurrentUserDetails(res.rpId, res.id, res.username, res.displayName);
       };
 
@@ -203,10 +203,7 @@
           }
           return html`
           <mdui-list-item nonclickable>
-            ${cred.aaguid && cred.aaguid !== '00000000-0000-0000-0000-000000000000'
-            ?html`
-            <mdui-icon slot="icon" nonclickable src="${aaguids[cred.aaguid].icon_light}"></mdui-icon>
-            `:''}
+            <mdui-icon slot="icon" nonclickable src="${aaguids[cred.aaguid]?.icon_light || '/favicon.svg'}"></mdui-icon>
             ${cred.name || 'Unnamed' }
             <div slot="description">${createdStr}${lastUsedStr}</div>
             <div class="buttons" slot="end-icon">
