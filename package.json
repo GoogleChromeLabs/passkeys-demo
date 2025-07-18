@@ -19,7 +19,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-handlebars": "^8.0.1",
-    "express-session": "^1.18.1",
+    "express-session": "^1.18.2",
     "express-useragent": "^1.0.15",
     "firebase-admin": "^13.0.2",
     "lit": "^3.2.1",
