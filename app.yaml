@@ -16,7 +16,7 @@ env_variables:
   NODE_ENV: production
   SESSION_SECRET: 'set your own secret'
 handlers:
-- url: /.*
+- url: 
   secure: always
-  redirect_http_response_code: 301
+  redirect_http_response_code: 200
   script: auto
