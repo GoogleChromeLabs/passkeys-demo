@@ -65,7 +65,7 @@ router.get('/aaguids', (req, res) => {
  * Set a `username` in the session.
  **/
 router.post('/username', async (req, res) => {
-  const { username } = req.body;
+  const { username } = req.body ?? {};
 
   try {
      // Only check username, no need to check password as this is a mock
@@ -100,7 +100,7 @@ router.post('/username', async (req, res) => {
  * This only checks if `username` is not empty string and ignores the password.
  **/
 router.post('/password', async (req, res) => {
-  if (!req.body.password) {
+  if (!req.body?.password) {
     return res.status(401).json({ error: 'Enter at least one random letter.' });
   }
   const user = await Users.findByUsername(req.session.username);
@@ -126,7 +126,7 @@ router.post('/userinfo', csrfCheck, sessionCheck, (req, res) => {
  * Update the user's display name.
  */
 router.post('/updateDisplayName', csrfCheck, sessionCheck, async (req, res) => {
-  const { newName } = req.body;
+  const { newName } = req.body ?? {};
   if (newName) {
     const { user } = res.locals;
     user.displayName = newName;
@@ -160,7 +160,7 @@ router.post('/getKeys', csrfCheck, sessionCheck, async (req, res) => {
  * Update the name of a passkey.
  */
 router.post('/renameKey', csrfCheck, sessionCheck, async (req, res) => {
-  const { credId, newName } = req.body;
+  const { credId, newName } = req.body ?? {};
   const { user } = res.locals;
   const credential = await Credentials.findById(credId);
   if (!user || user.id !== credential?.user_id) {
@@ -241,7 +241,7 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
   const expectedOrigin = config.associated_origins;
   const expectedRPID = config.hostname;
   const credential = req.body;
-  const conditional = req.query.hasOwnProperty('conditional');
+  const conditional = Object.hasOwn(req.query, 'conditional');
 
   try {
 
@@ -370,7 +370,7 @@ router.post('/signinResponse', csrfCheck, async (req, res) => {
 
   try {
     // Find the matching credential from the credential ID
-    const cred = await Credentials.findById(response.id);
+    const cred = await Credentials.findById(response?.id);
     if (!cred) {
       delete req.session.challenge;
 

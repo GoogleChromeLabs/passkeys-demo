@@ -44,7 +44,7 @@ export default {
               implementation: sass,
               webpackImporter: true,
               sassOptions: {
-                includePaths: ['./node_modules'],
+                loadPaths: ['./node_modules'],
               },
             },
           },
