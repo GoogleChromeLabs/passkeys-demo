@@ -24,7 +24,7 @@ import {
   verifyAuthenticationResponse
 } from '@simplewebauthn/server';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
-import { Users, Credentials } from './db.mjs';
+import { CredentialAlreadyExistsError, Users, Credentials } from './db.mjs';
 import aaguids from 'aaguid' with { type: 'json' };
 import { config } from '../config.js';
 
@@ -267,6 +267,18 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
       id: credentialID,
     } = registrationInfo.credential;
 
+    if (!credentialID) {
+      throw new Error('Credential ID is required.');
+    }
+
+    // Per WebAuthn Section 7.1 step 26, reject registration if the credential ID
+    // is already registered to any user (same user or another user) to prevent
+    // credential overwrite and account takeover.
+    const existingCredential = await Credentials.findById(credentialID);
+    if (existingCredential) {
+      throw new CredentialAlreadyExistsError();
+    }
+
     const {
       aaguid = '00000000-0000-0000-0000-000000000000', 
       credentialDeviceType,
@@ -281,8 +293,8 @@ router.post('/registerResponse', csrfCheck, sessionCheck, async (req, res) => {
     const name = (Object.keys(aaguids).length > 0 && aaguids[aaguid]?.name)
                   || req.useragent.platform;
     
-    // Store the registration result.
-    await Credentials.update({
+    // Store the registration result atomically to prevent race-condition overwrites.
+    await Credentials.create({
       id: credentialID,
       publicKey: base64PublicKey,
       name,
